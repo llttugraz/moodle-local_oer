@@ -27,7 +27,7 @@ The base plugin has an endpoint that provides the metadata of all published file
 
 ## Subplugins used by Graz University of Technology
 
-[moodle-oercourseinfo_tugraz](https://github.com/llttugraz/moodle-oercourseinfo_tugraz)
-[moodle-oerclassifcation_oefos](https://github.com/llttugraz/moodle-oerclassification_oefos)
+[moodle-oercourseinfo_tugraz](https://github.com/llttugraz/moodle-oercourseinfo_tugraz)  
+[moodle-oerclassifcation_oefos](https://github.com/llttugraz/moodle-oerclassification_oefos)  
 [moodle-oeruploader_tugraz](https://github.com/llttugraz/moodle-oeruploader_tugraz)
 
