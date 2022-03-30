@@ -181,7 +181,7 @@ class testcourse {
     public function generate_resource(\stdClass $course, \testing_data_generator $generator) {
         $record         = new \stdClass();
         $record->course = $course;
-        $record->files  = $this->generate_file()[1];
+        $record->files  = $this->generate_file();
         return $generator->create_module('resource', $record);
     }
 
