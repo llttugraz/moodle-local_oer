@@ -1,0 +1,151 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oer/coursecard
+
+    Renders a single coursecard
+
+    Example context (json):
+    {
+        "viewurl": "https://moodlesite/course/view.php?id=2",
+        "ignore": true,
+        "iconisimage": false,
+        "icon": "config.wwwroot/theme/image.php/boost/core/1644361882/f/pdf",
+        "title": "abc.pdf",
+        "mimetype": "application/pdf",
+        "timemodified": 0,
+        "timeuploaded": 0
+    }
+}}
+
+<div class="card-deck col-sm-6 col-md-6 col-lg-4 col-xl-3" {{#ignore}}style="opacity: 0.5;"{{/ignore}}>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header container">
+            <div class="row">
+                <div class="col-3">
+                    <div class="d-flex justify-content-start align-items-top my-2">
+                        {{#iconisimage}}
+                            <img class="m-0 img-thumbnail" alt="" aria-hidden="true" style="object-fit: cover; width: 40px; height: 40px;"
+                                 src="data:image/{{icontype}};base64, {{icon}}">
+                        {{/iconisimage}}
+                        {{^iconisimage}}
+                            <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
+                                <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
+                            </div>
+                        {{/iconisimage}}
+                    </div>
+                </div>
+                <div class="col-9 pl-0 pt-1">
+                    <div class="row">
+                        <div class="col-10">
+                            <p class="card-title d-block m-0">
+                                <span title="{{title}}">{{title}}</span>
+                            </p>
+                        </div>
+                        <div class="d-flex float-right mt-2 col-2">
+                            {{> local_oer/file-action-menu }}
+                        </div>
+                    </div>
+                    {{#ignore}}
+                        <div class="row m-0">
+                            <small><i class="icon fa fa-info-circle fa-fw" aria-hidden="true"></i>{{#str}} isignored, local_oer{{/str}}</small>
+                        </div>
+                    {{/ignore}}
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0 d-flex flex-column">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <ul class="list-group">
+                        <li class="list-group-item border-0 p-0">
+                            <div class="text-truncate d-block">
+                                <small>{{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span></small>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0 p-0">
+                            <small>{{#str}} section {{/str}}:
+                                {{#sections}}
+                                    {{sectionname}},
+                                {{/sections}}
+                            </small>
+                        </li>
+                        <li class="list-group-item border-0 p-0">
+                            <small>{{#str}} activity {{/str}}:
+                                {{#modules}}
+                                    <a href="{{moduleurl}}">{{modulename}}</a>,
+                                {{/modules}}
+                            </small>
+                        </li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <h5>{{#str}} readyforupload, local_oer{{/str}}</h5>
+                    <ul class="list-group">
+                        {{^licensecorrect}}
+                            <li class="list-group-item border-0 p-0"><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} selectcc, local_oer{{/str}}</small></li>
+                        {{/licensecorrect}}
+                        {{#licensecorrect}}
+                            <li class="list-group-item border-0 p-0">
+                                <div class="d-block text-truncate"><small>
+                                    <span title="{{license}}">
+                                        {{#pix}}i/valid, core{{/pix}} {{#str}} correctlicense, local_oer, {"license": {{#quote}}{{license}}{{/quote}} } {{/str}}
+                                    </span>
+                                </small>
+                                </div>
+                            </li>
+                        {{/licensecorrect}}
+                        {{#personmissing}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} personmissing, local_oer{{/str}}</small>
+                            </li>
+                        {{/personmissing}}
+                        {{^personmissing}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} persondefined, local_oer{{/str}}</small>
+                            </li>
+                        {{/personmissing}}
+                        {{#contextset}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} contextset, local_oer{{/str}}</small>
+                            </li>
+                        {{/contextset}}
+                        {{^contextset}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} contextnotset, local_oer{{/str}}</small>
+                            </li>
+                        {{/contextset}}
+                        {{#upload}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small>
+                            </li>
+                        {{/upload}}
+                        {{^upload}}
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} notmarkedforupload, local_oer{{/str}}</small>
+                            </li>
+                        {{/upload}}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="card-footer">
+            <div><small><small>{{#str}} lastchange, local_oer{{/str}} {{timemodified}}</small></small></div>
+            <div><small><small>{{#str}} uploaded, local_oer{{/str}} {{timeuploaded}}</small></small></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,7 @@
+{
+  "plugintypes": {
+    "oercourseinfo": "local/oer/metadata",
+    "oeruploader": "local/oer/uploader",
+    "oerclassification": "local/oer/classification"
+  }
+}

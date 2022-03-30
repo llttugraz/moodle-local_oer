@@ -1,0 +1,76 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_myoverview/nav-sort-selector
+
+    Taken from block_myoverview.
+    This template renders sorting dropdown.
+
+    Example context (json):
+    {
+        "title": false,
+        "lastaccessed": true
+    }
+}}
+
+<div id="files-view-{{uniqid}}" class="mb-1 mr-1 d-flex align-items-center">
+    <div class="dropdown">
+        <button id="sortingdropdown" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                aria-label="{{#str}} aria:sortingdropdown, block_myoverview {{/str}}">
+            {{#pix}} t/sort_by {{/pix}}
+            <span class="d-sm-inline-block" data-active-item-text>
+                {{#s_default}}{{#str}} default, local_oer {{/str}}{{/s_default}}
+                {{#s_title_asc}}{{#str}} title_asc, local_oer {{/str}}{{/s_title_asc}}
+                {{#s_title_desc}}{{#str}} title_desc, local_oer {{/str}}{{/s_title_desc}}
+                {{#s_mimetype}}{{#str}} filetype, local_oer {{/str}}{{/s_mimetype}}
+                {{#s_released}}{{#str}} released, local_oer {{/str}}{{/s_released}}
+            </span>
+        </button>
+        <ul id="local_oer-sort-files" class="dropdown-menu" role="menu" data-show-active-item data-skip-active-class="true" aria-labelledby="sortingdropdown">
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-value="s_default" aria-label="{{#str}} aria:default, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#s_default}}aria-current="true"{{/s_default}}>
+                    {{#str}} default, local_oer {{/str}}
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-value="s_title_asc" aria-label="{{#str}} aria:title_asc, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#s_title_asc}}aria-current="true"{{/s_title_asc}}>
+                    {{#str}} title_asc, local_oer {{/str}}
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-value="s_title_desc" aria-label="{{#str}} aria:title_desc, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#s_title_desc}}aria-current="true"{{/s_title_desc}}>
+                    {{#str}} title_desc, local_oer {{/str}}
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-value="s_mimetype" aria-label="{{#str}} aria:filetype, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#s_mimetype}}aria-current="true"{{/s_mimetype}}>
+                    {{#str}} filetype, local_oer {{/str}}
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" data-filter="sort" data-value="s_released" aria-label="{{#str}} aria:released, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#s_released}}aria-current="true"{{/s_released}}>
+                    {{#str}} released, local_oer {{/str}}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

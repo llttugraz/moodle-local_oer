@@ -1,0 +1,124 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oer/nav-grouping-selector
+
+    Taken from block_myoverview.
+    This template renders grouping dropdown.
+
+    Example context (json):
+    {
+        "f_all": true,
+        "f_update": false,
+        "f_norelease": false,
+        "f_ignore": false,
+        "f_noignore": false,
+        "f_deleted": false,
+        "founddeleted": false,
+        "f_section": false,
+        "sections": [
+           "sectionname1",
+           "sectionname2"
+        ]
+    }
+}}
+
+<div id="files-view-{{uniqid}}" class="dropdown mb-1 mr-1">
+    <button id="local_oer_groupingdropdown" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="{{#str}} aria:groupingdropdown, block_myoverview {{/str}}">
+        {{#pix}} i/filter {{/pix}}
+        <span class="d-sm-inline-block" data-active-item-text>
+            {{#f_all}}{{#str}} all, local_oer {{/str}}{{/f_all}}
+            {{#f_upload}}{{#str}} upload, local_oer {{/str}}{{/f_upload}}
+            {{#f_norelease}}{{#str}} upload, local_oer {{/str}}{{/f_norelease}}
+            {{#f_released}}{{#str}} released, local_oer {{/str}}{{/f_released}}
+            {{#f_ignore}}{{#str}} ignore, local_oer {{/str}}{{/f_ignore}}
+            {{#f_noignore}}{{#str}} noignore, local_oer {{/str}}{{/f_noignore}}
+            {{#founddeleted}}
+                {{#f_deleted}}{{#str}} deleted, local_oer {{/str}}{{/f_deleted}}
+            {{/founddeleted}}
+            {{#f_section}}{{#str}} section {{/str}}{{/f_section}}
+        </span>
+    </button>
+    <ul id="local_oer-select-grouping" class="dropdown-menu" role="menu" data-show-active-item data-skip-active-class="true" data-active-item-text
+        aria-labelledby="local_oer_groupingdropdown">
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_all" data-pref="f_all" aria-label="{{#str}} aria:all, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_all}}aria-current="true"{{/f_all}}>
+                {{#str}} all, local_oer {{/str}}
+            </a>
+        </li>
+        <li class="dropdown-divider" role="presentation">
+            <span class="filler">&nbsp;</span>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_upload" data-pref="f_upload" aria-label="{{#str}} aria:upload, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_upload}}aria-current="true"{{/f_upload}}>
+                {{#str}} upload, local_oer {{/str}}
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_norelease" data-pref="f_norelease" aria-label="{{#str}} aria:norelease, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_norelease}}aria-current="true"{{/f_norelease}}>
+                {{#str}} norelease, local_oer {{/str}}
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_released" data-pref="f_released" aria-label="{{#str}} aria:released, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_released}}aria-current="true"{{/f_released}}>
+                {{#str}} released, local_oer {{/str}}
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_ignore" data-pref="f_ignore" aria-label="{{#str}} aria:ignore, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_ignore}}aria-current="true"{{/f_ignore}}>
+                {{#str}} ignore, local_oer {{/str}}
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_noignore" data-pref="f_noignore" aria-label="{{#str}} aria:noignore, local_oer {{/str}}"
+               aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_noignore}}aria-current="true"{{/f_noignore}}>
+                {{#str}} noignore, local_oer {{/str}}
+            </a>
+        </li>
+        {{#founddeleted}}
+            <li>
+                <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_deleted" data-pref="f_deleted" aria-label="{{#str}} aria:deleted, local_oer {{/str}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem" {{#f_deleted}}aria-current="true"{{/f_deleted}}>
+                    {{#str}} deleted, local_oer {{/str}}
+                </a>
+            </li>
+        {{/founddeleted}}
+        <li class="dropdown-divider" role="presentation">
+            <span class="filler">&nbsp;</span>
+        </li>
+        {{#sections}}
+            <li>
+                <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_section" data-filtervalue="{{sectionname}}" data-pref="f_section"
+                   aria-label="Section: {{sectionname}}"
+                   aria-controls="files-view-{{uniqid}}" role="menuitem">
+                    {{sectionname}}
+                </a>
+            </li>
+        {{/sections}}
+    </ul>
+</div>
+<div class="mb-1 mr-auto">
+    <div class="form-group m-0">
+        <input type="search" class="form-control" id="local_oer_searchFilecardsInput" placeholder="{{#str}} searchtitle, local_oer {{/str}}">
+    </div>
+</div>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/oer/db" VERSION="20220316" COMMENT="XMLDB file for Moodle local/oer"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_oer_userlist" COMMENT="Userlist for using oer metadata tools">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="moodle userid"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="allowed or disallowed"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="timestamp"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="unique_pair" TYPE="unique" FIELDS="userid, type" COMMENT="a user can only be one time in allowance or in disallowance list, it is possible that a user is in both lists, because only one list type is active.."/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_oer_log" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle courseid"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Type of log message"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Detailed log message"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="local_oer" SEQUENCE="false" COMMENT="frankenstyle name of plugin"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_oer_courseinfo" COMMENT="Metadata of course">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle courseid"/>
+        <FIELD NAME="coursecode" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Course identifier, moodle shortname, else the external identifier of this course"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Mark entries as deleted when the course courseinfo changes."/>
+        <FIELD NAME="ignored" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Bool, if a course has multiple external courses linked, all except one can be ignored for oer items"/>
+        <FIELD NAME="external_courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If external webservice is used for information, this field can be used to link the unique id of external course"/>
+        <FIELD NAME="external_sourceid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If known, the external predecessor id of this course."/>
+        <FIELD NAME="coursename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The moodle coursename or the external coursename"/>
+        <FIELD NAME="coursename_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="structure" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Type of course (lecture, exercise ...)"/>
+        <FIELD NAME="structure_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General description of course and its topics"/>
+        <FIELD NAME="description_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="objectives" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the main goals of the course"/>
+        <FIELD NAME="objectives_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="organisation" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Whats the name of the organisation the course belongs to."/>
+        <FIELD NAME="organisation_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="ISO 639-1 language code this course uses"/>
+        <FIELD NAME="language_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="lecturer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="List of lecturers of the course, CSV Format: Firstname Lastname"/>
+        <FIELD NAME="lecturer_edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="subplugin" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="base" SEQUENCE="false" COMMENT="Source plugin of this information"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="courseidcoursecode" TYPE="unique" FIELDS="courseid, coursecode"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_oer_files" COMMENT="File metadata">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle courseid"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="File contenthash"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Title of the oer file"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the oer file"/>
+        <FIELD NAME="context" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Educational context"/>
+        <FIELD NAME="license" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="unknown" SEQUENCE="false" COMMENT="License shortname"/>
+        <FIELD NAME="persons" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Authors or Publishers of this file"/>
+        <FIELD NAME="tags" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Tags for this oer file, comma separated"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="2" NOTNULL="true" DEFAULT="de" SEQUENCE="false" COMMENT="Language in ISO-639-1 format (2 characters)"/>
+        <FIELD NAME="resourcetype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="classification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Tags from external classifications, stored as json"/>
+        <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Upload or ignore file"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="unique_entry" TYPE="unique" FIELDS="courseid, contenthash"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="contenthash" TYPE="foreign" FIELDS="contenthash" REFTABLE="files" REFFIELDS="contenthash"/>
+        <KEY NAME="license" TYPE="foreign" FIELDS="license" REFTABLE="license" REFFIELDS="shortname"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_oer_preference" COMMENT="File metadata preferences per course">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle courseid"/>
+        <FIELD NAME="context" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="license" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="persons" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="tags" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="resourcetype" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="classification" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_oer_snapshot" COMMENT="Snapshot of released metadata is stored.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="File contenthash"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="context" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="license" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="persons" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="tags" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="resourcetype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="classification" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="coursemetadata" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Metadata of linked courses added as json object."/>
+        <FIELD NAME="additionaldata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional metadata from subplugins stored as json object."/>
+        <FIELD NAME="releasehash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="SHA256 of metadata to compare if something has changed"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
