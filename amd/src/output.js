@@ -42,7 +42,7 @@ export const showFiles = (init) => {
         oldSearchValue = oldSearchInput.value;
     }
     Templates.render('local_oer/files', output)
-        .then(function (html, js) {
+        .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-overview', html, js);
             let searchInput = document.getElementById('local_oer_searchFilecardsInput');
             if (searchInput !== null) {
@@ -51,7 +51,8 @@ export const showFiles = (init) => {
                 searchInput.value = oldSearchValue;
                 searchInput.focus();
             }
-        }).fail(function (error) {
+            return; // For eslint.
+        }).fail(function(error) {
         window.console.debug(error);
     });
     showPagination();
@@ -74,7 +75,7 @@ export const showForm = (type, title, options) => {
         params: params,
     };
     let form = Fragment.loadFragment('local_oer', 'formdata', context, args);
-    form.done(function () {
+    form.done(function() {
         showFormModal(form, type, title, options);
     });
 };
@@ -86,7 +87,7 @@ const showFormModal = (form, type, title, options) => {
         type: ModalFactory.types.SAVE_CANCEL,
         title: title,
         body: form,
-    }).then(function (modal) {
+    }).then(function(modal) {
         modal.setLarge();
         modal.show();
         switch (type) {
@@ -105,13 +106,14 @@ const showFormModal = (form, type, title, options) => {
                 addInputFieldInputListener('stored', 'tags');
                 break;
         }
-        modal.getRoot().on(ModalEvents.hidden, function () {
+        modal.getRoot().on(ModalEvents.hidden, function() {
             modal.destroy();
         });
-        modal.getRoot().on(ModalEvents.save, function () {
+        modal.getRoot().on(ModalEvents.save, function() {
             saveForm(modal, element, options, type, title);
         });
-    }).catch(function (error) {
+        return; // For eslint.
+    }).catch(function(error) {
         window.console.debug(error);
     });
 };
@@ -125,7 +127,7 @@ const saveForm = (modal, element, options, type, title) => {
     };
     let context = element.dataset.context;
     var formSubmit = Fragment.loadFragment('local_oer', 'formdata', context, saveargs);
-    formSubmit.done(function (response) {
+    formSubmit.done(function(response) {
         if (response.indexOf('<form') !== -1) {
             modal.destroy();
             if (options.hasOwnProperty('preference')) {
@@ -138,16 +140,16 @@ const saveForm = (modal, element, options, type, title) => {
         } else if (type === 'PreferenceForm') {
             prepareFiles(Service.loadFiles());
         }
-    }).catch(function (error) {
+    }).catch(function(error) {
         window.console.debug('Form submission failed', error);
     });
 };
 
 const replaceFileInfo = (promises) => {
-    promises[0].done(function (response) {
+    promises[0].done(function(response) {
         let filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
         let output = JSON.parse(filelist);
-        output.files.forEach(function (file, index) {
+        output.files.forEach(function(file, index) {
             if (file.contenthash === response.file.contenthash) {
                 output.files[index] = response.file;
             }
@@ -164,7 +166,7 @@ const replaceFileInfo = (promises) => {
  * @param {boolean} init
  */
 export const prepareFiles = (promises, init) => {
-    promises[0].done(function (response) {
+    promises[0].done(function(response) {
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(response);
         showFiles(init);
     });
@@ -172,7 +174,7 @@ export const prepareFiles = (promises, init) => {
 
 const addInputFieldInputListener = (prefix, area) => {
     showTags(prefix + area);
-    document.getElementById('id_' + area).addEventListener('keypress', function (e) {
+    document.getElementById('id_' + area).addEventListener('keypress', function(e) {
         if (e.key !== 'Enter') {
             return;
         }
@@ -198,7 +200,7 @@ const addStoredTag = (prefix, tagarea) => {
 };
 
 const addRemoveTagListener = (tagarea) => {
-    document.getElementById('local_oer_' + tagarea + '_tagarea').addEventListener('click', function (e) {
+    document.getElementById('local_oer_' + tagarea + '_tagarea').addEventListener('click', function(e) {
         if (e.target.dataset.name !== tagarea) {
             return;
         }
@@ -208,7 +210,7 @@ const addRemoveTagListener = (tagarea) => {
             let name = e.target.dataset.value;
             let tags = document.querySelector('[name="' + tagarea + '"]').value.split(',');
             let result = [];
-            tags.forEach(function (tag) {
+            tags.forEach(function(tag) {
                 if (tag !== '' && tag !== name) {
                     result.push(tag);
                 }
@@ -224,7 +226,7 @@ const showTags = (tagarea) => {
     let tags = {tags: []};
     if (entries.length > 0) {
         entries = entries.split(',');
-        entries.forEach(function (entry) {
+        entries.forEach(function(entry) {
             tags.tags.push({tagarea: tagarea, tagvalue: entry, tag: entry});
         });
     } else {
@@ -232,9 +234,10 @@ const showTags = (tagarea) => {
     }
 
     Templates.render('local_oer/tags', tags)
-        .then(function (html, js) {
+        .then(function(html, js) {
             Templates.replaceNodeContents('#local_oer_' + tagarea + '_tagarea', html, js);
-        }).fail(function (e) {
+            return; // For eslint.
+        }).fail(function(e) {
             window.console.log(e);
         }
     );
@@ -246,7 +249,7 @@ const initSetPreferenceListener = (modal) => {
         return;
     }
 
-    button.addEventListener("click", function (action) {
+    button.addEventListener("click", function(action) {
         action.preventDefault();
         let options = {
             contenthash: button.dataset.contenthash,
@@ -265,7 +268,7 @@ const initPersonButtonListener = () => {
 
     showPersons();
 
-    button.addEventListener("click", function (action) {
+    button.addEventListener("click", function(action) {
         action.preventDefault();
         showPersonForm();
     });
@@ -274,25 +277,25 @@ const initPersonButtonListener = () => {
 const showPersonForm = () => {
     let context = document.getElementById("local_oer_files_main_area").dataset.context;
     let form = Fragment.loadFragment('local_oer', 'personform', context, []);
-    form.done(function () {
+    form.done(function() {
         let title = Str.get_string('addpersonbtn', 'local_oer');
-        title.done(function (localizedTitle) {
+        title.done(function(localizedTitle) {
             ModalFactory.create({
                 type: ModalFactory.types.SAVE_CANCEL,
                 title: localizedTitle,
                 body: form,
-            }).then(function (modal) {
+            }).then(function(modal) {
                 modal.setSaveButtonText(localizedTitle);
-                modal.getRoot().on(ModalEvents.hidden, function () {
+                modal.getRoot().on(ModalEvents.hidden, function() {
                     modal.destroy();
                 });
-                modal.getRoot().on(ModalEvents.save, function () {
+                modal.getRoot().on(ModalEvents.save, function() {
                     let formData = modal.getRoot().find('form').serialize();
                     let fields = formData.split('&');
                     let role = '';
                     let firstname = '';
                     let lastname = '';
-                    fields.forEach(function (field) {
+                    fields.forEach(function(field) {
                         let pair = field.split('=');
                         let key = pair[0];
                         let value = pair[1];
@@ -317,7 +320,8 @@ const showPersonForm = () => {
 
                 });
                 modal.show();
-            }).catch(function (error) {
+                return; // For eslint.
+            }).catch(function(error) {
                 window.console.debug(error);
             });
         });
@@ -329,7 +333,7 @@ const addPerson = (person) => {
     if (names !== '') {
         names = JSON.parse(names);
         let found = false;
-        names.persons.forEach(function (storedname) {
+        names.persons.forEach(function(storedname) {
             if (person.role === storedname.role
                 && person.firstname === storedname.firstname
                 && person.lastname === storedname.lastname) {
@@ -353,7 +357,7 @@ const removePerson = (person) => {
     }
     entries = JSON.parse(entries);
     let persons = {persons: []};
-    entries.persons.forEach(function (storedperson) {
+    entries.persons.forEach(function(storedperson) {
         if (person.role === storedperson.role
             && person.firstname === storedperson.firstname
             && person.lastname === storedperson.lastname) {
@@ -381,10 +385,10 @@ const showPersons = () => {
             component: 'local_oer',
         }
     ];
-    Str.get_strings(strings).then(function (results) {
+    Str.get_strings(strings).then(function(results) {
         entries = JSON.parse(entries);
         let persons = {persons: []};
-        entries.persons.forEach(function (person) {
+        entries.persons.forEach(function(person) {
             let localizedrole = results[0];
             switch (person.role) {
                 case 'Author':
@@ -403,13 +407,18 @@ const showPersons = () => {
             });
         });
         Templates.render('local_oer/persons', persons)
-            .then(function (html, js) {
+            .then(function(html, js) {
                 Templates.replaceNodeContents('#local_oer_storedperson_tagarea', html, js);
-            }).fail(function (e) {
+                return; // For eslint.
+            }).fail(function(e) {
                 window.console.log(e);
             }
         );
-    });
+        return; // For eslint.
+    }).fail(function(e) {
+            window.console.debug(e);
+        }
+    );
 };
 
 const showPagination = () => {
@@ -489,10 +498,11 @@ const showPagination = () => {
         filemax: filemax
     };
     Templates.render('local_oer/pagination', data)
-        .then(function (html, js) {
+        .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-pagination', html, js);
             addPaginationListeners(pages);
-        }).fail(function (error) {
+            return; // For eslint.
+        }).fail(function(error) {
         window.console.debug(error);
     });
 };
@@ -522,7 +532,7 @@ const addPaginationListeners = (pages) => {
     let selectlistener = document.getElementById('local-oer-pagination-select');
     let pagelistener = document.getElementById('local-oer-pagination-pages');
 
-    selectlistener.addEventListener("click", function (action) {
+    selectlistener.addEventListener("click", function(action) {
         action.preventDefault();
         let value = action.target.value;
         localStorage.setItem('local-oer-pagination-selected-' + courseid, value);
@@ -530,7 +540,7 @@ const addPaginationListeners = (pages) => {
         showFiles(false);
     });
 
-    pagelistener.addEventListener("click", function (action) {
+    pagelistener.addEventListener("click", function(action) {
         action.preventDefault();
         let value = action.target.dataset.page;
         if (value === undefined || value === '..') {

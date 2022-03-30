@@ -34,7 +34,7 @@ export const initActionMenuListener = (contenthash) => {
         return;
     }
 
-    menu.addEventListener("click", function (action) {
+    menu.addEventListener("click", function(action) {
         action.preventDefault();
         let type = action.target.dataset.action;
         let ch = action.target.dataset.contenthash;
