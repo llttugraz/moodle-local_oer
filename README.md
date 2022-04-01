@@ -3,7 +3,11 @@
 The Open Educational Resources (OER) plugin provides a graphical user interface (GUI) to release files from courses for public use.
 The first version of the plugin was developed during a project about [open education](https://www.openeducation.at/). It was developed very close to the Graz University of Technology customizations of Moodle. The use for other educational institutions was therefore very limited. 
 
-In this repository a refactored version of the plugin can be found. This version has been developed for a vanilla moodle. Adaptations, which are necessary for the Moodle instance at Graz University of Technology, were moved to subplugins. The base plugin is fully functional without these subplugins.
+In this repository a refactored version of the plugin can be found. This version has been developed for Moodles Boost theme. Adaptations, which are necessary for the Moodle instance at Graz University of Technology, were moved to subplugins. The base plugin is fully functional without these subplugins.
+
+# Requirements
+
+* [Moodle 3.9+](https://download.moodle.org/releases/latest/)
 
 # Setup
 
@@ -27,6 +31,15 @@ The metadata of released files is stored in an extra snapshot table. A snapshot 
 A task is running regularly and create snapshots of files marked for release. The release cycle can be configured in settings (see `local_oer | next_upload_window`). Predefined values can be selected (like Daily, Monthly etc..) or a custom setting is made (like 15.02;10.07 - this will then run every year on the given dates).
 
 When the pull service is active the newest releases can be requested on `https://*yourmoodledomain*/local/oer/public_metadata.php`. It also includes links to the files.
+
+# Views
+
+* GUI to edit and release files per course: `{yourmoodledomain}/local/oer/views/main.php?id={courseid}` - Can be found in every course in the course settings.
+* Maintain (dis)allowance of use: `{yourmoodledomain}/local/oer/views/manage.php` - Can be found in the administration settings
+* Releases: `{yourmoodledomain}/local/oer/views/releasehistory.php` - Can be found in the administration settings
+* Logs and errors: `{yourmoodledomain}/local/oer/views/log.php` - Can be found in the administration settings
+* Settings: `{yourmoodledomain}/admin/settings.php?section=local_oer` - Can be found in the administration settings
+* Time settings: `{yourmoodledomain}/local/oer/views/time_config.php` - Can be found in the administration settings
  
 # Metadata
 
