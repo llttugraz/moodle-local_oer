@@ -21,11 +21,80 @@ After installation of the plugin, there are several settings that can be made:
 * List of installed subplugins. Enable or disable them. If a subplugin has settings, a settings link will be shown.
 
 # Release snapshots
- TODO
+
+The metadata of released files is stored in an extra snapshot table. A snapshot contains all metadata the file had on the release. When the metadata changes a new release will be created. Old releases remain in the table and can be seen as release history on `https://*yourmoodledomain*/local/oer/views/releasehistory.php` (WIP - current release only shows courses with amount of files)
+
+A task is running regularly and create snapshots of files marked for release. The release cycle can be configured in settings (see `local_oer | next_upload_window`). Predefined values can be selected (like Daily, Monthly etc..) or a custom setting is made (like 15.02;10.07 - this will then run every year on the given dates).
+
+When the pull service is active the newest releases can be requested on `https://*yourmoodledomain*/local/oer/public_metadata.php`. It also includes links to the files.
  
 # Metadata
 
-TODO
+JSON Format:
+
+```
+  "moodlecourses": [
+    {
+      "files": [
+        {
+          "title": "Title of file",
+          "fileurl": "Link to fileresource in moodle instance",
+          "abstract": "Description of file",
+          "license": {
+            "shortname": "CC BY 4.0",
+            "fullname": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+            "source": "https://creativecommons.org/licenses/by/4.0/"
+          },
+          "context": "Higher Education",
+          "resourcetype": "No selection",
+          "language": "de",
+          "persons": [
+            {
+              "role": "Author",
+              "lastname": "Ortner",
+              "firstname": "Christian"
+            }
+          ],
+          "tags": [
+            "Nice",
+            "Example"
+          ],
+          "mimetype": "application/pdf",
+          "filesize": "123456",
+          "filecreationtime": "1648812703",
+          "timereleased": "1648812704",
+          "classification": [
+            {
+              "type": "oefos",
+              "url": "https://www.data.gv.at/katalog/dataset/stat_ofos-2012",
+              "values": [
+                {
+                  "identifier": "503008",
+                  "name": "E-learning"
+                }
+              ]
+            }
+          ],
+          "courses": [
+            {
+              "identifier": "moodlecourse",
+              "courseid": "2",
+              "sourceid": "",
+              "coursename": "OER JSON Example",
+              "structure": "Lecture",
+              "description": "Learn about the JSON structure of the metadata",
+              "objective": "",
+              "organisation": "Educational Technologies",
+              "courselanguage": "en",
+              "lecturer": "Christian Ortner"
+            }
+          ] // Coursemetadata per file
+        }
+      ] // Files
+    }
+  ] // Moodle course
+}
+```
 
 # Subplugin types
 
