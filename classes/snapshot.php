@@ -84,6 +84,7 @@ class snapshot {
         global $DB;
         $files = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid, 'contenthash' => $contenthash],
                                   'timecreated DESC');
+        // TODO.
     }
 
     /**
@@ -143,13 +144,15 @@ class snapshot {
         $snapshot                 = new \stdClass();
         $snapshot->courseid       = $this->courseid;
         $snapshot->contenthash    = $fileinfo->contenthash;
+        $snapshot->title          = $fileinfo->title;
+        $snapshot->description    = $fileinfo->description;
         $snapshot->context        = $fileinfo->context;
-        $snapshot->language       = $fileinfo->language;
-        $snapshot->persons        = $fileinfo->persons;
-        $snapshot->resourcetype   = $fileinfo->resourcetype;
-        $snapshot->tags           = $fileinfo->tags;
-        $snapshot->classification = $fileinfo->classification;
         $snapshot->license        = $fileinfo->license;
+        $snapshot->persons        = $fileinfo->persons;
+        $snapshot->tags           = $fileinfo->tags;
+        $snapshot->language       = $fileinfo->language;
+        $snapshot->resourcetype   = $fileinfo->resourcetype;
+        $snapshot->classification = $fileinfo->classification;
         $snapshot->coursemetadata = json_encode($courseinfo);
         $snapshot->additionaldata = $this->add_external_metadata();
         $hash                     = hash('sha256', json_encode($snapshot));
