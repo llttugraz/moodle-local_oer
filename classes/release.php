@@ -126,9 +126,10 @@ class release {
         $coursecontext = \context_course::instance($this->courseid);
         $metadata      = [
                 'title'            => $fileinfo->title,
+                'contenthash'      => $fileinfo->contenthash,
                 'fileurl'          => $CFG->wwwroot . '/pluginfile.php/' .
                                       $coursecontext->id . '/local_oer/public/' .
-                                      $fileinfo->id . '/releasedfile',
+                                      $fileinfo->id . '/' . $fileinfo->contenthash,
                 'abstract'         => $fileinfo->description ?? '',
                 'license'          => $fulllicense,
                 'context'          => $contexts[$fileinfo->context],
