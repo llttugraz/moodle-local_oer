@@ -46,11 +46,13 @@ When the pull service is active the newest releases can be requested on `https:/
 JSON Format:
 
 ```
+  "applicationprofile": "v1.0.0",
   "moodlecourses": [
     {
       "files": [
         {
           "title": "Title of file",
+          "contenthash": "The contenthash of the file as calculated from moodle",
           "fileurl": "Link to fileresource in moodle instance",
           "abstract": "Description of file",
           "license": {
