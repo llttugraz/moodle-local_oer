@@ -96,15 +96,20 @@ class courseinfo {
     public function generate_metadata(int $courseid): array {
         global $DB, $CFG;
         $course   = get_course($courseid);
-        $sql      = 'SELECT u.id, u.firstname, u.lastname FROM {user} u
+        $allnames = get_all_user_name_fields();
+        foreach ($allnames as $key => $name) {
+            $allnames[$key] = 'u.' . $name;
+        }
+        $sqlallnames = implode(',', $allnames);
+        $sql         = 'SELECT DISTINCT(u.id),' . $sqlallnames . ' FROM {user} u
                     JOIN {user_enrolments} ue ON ue.userid = u.id
                     JOIN {enrol} e ON e.id = ue.enrolid
                     JOIN {context} ctx ON ctx.instanceid = e.courseid
                     JOIN {role_assignments} ra ON ra.contextid = ctx.id AND ra.userid = u.id
                     WHERE ra.roleid = 3 AND e.status = 0 AND e.courseid = :courseid
                     AND ue.status = 0 AND ctx.contextlevel = 50';
-        $users    = $DB->get_records_sql($sql, ['courseid' => $courseid]);
-        $teachers = [];
+        $users       = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+        $teachers    = [];
         foreach ($users as $user) {
             $teachers[] = fullname($user);
         }
