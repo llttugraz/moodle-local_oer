@@ -35,7 +35,7 @@ jobs:
         database: [pgsql, mariadb]
         exclude:
         # Moodle 3.9 does not support PHP 8.0
-        - pgp: '8.0'
+        - php: '8.0'
           moodle-branch: 'MOODLE_39_STABLE'
 
     steps:
