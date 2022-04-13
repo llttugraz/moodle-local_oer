@@ -345,3 +345,4 @@ $string['prefresetbtn']                                    = 'Reset';
 $string['addpersonbtn']                                    = 'Add person';
 $string['amount']                                          = 'Files per page';
 $string['filecount']                                       = 'files are shown';
+$string['uploadignoreerror']                               = 'Mark for release and ignore cannot be set at the same time!';

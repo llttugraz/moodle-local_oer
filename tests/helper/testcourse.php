@@ -218,4 +218,28 @@ class testcourse {
         $file       = $fs->create_file_from_string($filerecord, $content);
         return $draftid;
     }
+
+    /**
+     * Returns the contenthash of the first found
+     *
+     * @param \stdClass $course Course object of Moodle test data generator.
+     * @return null
+     * @throws \dml_exception
+     */
+    public function get_contenthash_of_first_found_file($course) {
+        global $DB;
+        $module   = $DB->get_record('modules', ['name' => 'resource']);
+        $cms      = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id]);
+        $resource = reset($cms);
+        $context  = \context_module::instance($resource->id);
+        // There is also a dot entry. So there are at least two records.
+        $files       = $DB->get_records('files', ['contextid' => $context->id]);
+        $contenthash = null;
+        foreach ($files as $file) {
+            if ($file->filename != '.') {
+                $contenthash = $file->contenthash;
+            }
+        }
+        return $contenthash;
+    }
 }

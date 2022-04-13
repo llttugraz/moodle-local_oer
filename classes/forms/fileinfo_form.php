@@ -57,6 +57,7 @@ class fileinfo_form extends \moodleform {
         $mform->setType('contenthash', PARAM_ALPHANUM);
 
         $mform->addElement('text', 'title', get_string('title', 'local_oer'), 'wrap="virtual"');
+        $mform->setType('title', PARAM_TEXT);
         $mform->addRule('title', get_string('required'), 'required', '', 'client');
         $mform->addRule('title', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('title', 'title', 'local_oer');
@@ -158,6 +159,7 @@ class fileinfo_form extends \moodleform {
 
         $mform->addElement('html', '<hr>');
         $mform->addElement('hidden', 'storedperson', '');
+        $mform->setType('storedperson', PARAM_TEXT);
         $mform->addElement('static', 'storedperson_tagarea', '', '<div id="local_oer_storedperson_tagarea"></div>');
 
         global $OUTPUT;
@@ -167,9 +169,11 @@ class fileinfo_form extends \moodleform {
         $mform->addElement('html', '<hr>');
 
         $mform->addElement('hidden', 'storedtags', '');
+        $mform->setType('storedtags', PARAM_TEXT);
         $mform->addElement('static', 'storedtags_tagarea', '', '<div id="local_oer_storedtags_tagarea"></div>');
         $mform->addElement('text', 'tags', get_string('tags', 'local_oer'));
         $mform->addRule('tags', get_string('pressenter', 'local_oer'), 'maxlength', 0, 'client');
+        $mform->setType('tags', PARAM_TEXT);
         $mform->addHelpButton('tags', 'tags', 'local_oer');
         $mform->addElement('html', '<hr>');
 
@@ -220,20 +224,23 @@ class fileinfo_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = [];
-        if ($data['upload'] == 1 && $data['ignore'] == 1) {
+        if (isset($data['upload']) && isset($data['ignore']) && $data['upload'] == 1 && $data['ignore'] == 1) {
             $errors['ignore'] = get_string('uploadignoreerror', 'local_oer');
         }
-        if ($data['upload'] == 1 && !license::test_license_correct_for_upload($data['license'])) {
-            $errors['upload']  = get_string('error_upload_license', 'local_oer');
-            $errors['license'] = get_string('error_license', 'local_oer');
-        }
 
-        $persons = json_decode($data['storedperson']);
-        if ($data['upload'] == 1 && empty($persons->persons)) {
-            $errors['upload'] = get_string('error_upload_author', 'local_oer');
-        }
-        if ($data['upload'] == 1 && $data['context'] < 1) {
-            $errors['context'] = get_string('error_upload_context', 'local_oer');
+        if (isset($data['upload'])) {
+            if ($data['upload'] == 1 && !license::test_license_correct_for_upload($data['license'])) {
+                $errors['upload']  = get_string('error_upload_license', 'local_oer');
+                $errors['license'] = get_string('error_license', 'local_oer');
+            }
+
+            $persons = json_decode($data['storedperson']);
+            if ($data['upload'] == 1 && empty($persons->persons)) {
+                $errors['upload'] = get_string('error_upload_author', 'local_oer');
+            }
+            if ($data['upload'] == 1 && $data['context'] < 1) {
+                $errors['context'] = get_string('error_upload_context', 'local_oer');
+            }
         }
         if (empty($data['title'])) {
             $errors['title'] = get_string('required');
@@ -339,7 +346,9 @@ class fileinfo_form extends \moodleform {
         $result         = [];
         foreach ($classification as $plugin => $fullname) {
             $frankenstyle = 'oerclassification_' . $plugin;
-            if (isset($fromform[$frankenstyle])) {
+            // The autocomplete field submits a string when no selection has been made. Make sure this string is not stored.
+            // TODO: Is this intended behaviour or am i missing here something?
+            if (isset($fromform[$frankenstyle]) && $fromform[$frankenstyle] != '_qf__force_multiselect_submission') {
                 $result[$plugin] = $fromform[$frankenstyle];
             } else {
                 unset($result[$plugin]);
