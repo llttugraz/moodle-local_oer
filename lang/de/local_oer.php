@@ -363,3 +363,6 @@ $string['prefresetbtn']                                    = 'Zurücksetzen';
 $string['addpersonbtn']                                    = 'Person hinzufügen';
 $string['amount']                                          = 'Dateien pro Seite';
 $string['filecount']                                       = 'Dateien werden angezeigt';
+$string['uploadignoreerror']                               = 'Zur Freigabe markieren und Ignorieren können nicht ' .
+                                                             'gleichzeitig eingeschaltet sein!';
+
