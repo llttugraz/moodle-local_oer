@@ -348,7 +348,7 @@ $string['filecount']                                       = 'files are shown';
 $string['uploadignoreerror']                               = 'Mark for release and ignore cannot be set at the same time!';
 $string['requiredfields']                                  = 'Required fields';
 $string['requiredfields_desc']                             = 'Select the formular fields that are required for metadata/release.' .
-                                                             '`Title`, `Person(s)` and `License` are always required and ' .
+                                                             'Title, Person(s) and License are always required and ' .
                                                              'are not shown here.';
 $string['error_upload_resourcetype']                       = 'A resource has to be selected for release.';
 $string['error_upload_classification']                     = 'At least one value is necessary for release.';

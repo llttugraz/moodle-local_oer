@@ -367,7 +367,7 @@ $string['uploadignoreerror']                               = 'Zur Freigabe marki
                                                              'gleichzeitig eingeschaltet sein!';
 $string['requiredfields']                                  = 'Notwendige Felder';
 $string['requiredfields_desc']                             = 'Für das Release benötigte Metadaten/Formularfelder auswählen. ' .
-                                                             '`Titel`, `Person(en)` und `Lizenz` werden immer benötigt und ' .
+                                                             'Titel, Person(en) und Lizenz werden immer benötigt und ' .
                                                              'sind hier nicht extra angeführt';
 $string['error_upload_resourcetype']                       = 'Eine Ressource muss für die Veröffentlichung ausgewählt werden.';
 $string['error_upload_classification']                     = 'Mindestens ein Element muss für die Veröffentlichung ' .
