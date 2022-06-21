@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\helper\license;
+use local_oer\helper\requirements;
 
 /**
  * Class filelist
@@ -170,10 +171,10 @@ class filelist {
     public static function get_simple_filelist(int $courseid, string $contenthash = ''): array {
         global $DB;
         list($icons, $typegroup, $renderer) = self::prepare_file_icon_renderer($courseid);
-        $files             = self::get_course_files($courseid);
-        $list              = [];
-        $sections          = [];
-        $nothumbnail       = count($files) > 20;
+        $files       = self::get_course_files($courseid);
+        $list        = [];
+        $sections    = [];
+        $nothumbnail = count($files) > 20;
 
         foreach ($files as $file) {
             if (!empty($contenthash) && $file[0]['file']->get_contenthash() != $contenthash) {
@@ -198,49 +199,43 @@ class filelist {
                                                                                        $typegroup, $nothumbnail);
             $preference = $DB->get_record('local_oer_preference', ['courseid' => $courseid]);
             $entry      = [
-                    'id'             => 0, // Record does not exist yet.
-                    'contenthash'    => $file[0]['file']->get_contenthash(),
-                    'title'          => $file[0]['file']->get_filename(),
-                    'mimetype'       => $file[0]['file']->get_mimetype(),
-                    'icon'           => $icon,
-                    'icontype'       => $icontype,
-                    'iconisimage'    => $iconisimage,
-                    'timemodified'   => '-',
-                    'timeuploaded'   => '-',
-                    'timeuploadedts' => 0,
-                    'upload'         => 0,
-                    'ignore'         => $preference && $preference->state == 2 ? 1 : 0,
-                    'deleted'        => 0,
-                    'modules'        => $modules,
-                    'sections'       => $filesections,
-                    'licensecorrect' => false,
-                    'license'        => 'Licence not specified',
-                    'personmissing'  => true,
-                    'contextset'     => false,
+                    'id'              => 0, // Record does not exist yet.
+                    'contenthash'     => $file[0]['file']->get_contenthash(),
+                    'title'           => $file[0]['file']->get_filename(),
+                    'mimetype'        => $file[0]['file']->get_mimetype(),
+                    'icon'            => $icon,
+                    'icontype'        => $icontype,
+                    'iconisimage'     => $iconisimage,
+                    'timemodified'    => '-',
+                    'timeuploaded'    => '-',
+                    'timeuploadedts'  => 0,
+                    'upload'          => 0,
+                    'ignore'          => $preference && $preference->state == 2 ? 1 : 0,
+                    'deleted'         => 0,
+                    'modules'         => $modules,
+                    'sections'        => $filesections,
+                    'requirementsmet' => false,
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
             if ($DB->record_exists('local_oer_files',
                                    ['courseid' => $courseid, 'contenthash' => $file[0]['file']->get_contenthash()])) {
-                $record                  = $DB->get_record('local_oer_files',
-                                                           ['courseid'    => $courseid,
-                                                            'contenthash' => $file[0]['file']->get_contenthash()]);
-                $snapshotsql             = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "
-                                           . "courseid = :courseid AND contenthash = :contenthash";
-                $snapshot                = $DB->get_record_sql($snapshotsql,
-                                                               ['courseid'    => $courseid,
-                                                                'contenthash' => $file[0]['file']->get_contenthash()]);
-                $entry['id']             = $record->id;
-                $entry['title']          = $record->title;
-                $entry['timemodified']   = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
-                $entry['timeuploaded']   = !is_null($snapshot->release) ? userdate($snapshot->release) : '-';
-                $entry['timeuploadedts'] = $snapshot->release;
-                $entry['upload']         = $record->state == 1 ? 1 : 0;
-                $entry['ignore']         = $record->state == 2 ? 1 : 0;
-                $entry['licensecorrect'] = license::test_license_correct_for_upload($record->license);
-                $entry['license']        = license::get_license_fullname($record->license);
-                $persons = json_decode($record->persons);
-                $entry['personmissing']  = empty($persons->persons);
-                $entry['contextset']     = $record->context > 0;
+                $record = $DB->get_record('local_oer_files',
+                                          ['courseid'    => $courseid,
+                                           'contenthash' => $file[0]['file']->get_contenthash()]);
+                list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
+                $snapshotsql              = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "
+                                            . "courseid = :courseid AND contenthash = :contenthash";
+                $snapshot                 = $DB->get_record_sql($snapshotsql,
+                                                                ['courseid'    => $courseid,
+                                                                 'contenthash' => $file[0]['file']->get_contenthash()]);
+                $entry['id']              = $record->id;
+                $entry['title']           = $record->title;
+                $entry['timemodified']    = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
+                $entry['timeuploaded']    = !is_null($snapshot->release) ? userdate($snapshot->release) : '-';
+                $entry['timeuploadedts']  = $snapshot->release;
+                $entry['upload']          = $record->state == 1 ? 1 : 0;
+                $entry['ignore']          = $record->state == 2 ? 1 : 0;
+                $entry['requirementsmet'] = $releasable;
             }
             if (!empty($contenthash) && $file[0]['file']->get_contenthash() == $contenthash) {
                 return $entry;
@@ -307,7 +302,7 @@ class filelist {
     private static function select_file_icon_or_thumbnail(\stored_file $file, \core_renderer $renderer, array $icons,
                                                           array        $typegroup, bool $nothumbnail) {
         $mimetype = $file->get_mimetype();
-        if ($typegroup[$mimetype] == 'image' && !$nothumbnail) {
+        if (isset($typegroup[$mimetype]) && $typegroup[$mimetype] == 'image' && !$nothumbnail) {
             $icon        = $file->generate_image_thumbnail(60, 60);
             $icontype    = strpos($icon, "�PNG\r\n") === 0 ? 'png' : 'jpeg';
             $iconisimage = true;

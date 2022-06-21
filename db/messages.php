@@ -25,8 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version      = 2022061500;
-$plugin->requires     = 2020061500;
-$plugin->component    = 'local_oer';
-$plugin->release      = 'v2.1.12';
-$plugin->dependencies = [];
+$messageproviders = [
+    // Notify user with oer edit capability that a file does not met new requirements.
+    'requirementschanged' => [
+            'capability' => 'local/oer:edititems'
+    ],
+];

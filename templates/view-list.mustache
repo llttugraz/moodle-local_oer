@@ -63,47 +63,18 @@
                             {{/ignore}}
                         </p>
                     </div>
-                    <div class="col-2">
-                        <ul class="list-group">
-                            {{^licensecorrect}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} selectcc, local_oer{{/str}}</small></small>
-                                </li>
-                            {{/licensecorrect}}
-                            {{#licensecorrect}}
-                                <li class="list-group-item border-0 p-0">
-                                    <div class="d-block text-truncate"><small><small>
-                                    <span title="{{license}}">
-                                        {{#pix}}i/valid, core{{/pix}} {{#str}} correctlicense, local_oer, {"license": {{#quote}}{{license}}{{/quote}} } {{/str}}
-                                    </span>
-                                    </small></small>
-                                    </div>
-                                </li>
-                            {{/licensecorrect}}
-                            {{#personmissing}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} personmissing, local_oer{{/str}}</small></small>
-                                </li>
-                            {{/personmissing}}
-                            {{^personmissing}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} persondefined, local_oer{{/str}}</small></small>
-                                </li>
-                            {{/personmissing}}
-                        </ul>
-                    </div>
                     <div class="col-3">
                         <ul class="list-group">
-                            {{#contextset}}
+                            {{#requirementsmet}}
                                 <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} contextset, local_oer{{/str}}</small></small>
+                                    <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} requirementsmet, local_oer{{/str}}</small></small>
                                 </li>
-                            {{/contextset}}
-                            {{^contextset}}
+                            {{/requirementsmet}}
+                            {{^requirementsmet}}
                                 <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} contextnotset, local_oer{{/str}}</small></small>
+                                    <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} requirementsnotmet, local_oer{{/str}}</small></small>
                                 </li>
-                            {{/contextset}}
+                            {{/requirementsmet}}
                             {{#upload}}
                                 <li class="list-group-item border-0 p-0">
                                     <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small></small>

@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\helper\license;
+use local_oer\helper\requirements;
 use local_oer\plugininfo\oercourseinfo;
 
 /**
@@ -131,7 +132,8 @@ class snapshot {
             // File metadata has not been stored yet, so this file can be skipped.
             return;
         }
-        if (!$this->file_ready_for_release($fileinfo->state, $fileinfo->license, $fileinfo->persons, $fileinfo->context)) {
+        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($fileinfo);
+        if (!$release) {
             // At least one criteria is not fulfilled, file cannot be released.
             if ($fileinfo->state == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
@@ -160,7 +162,10 @@ class snapshot {
         $snapshot->usermodified   = $USER->id;
         $snapshot->timemodified   = time();
         $snapshot->timecreated    = time();
-        if (!$DB->record_exists('local_oer_snapshot', ['releasehash' => $hash])) {
+        $latestrelease            = $DB->get_records('local_oer_snapshot',
+                                                     ['courseid' => $this->courseid, 'contenthash' => $fileinfo->contenthash],
+                                                     'timecreated DESC', '*', 0, 1);
+        if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);
         }
     }
@@ -178,29 +183,10 @@ class snapshot {
             if ($key == $activeaggregator) {
                 $frankenstyle = 'oercourseinfo_' . $key;
                 $plugin       = '\\' . $frankenstyle . '\info';
-                return json_encode($plugin::add_metadata_fields());
+                return json_encode($plugin::add_metadata_fields($this->courseid));
             }
         }
         return null;
-    }
-
-    /**
-     * Test the release criteria of the file.
-     *
-     * @param int         $release Release state of file
-     * @param string      $license Shortname of license
-     * @param string|null $persons List of persons added to file
-     * @param int         $context Educational context
-     * @return bool
-     */
-    public static function file_ready_for_release(int $release, string $license, ?string $persons, int $context): bool {
-        $licenseobject = license::get_license_by_shortname($license);
-        $reqlicense    = license::test_license_correct_for_upload($license) || is_null($licenseobject);
-        $reqcontext    = $context > 0;
-        $people        = json_decode($persons);
-        $reqpersons    = !empty($people->persons);
-        $reqrelease    = $release == 1;
-        return $reqrelease && $reqpersons && $reqcontext && $reqlicense;
     }
 
     /**

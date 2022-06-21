@@ -25,8 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) { // Needs this condition or there is error on login page.
-    $settings = new admin_settingpage('local_oer', get_string('oer_link', 'local_oer'));
+if ($hassiteconfig) {
+    $ADMIN->add('localplugins', new admin_category('oersettings', get_string('oer_link', 'local_oer'), false));
+    $settings = new admin_settingpage('local_oer', get_string('oer_settings', 'local_oer'));
     $settings->add(new admin_setting_heading('oermetadata',
                                              get_string('oermetadataheading', 'local_oer'),
                                              get_string('oermetadataheading_desc', 'local_oer')));
@@ -38,22 +39,40 @@ if ($hassiteconfig) { // Needs this condition or there is error on login page.
                                                   get_string('metadataaggregator_description', 'local_oer'),
                                                   'no_value', $select));
 
+    $requiredchoices = [
+            'description'  => 'abstract',
+            'context'      => 'context',
+            'tags'         => 'tags',
+            'language'     => 'language',
+            'resourcetype' => 'resourcetype',
+    ];
+    $classifications = \local_oer\plugininfo\oerclassification::get_enabled_plugins();
+    foreach ($classifications as $key => $classplugin) {
+        $requiredchoices['oerclassification_' . $key] = $key;
+    }
+
+    $reqsetting = new admin_setting_configmultiselect('local_oer/requiredfields',
+                                                      get_string('requiredfields', 'local_oer'),
+                                                      get_string('requiredfields_desc', 'local_oer'),
+                                                      [], $requiredchoices);
+    $reqsetting->set_updatedcallback('local_oer_reset_releasestate_if_necessary');
+
+    $settings->add($reqsetting);
+
     $settings->add(new admin_setting_configcheckbox('local_oer/uselicensereplacement',
                                                     get_string('uselicensereplacement', 'local_oer'),
                                                     get_string('uselicensereplacement_description', 'local_oer'),
                                                     '0'));
-    if (get_config('local_oer', 'uselicensereplacement') == 1) {
-        $licensereplacedefault = "cc=>CC BY 3.0\r\n" .
-                                 "cc-nd=>CC BY-ND 3.0\r\n" .
-                                 "cc-nc-nd=>CC BY-NC-ND 3.0\r\n" .
-                                 "cc-nc=>CC BY-NC 3.0\r\n" .
-                                 "cc-nc-sa=>CC BY-NC-SA 3.0\r\n" .
-                                 "cc-sa=>CC BY-SA 3.0\r\n";
-        $settings->add(new admin_setting_configtextarea('local_oer/licensereplacement',
-                                                        get_string('licensereplacement', 'local_oer'),
-                                                        get_string('licensereplacement_description', 'local_oer'),
-                                                        $licensereplacedefault));
-    }
+    $licensereplacedefault = "cc=>CC BY 3.0\r\n" .
+                             "cc-nd=>CC BY-ND 3.0\r\n" .
+                             "cc-nc-nd=>CC BY-NC-ND 3.0\r\n" .
+                             "cc-nc=>CC BY-NC 3.0\r\n" .
+                             "cc-nc-sa=>CC BY-NC-SA 3.0\r\n" .
+                             "cc-sa=>CC BY-SA 3.0\r\n";
+    $settings->add(new admin_setting_configtextarea('local_oer/licensereplacement',
+                                                    get_string('licensereplacement', 'local_oer'),
+                                                    get_string('licensereplacement_description', 'local_oer'),
+                                                    $licensereplacedefault));
 
     $settings->add(new admin_setting_heading('oerrelease',
                                              get_string('oerreleaseheading', 'local_oer'),
@@ -100,7 +119,7 @@ if ($hassiteconfig) { // Needs this condition or there is error on login page.
         $settings->add(new oersubplugins_settings());
     }
 
-    $ADMIN->add('localplugins', $settings);
+    $ADMIN->add('oersettings', $settings);
     unset($settings);
     $ADMIN->add('localplugins',
                 new admin_category('localoersubpluginssettings', new lang_string('pluginname', 'local_oer'), true));
@@ -114,17 +133,66 @@ if ($hassiteconfig) { // Needs this condition or there is error on login page.
         $plugin->load_settings($ADMIN, 'localoersubpluginssettings', $hassiteconfig);
     }
     $settings = null;
+} else {
+    $ADMIN->add('root', new admin_category('oersettings', get_string('oer_link', 'local_oer'), false));
 }
 
-$ADMIN->add('root', new admin_externalpage('oer_allowedlist',
-                                           get_string('manage_oer', 'local_oer'),
-                                           new moodle_url('/local/oer/views/manage.php'),
-                                           'local/oer:manage'));
-$ADMIN->add('root', new admin_externalpage('oer_logs',
-                                           get_string('log_oer', 'local_oer'),
-                                           new moodle_url('/local/oer/views/log.php'),
-                                           'local/oer:manage'));
-$ADMIN->add('root', new admin_externalpage('oer_releasehistory',
-                                           get_string('releasehistory', 'local_oer'),
-                                           new moodle_url('/local/oer/views/releasehistory.php'),
-                                           'local/oer:manage'));
+$ADMIN->add('oersettings', new admin_externalpage('oer_allowedlist',
+                                                  get_string('manage_oer', 'local_oer'),
+                                                  new moodle_url('/local/oer/views/manage.php'),
+                                                  'local/oer:manage'));
+$ADMIN->add('oersettings', new admin_externalpage('oer_logs',
+                                                  get_string('log_oer', 'local_oer'),
+                                                  new moodle_url('/local/oer/views/log.php'),
+                                                  'local/oer:manage'));
+$ADMIN->add('oersettings', new admin_externalpage('oer_releasehistory',
+                                                  get_string('releasehistory', 'local_oer'),
+                                                  new moodle_url('/local/oer/views/releasehistory.php'),
+                                                  'local/oer:manage'));
+
+if (!function_exists('local_oer_reset_releasestate_if_necessary')) {
+    /**
+     * When the requirements change, the files that already have been set to release have to be tested against the
+     * new requirements and the state has to be set to 0 if the file does not meet the new requirements settings.
+     * Does not affect already made releases/snapshots as the requirements had other values back then.
+     *
+     * Also send a notification to affected users that the requirements have changed and some files have to be revisited.
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    function local_oer_reset_releasestate_if_necessary() {
+        global $DB, $USER;
+        $files   = $DB->get_records('local_oer_files', ['state' => 1]);
+        $courses = [];
+        foreach ($files as $file) {
+            list($reqarray, $releasable, $release) = \local_oer\helper\requirements::metadata_fulfills_all_requirements($file);
+            if (!$release) {
+                $courses[$file->courseid][] = $file;
+                $file->state                = 0;
+                $file->usermodified         = $USER->id;
+                $file->timemodified         = time();
+                $DB->update_record('local_oer_files', $file);
+            }
+        }
+        if (!empty($courses)) {
+            foreach ($courses as $course => $files) {
+                $coursecontext = context_course::instance($course);
+                $sql           = "SELECT u.id FROM {user} u " .
+                                 "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
+                                 "JOIN {user_enrolments} ue ON u.id = ue.userid " .
+                                 "JOIN {enrol} e ON e.id = ue.enrolid " .
+                                 "WHERE ul.type ='allow' AND e.courseid = :courseid";
+                $users         = $DB->get_records_sql($sql, ['courseid' => $course]);
+                foreach ($users as $userid) {
+                    if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
+                        $user = $DB->get_record('user', ['id' => $userid->id]);
+                        \local_oer\message::send_requirementschanged($user, $files, $course);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -34,33 +34,6 @@ require_once(__DIR__ . '/helper/testcourse.php');
  */
 class snapshot_test extends \advanced_testcase {
     /**
-     * Test different combinations on the method which decides if a file is ready for release.
-     *
-     * @return void
-     */
-    public function test_file_ready_for_release() {
-        $this->resetAfterTest();
-        $this->assertFalse(snapshot::file_ready_for_release(0, 'unknown', '', 0));
-        $this->assertFalse(snapshot::file_ready_for_release(1, 'unknown', '', 0));
-        $this->assertFalse(snapshot::file_ready_for_release(0, 'cc', '', 1));
-        $this->assertFalse(snapshot::file_ready_for_release(1, 'cc', '', 1));
-        $this->assertFalse(snapshot::file_ready_for_release(0, 'unknown', '', 1));
-        $this->assertFalse(snapshot::file_ready_for_release(0, 'unknown',
-                                                            '{"persons":[{"role":"Author",' .
-                                                            '"lastname":"Ortner","firstname":"Christian"}]}',
-                                                            1));
-        $this->assertFalse(snapshot::file_ready_for_release(0, 'cc',
-                                                            '{"persons":[{"role":"Author","lastname":"Ortner",' .
-                                                            '"firstname":"Christian"}]}',
-                                                            1));
-        $this->assertTrue(snapshot::file_ready_for_release(1, 'cc',
-                                                           '{"persons":[{"role":"Author",' .
-                                                           '"lastname":"Ortner","firstname":"Christian"}, ' .
-                                                           '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}',
-                                                           1));
-    }
-
-    /**
      * Test if file snapshots are correctly taken from a testcourse.
      *
      * @return void
