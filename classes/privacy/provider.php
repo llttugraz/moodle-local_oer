@@ -179,7 +179,7 @@ class provider implements
             return;
         }
 
-        $sql = "SELECT userid FROM {local_oer_userlist}";
+        $sql = "SELECT userid FROM {local_oer_userlist} ORDER BY userid ASC";
         $userlist->add_from_sql('userid', $sql, []);
     }
 
