@@ -365,4 +365,25 @@ $string['amount']                                          = 'Dateien pro Seite'
 $string['filecount']                                       = 'Dateien werden angezeigt';
 $string['uploadignoreerror']                               = 'Zur Freigabe markieren und Ignorieren können nicht ' .
                                                              'gleichzeitig eingeschaltet sein!';
-
+$string['requiredfields']                                  = 'Notwendige Felder';
+$string['requiredfields_desc']                             = 'Für das Release benötigte Metadaten/Formularfelder auswählen. ' .
+                                                             'Titel, Person(en) und Lizenz werden immer benötigt und ' .
+                                                             'sind hier nicht extra angeführt';
+$string['error_upload_resourcetype']                       = 'Eine Ressource muss für die Veröffentlichung ausgewählt werden.';
+$string['error_upload_classification']                     = 'Mindestens ein Element muss für die Veröffentlichung ' .
+                                                             'ausgewählt werden';
+$string['error_upload_language']                           = 'Für die Veröffentlichung ist eine Sprache erforderlich.';
+$string['error_upload_description']                        = 'Ein Abstrakt ist für die Veröffentlichung erforderlich.';
+$string['error_upload_tags']                               = 'Mindestens ein Tag ist für die Veröffentlichung erforderlich.';
+$string['requirementsmet']                                 = 'Alle Voraussetzungen für die Freigabe sind erfüllt.';
+$string['requirementsnotmet']                              = 'Nicht alle Voraussetzungen sind erfüllt.';
+$string['oer_settings']                                    = 'Plugin Einstellungen';
+$string['messageprovider:requirementschanged']             = 'OER Metadaten Anforderungen haben sich geändert';
+$string['requirementschanged_subject']                     = 'Open Educational Resources: Metadaten Anforderungen geändert';
+$string['requirementschanged_body']                        = 'Aufgrund geänderter Richtlinien für die Handhabung von Open ' .
+                                                             'Educational Resources wurden die Vorraussetzungen zum ' .
+                                                             'Veröffentlichen von Dateien geändert' .
+                                                             '<br><br>' .
+                                                             'Die Metadaten folgender Dateien müssen im Kurs {$a->course} ' .
+                                                             'für eine erneute Veröffentlichung angepasst werden:<br><br>';
+$string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';

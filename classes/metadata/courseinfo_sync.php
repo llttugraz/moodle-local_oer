@@ -53,7 +53,6 @@ class courseinfo_sync {
                 'update'      => [],
                 'markdeleted' => [],
         ];
-
         foreach ($newcourses as $newcourse) {
             $found = false;
             foreach ($oldcourses as $key => $oldcourse) {
@@ -76,7 +75,6 @@ class courseinfo_sync {
                 $sync['markdeleted'][] = $course;
             }
         }
-
         global $DB;
         foreach ($sync['create'] as $course) {
             $DB->insert_record('local_oer_courseinfo', $course);
@@ -97,7 +95,7 @@ class courseinfo_sync {
                 $delete = true;
             }
             if ($delete) {
-                $DB->delete_records('local_oer_courseinfo', ['courseid' => $course->id, 'coursecode' => $course->coursecode]);
+                $DB->delete_records('local_oer_courseinfo', ['courseid' => $course->courseid, 'coursecode' => $course->coursecode]);
             } else {
                 if ($course->deleted == 1 && $course->ignored == 1) {
                     // Course is just revisited, and already set to delete - skip.

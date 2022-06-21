@@ -88,6 +88,9 @@ class fileinfoform_test extends \advanced_testcase {
     public function test_validation() {
         $this->resetAfterTest();
         $this->setAdminUser();
+        // Update from 14.06.2022, now it is possible to select required fields.
+        $config = 'description,context';
+        set_config('requiredfields', $config, 'local_oer');
 
         $testcourse  = new testcourse();
         $course      = $testcourse->generate_testcourse($this->getDataGenerator());
@@ -129,8 +132,8 @@ class fileinfoform_test extends \advanced_testcase {
                                                   'Test set state method', 1,
                                                   'cc', 'en', 1, [], 1, 0);
         $errors   = $form->validation($fromform, []);
-        $this->assertTrue(isset($errors['upload']), 'Release cannot be set when no person is added to metadata');
-        $this->assertEquals(get_string('error_upload_author', 'local_oer'), $errors['upload'],
+        $this->assertTrue(isset($errors['addpersons']), 'Release cannot be set when no person is added to metadata');
+        $this->assertEquals(get_string('error_upload_author', 'local_oer'), $errors['addpersons'],
                             'Upload cannot be set when no person is added to metadata');
 
         // Upload is activated, but no context is set.

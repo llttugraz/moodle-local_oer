@@ -96,39 +96,16 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 <li class="list-group-item">
                     <h5>{{#str}} readyforupload, local_oer{{/str}}</h5>
                     <ul class="list-group">
-                        {{^licensecorrect}}
-                            <li class="list-group-item border-0 p-0"><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} selectcc, local_oer{{/str}}</small></li>
-                        {{/licensecorrect}}
-                        {{#licensecorrect}}
+                        {{#requirementsmet}}
                             <li class="list-group-item border-0 p-0">
-                                <div class="d-block text-truncate"><small>
-                                    <span title="{{license}}">
-                                        {{#pix}}i/valid, core{{/pix}} {{#str}} correctlicense, local_oer, {"license": {{#quote}}{{license}}{{/quote}} } {{/str}}
-                                    </span>
-                                </small>
-                                </div>
+                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} requirementsmet, local_oer{{/str}}</small>
                             </li>
-                        {{/licensecorrect}}
-                        {{#personmissing}}
+                        {{/requirementsmet}}
+                        {{^requirementsmet}}
                             <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}} {{#str}} personmissing, local_oer{{/str}}</small>
+                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} requirementsnotmet, local_oer{{/str}}</small>
                             </li>
-                        {{/personmissing}}
-                        {{^personmissing}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} persondefined, local_oer{{/str}}</small>
-                            </li>
-                        {{/personmissing}}
-                        {{#contextset}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} contextset, local_oer{{/str}}</small>
-                            </li>
-                        {{/contextset}}
-                        {{^contextset}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} contextnotset, local_oer{{/str}}</small>
-                            </li>
-                        {{/contextset}}
+                        {{/requirementsmet}}
                         {{#upload}}
                             <li class="list-group-item border-0 p-0">
                                 <small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small>

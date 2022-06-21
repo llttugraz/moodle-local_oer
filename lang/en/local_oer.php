@@ -346,3 +346,23 @@ $string['addpersonbtn']                                    = 'Add person';
 $string['amount']                                          = 'Files per page';
 $string['filecount']                                       = 'files are shown';
 $string['uploadignoreerror']                               = 'Mark for release and ignore cannot be set at the same time!';
+$string['requiredfields']                                  = 'Required fields';
+$string['requiredfields_desc']                             = 'Select the formular fields that are required for metadata/release.' .
+                                                             'Title, Person(s) and License are always required and ' .
+                                                             'are not shown here.';
+$string['error_upload_resourcetype']                       = 'A resource has to be selected for release.';
+$string['error_upload_classification']                     = 'At least one value is necessary for release.';
+$string['error_upload_language']                           = 'A language has to be selected for release.';
+$string['error_upload_description']                        = 'An abstract is necessary for release.';
+$string['error_upload_tags']                               = 'At least one tag is necessary for release.';
+$string['requirementsmet']                                 = 'All requirements for release are met.';
+$string['requirementsnotmet']                              = 'Not all requirements for release are met.';
+$string['oer_settings']                                    = 'Plugin settings';
+$string['messageprovider:requirementschanged']             = 'OER Metadata requirements have changed';
+$string['requirementschanged_subject']                     = 'Open Educational Resources metadata requirements have changed';
+$string['requirementschanged_body']                        = 'Due to changes in the guidelines for handling Open Educational ' .
+                                                             'Resources, the requirements for publishing files have been changed. ' .
+                                                             '<br><br>' .
+                                                             'The metadata of the following files in course {$a->course} must ' .
+                                                             'be modified for republishing: <br><br>';
+$string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';

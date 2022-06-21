@@ -44,6 +44,7 @@ class fileinfo_form extends \moodleform {
         $course = $this->_customdata;
 
         global $DB, $OUTPUT;
+        $reqfields = static::get_required_fields();
 
         $files      = filelist::get_single_file($course['courseid'], $course['contenthash']);
         $file       = $files[0]; // We just need the first entry, all others are duplicates if available.
@@ -65,6 +66,9 @@ class fileinfo_form extends \moodleform {
         $mform->addElement('textarea', 'description', get_string('filedescription', 'local_oer'),
                            'wrap="virtual" rows="3" cols="60"');
         $mform->addHelpButton('description', 'filedescription', 'local_oer');
+        if (in_array('description', $reqfields)) {
+            $mform->addRule('description', get_string('required'), 'required', '', 'client');
+        }
 
         $data                = [];
         $data['courseid']    = $course['courseid'];
@@ -138,6 +142,17 @@ class fileinfo_form extends \moodleform {
     }
 
     /**
+     * Get list of required fields from settings.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_required_fields() {
+        $requiredfields = get_config('local_oer', 'requiredfields');
+        return explode(',', $requiredfields);
+    }
+
+    /**
      * As the preference form and the fileinfo form are nearly the same, a shared function has been introduced
      * to add all similar fields to both of the formulars.
      *
@@ -147,15 +162,20 @@ class fileinfo_form extends \moodleform {
      * @throws \coding_exception
      */
     public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref = false) {
+        $reqfields = static::get_required_fields();
         $mform->addElement('select', 'context', get_string('context', 'local_oer'),
                            formhelper::lom_context_list(true, $addnopref));
         $mform->setDefault('context', $addnopref ? 'nopref' : 1);
         $mform->addHelpButton('context', 'context', 'local_oer');
+        if (in_array('context', $reqfields)) {
+            $mform->addRule('context', get_string('required'), 'required', '', 'client');
+        }
 
         $mform->addElement('select', 'license', get_string('license', 'local_oer'),
                            license::get_licenses_select_data($addnopref));
         $mform->setDefault('license', $addnopref ? 'nopref' : 'unknown');
         $mform->addHelpButton('license', 'license', 'local_oer');
+        $mform->addRule('license', get_string('required'), 'required', '', 'client');
 
         $mform->addElement('html', '<hr>');
         $mform->addElement('hidden', 'storedperson', '');
@@ -167,6 +187,7 @@ class fileinfo_form extends \moodleform {
         $mform->addElement('static', 'addpersons', get_string('person', 'local_oer'), $prefhtml);
         $mform->addHelpButton('addpersons', 'person', 'local_oer');
         $mform->addElement('html', '<hr>');
+        $mform->addRule('addpersons', get_string('required'), 'required', '', 'client');
 
         $mform->addElement('hidden', 'storedtags', '');
         $mform->setType('storedtags', PARAM_TEXT);
@@ -176,16 +197,25 @@ class fileinfo_form extends \moodleform {
         $mform->setType('tags', PARAM_TEXT);
         $mform->addHelpButton('tags', 'tags', 'local_oer');
         $mform->addElement('html', '<hr>');
+        if (in_array('tags', $reqfields)) {
+            $mform->addRule('tags', get_string('required'), 'required', '', 'client');
+        }
 
         $mform->addElement('select', 'language', get_string('language', 'local_oer'),
                            formhelper::language_select_data($addnopref));
         $mform->setDefault('language', $addnopref ? 'nopref' : 'de');
         $mform->addHelpButton('language', 'language', 'local_oer');
+        if (in_array('language', $reqfields)) {
+            $mform->addRule('language', get_string('required'), 'required', '', 'client');
+        }
 
         $mform->addElement('select', 'resourcetype', get_string('resourcetype', 'local_oer'),
                            formhelper::lom_resource_types(true, $addnopref));
         $mform->setDefault('resourcetype', $addnopref ? 'nopref' : 0);
         $mform->addHelpButton('resourcetype', 'resourcetype', 'local_oer');
+        if (in_array('resourcetype', $reqfields)) {
+            $mform->addRule('resourcetype', get_string('required'), 'required', '', 'client');
+        }
     }
 
     /**
@@ -223,24 +253,46 @@ class fileinfo_form extends \moodleform {
      * @throws \coding_exception
      */
     public function validation($data, $files) {
-        $errors = [];
+        $errors    = [];
+        $reqfields = static::get_required_fields();
         if (isset($data['upload']) && isset($data['ignore']) && $data['upload'] == 1 && $data['ignore'] == 1) {
             $errors['ignore'] = get_string('uploadignoreerror', 'local_oer');
         }
 
-        if (isset($data['upload'])) {
-            if ($data['upload'] == 1 && !license::test_license_correct_for_upload($data['license'])) {
+        if (isset($data['upload']) && $data['upload'] == 1) {
+            if (!license::test_license_correct_for_upload($data['license'])) {
                 $errors['upload']  = get_string('error_upload_license', 'local_oer');
                 $errors['license'] = get_string('error_license', 'local_oer');
             }
 
             $persons = json_decode($data['storedperson']);
-            if ($data['upload'] == 1 && empty($persons->persons)) {
-                $errors['upload'] = get_string('error_upload_author', 'local_oer');
+            if (empty($persons->persons)) {
+                $errors['addpersons'] = get_string('error_upload_author', 'local_oer');
             }
-            if ($data['upload'] == 1 && $data['context'] < 1) {
+            if (in_array('context', $reqfields) && $data['context'] < 1) {
                 $errors['context'] = get_string('error_upload_context', 'local_oer');
             }
+            if (in_array('tags', $reqfields) && empty($data['storedtags'])) {
+                $errors['tags'] = get_string('error_upload_tags', 'local_oer');
+            }
+            if (in_array('description', $reqfields) && empty($data['description'])) {
+                $errors['description'] = get_string('error_upload_description', 'local_oer');
+            }
+            if (in_array('language', $reqfields) && $data['language'] === "0") {
+                $errors['language'] = get_string('error_upload_language', 'local_oer');
+            }
+            if (in_array('resourcetype', $reqfields) && $data['resourcetype'] < 1) {
+                $errors['resourcetype'] = get_string('error_upload_resourcetype', 'local_oer');
+            }
+            $classifications = \local_oer\plugininfo\oerclassification::get_enabled_plugins();
+            foreach ($classifications as $key => $classplugin) {
+                if (in_array('oerclassification_' . $key, $reqfields) &&
+                    (empty($data['oerclassification_' . $key]) ||
+                     $data['oerclassification_' . $key] == '_qf__force_multiselect_submission')) {
+                    $errors['oerclassification_' . $key] = get_string('error_upload_classification', 'local_oer');
+                }
+            }
+
         }
         if (empty($data['title'])) {
             $errors['title'] = get_string('required');
@@ -386,6 +438,7 @@ class fileinfo_form extends \moodleform {
     public static function prepare_classification_values_for_form(\MoodleQuickForm $mform, ?\stdClass $classificationdata,
                                                                   array            &$data): void {
         $classification = oerclassification::get_enabled_plugins();
+        $reqfields      = static::get_required_fields();
         foreach ($classification as $key => $pluginname) {
             $frankenstyle = 'oerclassification_' . $key;
             // Load classification data and add them to form 0..n classification plugins possible.
@@ -399,6 +452,9 @@ class fileinfo_form extends \moodleform {
                                             $selectdata, $options);
             $mform->addElement($select);
             $mform->addHelpButton($frankenstyle, 'selectname', $frankenstyle);
+            if (in_array($frankenstyle, $reqfields)) {
+                $mform->addRule($frankenstyle, get_string('required'), 'required', '', 'client');
+            }
             if (!is_null($classificationdata) && isset($classificationdata->$key)) {
                 $data[$frankenstyle] = $classificationdata->$key;
             }

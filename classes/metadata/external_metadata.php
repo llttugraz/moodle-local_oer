@@ -46,7 +46,8 @@ interface external_metadata {
      * Return an associative array, the fields will be added as additional data.
      * Existing fields will not be overwritten.
      *
+     * @param int $courseid Moodle courseid
      * @return array
      */
-    public static function add_metadata_fields(): array;
+    public static function add_metadata_fields(int $courseid): array;
 }

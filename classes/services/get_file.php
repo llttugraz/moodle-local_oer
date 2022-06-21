@@ -97,25 +97,21 @@ class get_file extends \external_api {
     public static function external_file_return_value() {
         return new \external_single_structure(
                 [
-                        'id'             => new \external_value(PARAM_INT, 'DB id of oer file entry'),
-                        'contenthash'    => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
-                        'title'          => new \external_value(PARAM_TEXT, 'Title or filename'),
-                        'mimetype'       => new \external_value(PARAM_TEXT, 'Mimetype'),
-                        'icon'           => new \external_value(PARAM_RAW, 'File icon'),
-                        'icontype'       => new \external_value(PARAM_ALPHA, 'File icon type'),
-                        'iconisimage'    => new \external_value(PARAM_BOOL, 'Bool if icon is image'),
-                        'timemodified'   => new \external_value(PARAM_TEXT, 'Readable time'),
-                        'timeuploaded'   => new \external_value(PARAM_TEXT, 'Uploaded time'),
-                        'timeuploadedts' => new \external_value(PARAM_INT, 'Uploaded timestamp'),
-                        'upload'         => new \external_value(PARAM_BOOL, 'File ready for upload'),
-                        'ignore'         => new \external_value(PARAM_BOOL, 'File ignored'),
-                        'licensecorrect' => new \external_value(PARAM_BOOL, 'File uses CC license type'),
-                        'license'        => new \external_value(PARAM_TEXT, 'Fullname of license'),
-                        'personmissing'  => new \external_value(PARAM_BOOL, 'No persons defined'),
-                        'contextset'     => new \external_value(PARAM_BOOL, 'Context has been selected'),
-                        'deleted'        => new \external_value(PARAM_BOOL,
-                                                                'File deleted, orphaned metadata'),
-                        'modules'        => new \external_multiple_structure(
+                        'id'              => new \external_value(PARAM_INT, 'DB id of oer file entry'),
+                        'contenthash'     => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
+                        'title'           => new \external_value(PARAM_TEXT, 'Title or filename'),
+                        'mimetype'        => new \external_value(PARAM_TEXT, 'Mimetype'),
+                        'icon'            => new \external_value(PARAM_RAW, 'File icon'),
+                        'icontype'        => new \external_value(PARAM_ALPHA, 'File icon type'),
+                        'iconisimage'     => new \external_value(PARAM_BOOL, 'Bool if icon is image'),
+                        'timemodified'    => new \external_value(PARAM_TEXT, 'Readable time'),
+                        'timeuploaded'    => new \external_value(PARAM_TEXT, 'Uploaded time'),
+                        'timeuploadedts'  => new \external_value(PARAM_INT, 'Uploaded timestamp'),
+                        'upload'          => new \external_value(PARAM_BOOL, 'File ready for upload'),
+                        'ignore'          => new \external_value(PARAM_BOOL, 'File ignored'),
+                        'deleted'         => new \external_value(PARAM_BOOL,
+                                                                 'File deleted, orphaned metadata'),
+                        'modules'         => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
                                                 'moduleurl'  => new \external_value(PARAM_URL,
@@ -124,7 +120,7 @@ class get_file extends \external_api {
                                                                                     'Name of course module'),
                                         ]
                                 )),
-                        'sections'       => new \external_multiple_structure(
+                        'sections'        => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
                                                 'sectionnum'  => new \external_value(PARAM_INT,
@@ -133,7 +129,8 @@ class get_file extends \external_api {
                                                                                      'Name of section in course'),
                                         ]
                                 )),
-
+                        'requirementsmet' => new \external_value(PARAM_BOOL,
+                                                                 'Boolean if all requirements for release are fulfilled'),
                 ]);
     }
 }

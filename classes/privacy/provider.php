@@ -29,7 +29,9 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
+use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
+use core_privacy\local\request\writer;
 
 /**
  * Class provider
@@ -45,6 +47,15 @@ class provider implements
         \core_privacy\local\request\plugin\provider {
     /**
      * Get metadata
+     *
+     * This plugin does not really store anything of interest for privacy issues.
+     * All tables have the Moodle default usermodified field, but the data of the
+     * tables itself is mostly metadata of the files. The authors/publishers added
+     * to the files do not have a link to a Moodle user. Also when the user
+     * is deleted from Moodle, the files are from the course and the releases are
+     * also not affected from it.
+     * The only table where user data is stored is the userlist table. In this
+     * table the allowance to use the OER functionality is stored.
      *
      * @param collection $collection
      * @return collection
@@ -64,59 +75,123 @@ class provider implements
     }
 
     /**
-     * TODO
+     * Delete all users from userlist.
      *
      * @param \context $context
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        // TODO: Implement delete_data_for_all_users_in_context() method.
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return;
+        }
+        global $DB;
+        $users = $DB->get_records('local_oer_userlist');
+        foreach ($users as $user) {
+            static::delete_user_data($user->userid);
+        }
     }
 
     /**
-     * TODO
+     * Delete the data of a user
      *
      * @param approved_contextlist $contextlist
+     * @return void
+     * @throws \dml_exception
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        // TODO: Implement delete_data_for_user() method.
+        if (empty($contextlist->count())) {
+            return;
+        }
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            if ($context->contextlevel != CONTEXT_SYSTEM) {
+                continue;
+            }
+            static::delete_user_data($userid);
+        }
     }
 
     /**
-     * TODO
+     * Delete all given users.
      *
      * @param approved_userlist $userlist
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        // TODO: Implement delete_data_for_users() method.
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return;
+        }
+        $users = $userlist->get_userids();
+        foreach ($users as $userid) {
+            static::delete_user_data($userid);
+        }
     }
 
     /**
-     * TODO
+     * Export the data of the user.
      *
      * @param approved_contextlist $contextlist
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        // TODO: Implement export_user_data() method.
+        global $DB;
+
+        $sql = "SELECT * FROM {local_oer_userlist} ou WHERE ou.userid = :userid";
+        if ($userrecord = $DB->get_record_sql($sql, ['userid' => $contextlist->get_user()->id])) {
+            $data = (object) [
+                    'userid'      => $userrecord->userid,
+                    'type'        => $userrecord->type,
+                    'timecreated' => transform::datetime($userrecord->timecreated),
+            ];
+            writer::with_context(\context_system::instance())->export_data(
+                    [
+                            get_string('pluginname', 'local_oer')
+                    ], $data);
+        }
     }
 
     /**
-     * TODO
+     * Userlist is always in system context.
      *
      * @param int $userid
      * @return contextlist
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-        // TODO: Implement get_contexts_for_userid() method.
+        global $DB;
         $contextlist = new contextlist();
+        if (!$DB->record_exists('local_oer_userlist', ['userid' => $userid])) {
+            return $contextlist;
+        }
+        $contextlist->add_system_context();
         return $contextlist;
     }
 
     /**
-     * TODO
+     * All users are stored in system context. So get all users from userlist table.
      *
      * @param userlist $userlist
      */
     public static function get_users_in_context(userlist $userlist) {
-        // TODO: Implement get_users_in_context() method.
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_system) {
+            return;
+        }
+
+        $sql = "SELECT userid FROM {local_oer_userlist} ORDER BY userid ASC";
+        $userlist->add_from_sql('userid', $sql, []);
+    }
+
+    /**
+     * This does the deletion of user data in the userlist table.
+     *
+     * @param int $userid Moodle user id
+     * @return void
+     * @throws \dml_exception
+     */
+    protected static function delete_user_data(int $userid) {
+        global $DB;
+        $DB->delete_records('local_oer_userlist', ['userid' => $userid]);
     }
 }

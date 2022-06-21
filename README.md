@@ -14,6 +14,7 @@ In this repository a refactored version of the plugin can be found. This version
 After installation of the plugin, there are several settings that can be made:
 
 * `local_oer | metadataaggregator` if a subplugin is for linked external course metadata is installed, select the subplugin that should be used. (Default: Default courseinfo aggregator) 
+* `local_oer | requiredfields` Select the fields that will show as required in the file metadata form. `Title`, `License` and `Persons` are always required. (New setting since 2.1.12)
 * `local_oer | uselicensereplacement` When enabled, an additional textarea will appear below. (Default: No)
 * `local_oer | licensereplacement` Enter replacements for the moodle license shortnames in the format: `cc-nd=>CC BY-ND 3.0`. The exchange takes place when the metadata is queried.
 * `local_oer | zipperfilesize` Size of the ZIP files. The Zipper is a helper that can be used by upload subplugins to create ZIP Packages from released files in courses. For administrators there is a Download ZIP button in the OER view in courses, but this always generates only one ZIP of full size and ignores this setting.
