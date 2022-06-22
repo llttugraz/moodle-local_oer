@@ -153,11 +153,11 @@ $string['person']                                          = 'Person(en)';
 $string['prefperson']                                      = 'Person(en) (Voreinstellung)';
 $string['preftags']                                        = 'Schlagwörter (Voreinstellung)';
 $string['prefclassification']                              = 'Zusätzliche Schlagwörter (Voreinstellung)';
-$string['person_help']                                     = '<p>Namen im Forma ' .
-                                                             '<strong>Vorname Nachname</strong> eingeben' .
+$string['person_help']                                     = '<p>Namen im Format ' .
+                                                             '<strong>Vorname Nachname</strong> eingeben ' .
                                                              'und mit <strong>Enter</strong> bestätigen.</p> ' .
                                                              '<p>Mehrere Personen können eingegeben werden.</p>' .
-                                                             '<p>Eingegebene Namen werde oberhald des Eingabefeldes angezeigt.</p>' .
+                                                             '<p>Eingegebene Namen werde oberhalb des Eingabefeldes angezeigt.</p>' .
                                                              '<p>Durch Klick auf die Boxen können Namen wieder entfernt werden.</p>';
 $string['confirmperson']                                   = 'Zum Bestätigen <strong>Enter</strong> drücken.';
 $string['preferenceenabled']                               = 'Voreinstellungen sind für diese Datei <strong>aktiviert</strong>.' .
@@ -384,6 +384,7 @@ $string['requirementschanged_body']                        = 'Aufgrund geändert
                                                              'Educational Resources wurden die Vorraussetzungen zum ' .
                                                              'Veröffentlichen von Dateien geändert' .
                                                              '<br><br>' .
-                                                             'Die Metadaten folgender Dateien müssen im Kurs {$a->course} ' .
+                                                             'Die Metadaten folgender Dateien müssen im Kurs ' .
+                                                             '<a href="{$a->url}">{$a->course}</a> ' .
                                                              'für eine erneute Veröffentlichung angepasst werden:<br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';

@@ -28,5 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version      = 2022061500;
 $plugin->requires     = 2020061500;
 $plugin->component    = 'local_oer';
-$plugin->release      = 'v2.1.12';
+$plugin->release      = 'v2.1.13';
+$plugin->maturity     = MATURITY_STABLE;
 $plugin->dependencies = [];

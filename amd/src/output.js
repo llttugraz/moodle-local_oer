@@ -274,7 +274,10 @@ const initPersonButtonListener = () => {
     });
 };
 
-const showPersonForm = () => {
+const showPersonForm = (setInvalid) => {
+    if (typeof setInvalid === 'undefined') {
+        setInvalid = false;
+    }
     let context = document.getElementById("local_oer_files_main_area").dataset.context;
     let form = Fragment.loadFragment('local_oer', 'personform', context, []);
     form.done(function() {
@@ -320,6 +323,12 @@ const showPersonForm = () => {
 
                 });
                 modal.show();
+                if (setInvalid) {
+                    let element = document.getElementById("id_firstname");
+                    element.classList.add("is-invalid");
+                    element = document.getElementById("id_lastname");
+                    element.classList.add("is-invalid");
+                }
                 return; // For eslint.
             }).catch(function(error) {
                 window.console.debug(error);
@@ -340,7 +349,11 @@ const addPerson = (person) => {
                 found = true;
             }
         });
-        if (!found) {
+        // If one of the required fields is empty, reload the form.
+        if (person.firstname === '' || person.lastname === '') {
+            showPersonForm(true);
+            return;
+        } else if (!found) {
             names.persons.push(person);
             document.querySelector('[name="storedperson"]').value = JSON.stringify(names);
         }
