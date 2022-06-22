@@ -363,6 +363,7 @@ $string['requirementschanged_subject']                     = 'Open Educational R
 $string['requirementschanged_body']                        = 'Due to changes in the guidelines for handling Open Educational ' .
                                                              'Resources, the requirements for publishing files have been changed. ' .
                                                              '<br><br>' .
-                                                             'The metadata of the following files in course {$a->course} must ' .
+                                                             'The metadata of the following files in course ' .
+                                                             '<a href="{$a->url}">{$a->course}</a> must ' .
                                                              'be modified for republishing: <br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';
