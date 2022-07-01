@@ -1,7 +1,1 @@
 .idea
-classification/*
-!classification/readme.md
-metadata/*
-!metadata/readme.md
-uploader/*
-!uploader/readme.md
