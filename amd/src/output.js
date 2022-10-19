@@ -416,7 +416,7 @@ const showPersons = () => {
                 role: person.role,
                 firstname: person.firstname,
                 lastname: person.lastname,
-                name: localizedrole + ': ' + person.firstname + ' ' + person.lastname
+                name: decodeURI(localizedrole + ': ' + person.firstname + ' ' + person.lastname)
             });
         });
         Templates.render('local_oer/persons', persons)
