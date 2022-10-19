@@ -52,6 +52,7 @@ class fileinfoform_test extends \advanced_testcase {
      * @return void
      * @throws \ReflectionException
      * @throws \dml_exception
+     * @covers ::set_state
      */
     public function test_set_state() {
         $this->resetAfterTest();
