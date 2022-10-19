@@ -34,6 +34,8 @@ require_once(__DIR__ . '/helper/fromform.php');
 
 /**
  * Class fileinfoform_test
+ *
+ * @coversDefaultClass \local_oer\forms\fileinfo_form
  */
 class fileinfoform_test extends \advanced_testcase {
     /**
@@ -50,6 +52,7 @@ class fileinfoform_test extends \advanced_testcase {
      * @return void
      * @throws \ReflectionException
      * @throws \dml_exception
+     * @covers ::set_state
      */
     public function test_set_state() {
         $this->resetAfterTest();
@@ -84,6 +87,7 @@ class fileinfoform_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
+     * @covers ::validation
      */
     public function test_validation() {
         $this->resetAfterTest();
@@ -173,6 +177,10 @@ class fileinfoform_test extends \advanced_testcase {
      * Insert and update metadata in local_oer_files table.
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     * @covers ::update_metadata
      */
     public function test_update_metadata() {
         $this->resetAfterTest();

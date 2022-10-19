@@ -35,6 +35,8 @@ use local_oer\userlist\userlist;
 
 /**
  * Privacy test for the local_oer plugin
+ *
+ * @coversDefaultClass \local_oer\privacy\provider
  */
 class privacy_provider_test extends provider_testcase {
     /**
@@ -58,6 +60,10 @@ class privacy_provider_test extends provider_testcase {
 
     /**
      * Check that a user context is returned if there is any user data for this user.
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::get_contexts_for_userid
      */
     public function test_get_contexts_for_userid() {
         $this->resetAfterTest();
@@ -75,6 +81,11 @@ class privacy_provider_test extends provider_testcase {
 
     /**
      * Test that user data is exported correctly.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers ::export_user_data
      */
     public function test_export_user_data() {
         $this->resetAfterTest();
@@ -97,6 +108,10 @@ class privacy_provider_test extends provider_testcase {
 
     /**
      * Test delete all users from userlist because of system context
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::delete_data_for_all_users_in_context
      */
     public function test_delete_data_for_all_users_in_context() {
         $this->resetAfterTest();
@@ -118,6 +133,10 @@ class privacy_provider_test extends provider_testcase {
 
     /**
      * Test delete the entries of a user from userlist.
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::delete_data_for_user
      */
     public function test_delete_data_for_user() {
         $this->resetAfterTest();
@@ -143,6 +162,10 @@ class privacy_provider_test extends provider_testcase {
 
     /**
      * Test that all users in userlist are fetched
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::get_users_in_context
      */
     public function test_get_users_in_context() {
         $this->resetAfterTest();
@@ -173,6 +196,10 @@ class privacy_provider_test extends provider_testcase {
     /**
      * Test that data for users in approved userlist is deleted.
      * Works the same as the delete_data_for_all_users_in_context.
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::delete_data_for_users
      */
     public function test_delete_data_for_users() {
         $this->resetAfterTest();
