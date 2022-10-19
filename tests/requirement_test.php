@@ -34,6 +34,8 @@ require_once(__DIR__ . '/helper/testcourse.php');
 
 /**
  * Class requirement_test
+ *
+ * @coversDefaultClass \local_oer\helper\requirements
  */
 class requirement_test extends \advanced_testcase {
     /**
@@ -41,6 +43,7 @@ class requirement_test extends \advanced_testcase {
      *
      * @return void
      * @throws \dml_exception
+     * @covers ::metadata_fulfills_all_requirements
      */
     public function test_metadata_fulfills_all_requirements() {
         $this->resetAfterTest();
@@ -204,6 +207,7 @@ class requirement_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
+     * @covers local_oer_reset_releasestate_if_necessary
      */
     public function test_local_oer_reset_releasestate_if_necessary() {
         $this->resetAfterTest();
