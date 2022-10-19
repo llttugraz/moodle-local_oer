@@ -176,7 +176,7 @@ class requirement_test extends \advanced_testcase {
     }
 
     /**
-     * As the file releasae reset function has something to do with the requirements, the test is added to this file.
+     * As the file release reset function has something to do with the requirements, the test is added to this file.
      *
      * When the requirements are changed in the settings, a callback is called to check for all the file metadata that is set to
      * release. The requirements are tested again for this file. When the requirements are not met anymore, the release state of
@@ -295,6 +295,34 @@ class requirement_test extends \advanced_testcase {
         $this->assertEquals($teacher11->id, $messages[0]->useridto);
         $this->assertEquals($teacher22->id, $messages[1]->useridto);
         $this->assertEquals($teacher32->id, $messages[2]->useridto);
+        $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
+
+        // Case 4: File has been deleted, but metadata still exists, no notification should be sent.
+        $testcourse->set_files_to($course1->id, 5, true);
+        $testcourse->set_files_to($course2->id, 5, true);
+        $coursefiles = filelist::get_course_files($course1->id);
+        $this->assertNotEmpty($coursefiles);
+        foreach ($coursefiles as $files) {
+            foreach ($files as $file) {
+                $file['file']->delete();
+            }
+        }
+        $coursefiles = filelist::get_course_files($course2->id);
+        $this->assertNotEmpty($coursefiles);
+        foreach ($coursefiles as $files) {
+            foreach ($files as $file) {
+                $file['file']->delete();
+            }
+        }
+        $coursefiles = filelist::get_course_files($course1->id);
+        $this->assertEmpty($coursefiles);
+        $coursefiles = filelist::get_course_files($course2->id);
+        $this->assertEmpty($coursefiles);
+        $this->assertCount(10, $DB->get_records('local_oer_files', ['state' => 1]));
+        $sink = $this->redirectMessages();
+        local_oer_reset_releasestate_if_necessary();
+        $messages = $sink->get_messages();
+        $this->assertEquals(0, count($messages), 'As the files have been deleted, no notifications should be sent.');
         $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
     }
 }
