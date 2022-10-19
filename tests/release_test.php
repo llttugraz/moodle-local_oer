@@ -31,6 +31,8 @@ require_once(__DIR__ . '/helper/testcourse.php');
 
 /**
  * Class release_testcase
+ *
+ * @coversDefaultClass \local_oer\release
  */
 class release_test extends \advanced_testcase {
     /**
@@ -40,6 +42,7 @@ class release_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
+     * @covers ::get_released_files
      */
     public function test_get_released_files() {
         $this->resetAfterTest();

@@ -207,7 +207,7 @@ class requirement_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers local_oer_reset_releasestate_if_necessary
+     * @covers ::local_oer_reset_releasestate_if_necessary
      */
     public function test_local_oer_reset_releasestate_if_necessary() {
         $this->resetAfterTest();

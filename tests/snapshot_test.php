@@ -31,6 +31,8 @@ require_once(__DIR__ . '/helper/testcourse.php');
 
 /**
  * Class snapshot_test
+ *
+ * @coversDefaultClass \local_oer\snapshot
  */
 class snapshot_test extends \advanced_testcase {
     /**
@@ -40,6 +42,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
+     * @covers ::create_snapshot_of_course_files
      */
     public function test_create_snapshot_of_course_files() {
         $this->resetAfterTest();

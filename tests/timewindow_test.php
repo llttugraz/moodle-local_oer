@@ -29,6 +29,8 @@ use local_oer\time\time_settings;
 
 /**
  * Class timewindow_testcase
+ *
+ * @coversDefaultClass \local_oer\time\time_settings
  */
 class timewindow_test extends \advanced_testcase {
     /**
@@ -36,6 +38,7 @@ class timewindow_test extends \advanced_testcase {
      *
      * @return void
      * @throws \dml_exception
+     * @covers ::set_next_upload_window
      */
     public function test_daily_upload() {
         $this->resetAfterTest(true);
@@ -54,6 +57,7 @@ class timewindow_test extends \advanced_testcase {
      *
      * @return void
      * @throws \dml_exception
+     * @covers ::set_next_upload_window
      */
     public function test_weekly_upload() {
         $this->resetAfterTest(true);
@@ -72,6 +76,7 @@ class timewindow_test extends \advanced_testcase {
      *
      * @return void
      * @throws \dml_exception
+     * @covers ::set_next_upload_window
      */
     public function test_monthly_upload() {
         $this->resetAfterTest(true);
@@ -90,6 +95,7 @@ class timewindow_test extends \advanced_testcase {
      *
      * @return void
      * @throws \dml_exception
+     * @covers ::set_next_upload_window
      */
     public function test_custom_upload() {
         $this->resetAfterTest(true);
@@ -125,6 +131,7 @@ class timewindow_test extends \advanced_testcase {
      *
      * @return void
      * @throws \coding_exception
+     * @covers ::format_difference
      */
     public function test_format_difference() {
         $this->resetAfterTest(true);

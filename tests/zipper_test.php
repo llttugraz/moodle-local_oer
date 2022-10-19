@@ -31,6 +31,8 @@ require_once(__DIR__ . '/helper/testcourse.php');
 
 /**
  * Testfile for the courseinfo and sync classes
+ *
+ * @coversDefaultClass \local_oer\zipper
  */
 class zipper_test extends \advanced_testcase {
     /**
@@ -42,6 +44,7 @@ class zipper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
+     * @covers ::separate_files_to_packages
      */
     public function test_separate_files_to_packages() {
         $this->resetAfterTest(true);
@@ -72,6 +75,7 @@ class zipper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
+     * @covers ::compress_file_package
      */
     public function test_compress_file_package() {
         $this->resetAfterTest(true);
