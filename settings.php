@@ -179,6 +179,16 @@ if (!function_exists('local_oer_reset_releasestate_if_necessary')) {
         }
         if (!empty($courses)) {
             foreach ($courses as $course => $files) {
+                // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
+                $filelist = \local_oer\filelist::get_course_files($course);
+                foreach ($files as $key => $file) {
+                    if (!isset($filelist[$file->contenthash])) {
+                        unset($files[$key]);
+                    }
+                }
+                if (empty($files)) {
+                    continue;
+                }
                 $coursecontext = context_course::instance($course);
                 $sql           = "SELECT u.id FROM {user} u " .
                                  "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
