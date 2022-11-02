@@ -138,18 +138,32 @@ class coursecustomfield {
         $typeconversion = [
                 'checkbox' => 'bool',
                 'date'     => 'timestamp',
+                'textarea' => 'text',
+                'select'   => 'text',
         ];
         foreach ($customfields as $category) {
             foreach ($category['fields'] as $field) {
+                $data       = $field['type'] == 'select' ? self::get_text_of_select_field($field) : $field['data'];
                 $snapshot[] = [
                         'shortname' => $field['shortname'],
                         'fullname'  => $field['fullname'],
                         'type'      => $typeconversion[$field['type']] ?? $field['type'],
-                        'data'      => $field['data'],
+                        'data'      => $data,
                         'category'  => $category['name'],
                 ];
             }
         }
         return $snapshot;
+    }
+
+    /**
+     * Return the text of a select field value.
+     *
+     * @param array $field Customfield in array format of OER plugin.
+     * @return string
+     */
+    public static function get_text_of_select_field(array $field): string {
+        $options = explode("\r\n", $field['settings']['options']);
+        return $options[$field['data']];
     }
 }

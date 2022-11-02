@@ -128,8 +128,7 @@ class courseinfo_form extends \moodleform {
                                                    userdate($field['data']));
                                 break;
                             case 'select':
-                                $values = explode("\r\n", $field['settings']['options']);
-                                $value  = $values[$field['data']];
+                                $value = coursecustomfield::get_text_of_select_field($field);
                                 $mform->addElement('static', $categoryname . $shortname, $field['fullname'], $value);
                                 break;
                             case 'checkbox':
