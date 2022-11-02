@@ -26,6 +26,7 @@
 namespace local_oer\forms;
 
 use local_oer\helper\formhelper;
+use local_oer\metadata\coursecustomfield;
 use local_oer\metadata\courseinfo;
 use local_oer\metadata\courseinfo_sync;
 
@@ -109,6 +110,38 @@ class courseinfo_form extends \moodleform {
             $mform          = $this->form_default_element($mform, $course, $data, 'language', 'select', 2, 0, false, $languages);
             $mform          = $this->form_default_element($mform, $course, $data, 'lecturer', 'textarea', 0, 0, false,
                                                           $textareaformat);
+
+            if ($course->subplugin == courseinfo::BASETYPE && get_config('local_oer', 'coursecustomfields')) {
+                $customfields = coursecustomfield::get_course_customfields_with_applied_config($course->courseid, true);
+                foreach ($customfields as $category) {
+                    $categoryname = str_replace(' ', '', strtolower($category['name'])) . $category['id'] . '_' .
+                                    $course->coursecode;
+                    $cattext      = empty($category['fields']) ? get_string('nofieldsincat', 'local_oer') : '';
+                    $mform->addElement('html', '<hr>');
+                    $mform->addElement('static', $categoryname, '<strong>' . $category['name'] . '</strong>', $cattext);
+                    $mform->addHelpButton($categoryname, 'customfieldcategory', 'local_oer');
+                    foreach ($category['fields'] as $field) {
+                        $shortname = $field['shortname'];
+                        switch ($field['type']) {
+                            case 'date':
+                                $mform->addElement('static', $categoryname . $shortname, $field['fullname'],
+                                                   userdate($field['data']));
+                                break;
+                            case 'select':
+                                $values = explode("\r\n", $field['settings']['options']);
+                                $value  = $values[$field['data']];
+                                $mform->addElement('static', $categoryname . $shortname, $field['fullname'], $value);
+                                break;
+                            case 'checkbox':
+                                $value = $field['data'] ? get_string('active') : get_string('inactive');
+                                $mform->addElement('static', $categoryname . $shortname, $field['fullname'], $value);
+                                break;
+                            default:
+                                $mform->addElement('static', $categoryname . $shortname, $field['fullname'], $field['data']);
+                        }
+                    }
+                }
+            }
         }
 
         $mform->disable_form_change_checker();
@@ -191,16 +224,26 @@ class courseinfo_form extends \moodleform {
     private function form_default_element(\MoodleQuickForm $mform, \stdClass $course, array &$data,
                                           string           $identifier, string $type, int $maxlength = 0,
                                           int              $minlength = 0, bool $required = false,
-                                                           $additionaldata = false): \MoodleQuickForm {
+                                                           $additionaldata = false, $shownname = '',
+                                                           $helpstring = '', $ignoreable = false): \MoodleQuickForm {
         $name                 = $identifier . '_' . $course->coursecode;
+        $shownname            = $shownname == '' ? get_string($identifier, 'local_oer') : $shownname;
         $checkbox             = $identifier . '_edited_' . $course->coursecode;
+        $ignorebox            = $identifier . '_ignore_' . $course->coursecode;
         $group                = $name . 'group';
+        $helpstring           = $helpstring == '' ? $identifier : $helpstring;
         $availablefromgroup   = array();
-        $availablefromgroup[] =& $mform->createElement($type, $name, get_string($identifier, 'local_oer'), $additionaldata);
+        $availablefromgroup[] =& $mform->createElement($type, $name, $shownname, $additionaldata);
         $availablefromgroup[] =& $mform->createElement('checkbox', $checkbox, '', get_string('overwrite', 'local_oer'));
-        $mform->addGroup($availablefromgroup, $name . 'group', get_string($identifier, 'local_oer'), ' ', false);
+        $mform->addGroup($availablefromgroup, $name . 'group', $shownname, ' ', false);
         $mform->disabledIf($group, $checkbox);
         $mform->hideif($group, 'ignored_' . $course->coursecode, 'checked');
+        if ($ignoreable) {
+            $mform->addElement('checkbox', $ignorebox, '', get_string('ignore', 'local_oer'));
+            $mform->disabledIf($group, $ignorebox, 'checked');
+            $mform->hideif($ignorebox, 'ignored_' . $course->coursecode, 'checked');
+            $mform->addElement('html', '<hr>');
+        }
         if ($required) {
             $mform->addRule($group, get_string('required'), 'required', '', 'client');
         }
@@ -210,7 +253,7 @@ class courseinfo_form extends \moodleform {
         if ($maxlength > 0) {
             $mform->addRule($group, get_string('maximumchars', '', $maxlength), 'maxlength', $maxlength, 'client');
         }
-        $mform->addHelpButton($group, $identifier, 'local_oer');
+        $mform->addHelpButton($group, $helpstring, 'local_oer');
         $data[$name]        = $course->$identifier;
         $checkboxidentifier = $identifier . '_edited';
         $data[$checkbox]    = $course->$checkboxidentifier;

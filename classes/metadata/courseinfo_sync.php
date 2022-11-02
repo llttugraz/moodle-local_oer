@@ -149,6 +149,11 @@ class courseinfo_sync {
         $updatecourse->usermodified        = $newcourse->usermodified;
         $updatecourse->timecreated         = $oldcourse->timecreated;
         $updatecourse->timemodified        = $newcourse->timemodified;
+        // This check has to be made against newcourse, oldcourse may not exist yet.
+        if ($newcourse->subplugin == courseinfo::BASETYPE) {
+            list($updatecourse->customfields, $updateneeded) = $this->compare_customfields($oldcourse->customfields,
+                                                                                           $newcourse->customfields);
+        }
 
         if ($oldcourse->coursename_edited == 0 && $oldcourse->coursename != $newcourse->coursename) {
             $updateneeded = true;
@@ -176,5 +181,27 @@ class courseinfo_sync {
         }
 
         return [$updatecourse, $updateneeded];
+    }
+
+    /**
+     * Customfields are added in a different way than the normal course fields. Customfields cannot be changed
+     * in the OER plugin, so no overwrite is possible. That means only need to check if something has changed to determine
+     * if an update is needed.
+     *
+     * @param $oldcourse
+     * @param $newcourse
+     * @return array
+     */
+    private function compare_customfields($oldfields, $newfields): array {
+        if (empty($newfields)) {
+            return [null, !empty($oldfields)];
+        }
+        $oldfields = json_encode($oldfields);
+        $newfields = json_encode($newfields);
+
+        $oldhash = hash('sha256', $oldfields);
+        $newhash = hash('sha256', $newfields);
+
+        return [$newfields, $oldhash != $newhash];
     }
 }

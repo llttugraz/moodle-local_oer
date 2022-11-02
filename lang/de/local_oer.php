@@ -388,3 +388,41 @@ $string['requirementschanged_body']                        = 'Aufgrund geändert
                                                              '<a href="{$a->url}">{$a->course}</a> ' .
                                                              'für eine erneute Veröffentlichung angepasst werden:<br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';
+$string['coursecustomfields']                              = 'Benutzerdefinierte Kursfelder hinzufügen';
+$string['customfieldcategory_help']                        = 'Dies ist der Name einer benutzerdefinierten Feldkategorie, ' .
+                                                             'darunter sind die Felder der Kategorie zu sehen.';
+$string['customfield_help']                                = 'Benutzerdefinierte Kursfelder können auf ähnliche Weise wie die ' .
+                                                             'Standard-Kursfelder hinzugefügt werden. Sie können auch ' .
+                                                             'überschrieben werden, so dass ein anderer Wert als der im Kurs ' .
+                                                             'eingestellte verwendet werden kann. ' .
+                                                             'Weiters ist es auch möglich diese zu ignorieren, um sie nicht zu ' .
+                                                             'den Kurs-Metadaten der freigegebenen OER-Objekte hinzuzufügen.';
+$string['coursecustomfields_description']                  = 'Wenn diese Option aktiviert ist, werden benutzerdefinierte ' .
+                                                             'Kursfelder (course customfields) aus dem System gelesen und zu ' .
+                                                             'den Kursmetadaten des Moodle-Kurses hinzugefügt.';
+$string['coursecustomfieldsvisibility']                    = 'Sichtbarkeit von benutzerdefinierten Feldern';
+$string['coursecustomfieldsvisibility_description']        = '<p>Die Sichtbarkeitsstufe gibt an, welche Felder zu den ' .
+                                                             'Metadaten hinzugefügt werden. Wenn ein benutzerdefiniertes ' .
+                                                             'Feld in Moodle eingerichtet wird, muss festgelegt werden, ' .
+                                                             'welche Nutzer das Feld sehen können. Hierfür gibt es drei ' .
+                                                             'Optionen. Im OER-Kontext können diese drei Optionen wie ' .
+                                                             'folgt verwendet werden.</p>' .
+                                                             '<ul>' .
+                                                             '<li>"Alle": Nur Felder, die mit diesem Status markiert sind, ' .
+                                                             'werden hinzugefügt</li>' .
+                                                             '<li>"Trainer:innen": Die Felder "Trainer:innen" und "Alle" ' .
+                                                             'werden hinzugefügt</li>' .
+                                                             '<li>"Nicht-sichtbar": Alle Felder werden hinzugefügt ' .
+                                                             '(einschließlich der anderen Optionen)</li>' .
+                                                             '</ul>';
+$string['coursecustomfieldsignored']                       = 'Benutzerdefinierte Felder ignorieren';
+$string['coursecustomfieldsignored_description']           = '<p>Ignorieren Sie benutzerdefinierte Felder, ' .
+                                                             'indem Sie sie diese in diesem Mehrfachauswahlfeld auswählen. ' .
+                                                             'Standardmäßig werden alle Felder zu den Kursmetadaten ' .
+                                                             'hinzugefügt, wenn benutzerdefinierte Felder für ' .
+                                                             'das OER-Plugin aktiviert sind.</p>' .
+                                                             '<p>Beachten Sie, dass die Sichtbarkeitseinstellung ebenfalls ' .
+                                                             'angewendet wird und die Felder eventuell nicht angezeigt ' .
+                                                             'werden, auch wenn sie in dieser Einstellung angezeigt werden.</p>' .
+                                                             '<p>Feldformat: {Feldname} ({Kategorie} {Sichtbarkeit})</p>';
+$string['nofieldsincat']                                   = 'Diese Kategorie enthält keine Felder, die angezeigt werden können.';

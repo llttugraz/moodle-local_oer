@@ -27,6 +27,8 @@ namespace local_oer;
 
 use local_oer\helper\license;
 use local_oer\helper\requirements;
+use local_oer\metadata\coursecustomfield;
+use local_oer\metadata\courseinfo;
 use local_oer\plugininfo\oercourseinfo;
 
 /**
@@ -134,7 +136,7 @@ class snapshot {
         }
         list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($fileinfo);
         if (!$release) {
-            // At least one criteria is not fulfilled, file cannot be released.
+            // At least one criterion is not fulfilled, file cannot be released.
             if ($fileinfo->state == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
                 logger::add($this->courseid, logger::LOGERROR, 'File with hash ' . $fileinfo->contenthash .
@@ -202,7 +204,7 @@ class snapshot {
         $courses    = $DB->get_records('local_oer_courseinfo', ['courseid' => $this->courseid, 'ignored' => 0, 'deleted' => 0]);
         $courseinfo = [];
         foreach ($courses as $course) {
-            $courseinfo[] = [
+            $info         = [
                     'identifier'     => $course->coursecode,
                     'courseid'       => $course->external_courseid,
                     'sourceid'       => $course->external_sourceid,
@@ -214,6 +216,11 @@ class snapshot {
                     'courselanguage' => $course->language ?? '',
                     'lecturer'       => $course->lecturer ?? '',
             ];
+            $customfields = coursecustomfield::get_customfields_for_snapshot($course->courseid);
+            if (!empty($customfields)) {
+                $info['customfields'] = $customfields;
+            }
+            $courseinfo[] = $info;
         }
         if (empty($courseinfo)) {
             return false;

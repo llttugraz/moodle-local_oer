@@ -367,3 +367,35 @@ $string['requirementschanged_body']                        = 'Due to changes in 
                                                              '<a href="{$a->url}">{$a->course}</a> must ' .
                                                              'be modified for republishing: <br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';
+$string['coursecustomfields']                              = 'Add course customfields';
+$string['coursecustomfields_description']                  = 'When enabled, course custom fields are read from the system and ' .
+                                                             'are added to the course metadata of the moodle course.';
+$string['customfieldcategory_help']                        = 'This is the name of a custom field category, below the fields of ' .
+                                                             'the category can be seen.';
+$string['coursecustomfieldsvisibility']                    = 'Set customfield visibility level';
+$string['coursecustomfieldsvisibility_description']        = '<p>The visibility level indicates the fields that are ' .
+                                                             'added to the metadata. When a customfield is set up in Moodle, it ' .
+                                                             'has to be defined which users can see the field. There are three ' .
+                                                             'options for that. In OER context these three options can be used as ' .
+                                                             'follows </p>' .
+                                                             '<ul>' .
+                                                             '<li>"Everyone": Only fields marked with this state are added</li>' .
+                                                             '<li>"Teachers": "Teachers" and "Everyone" fields are added</li>' .
+                                                             '<li>"Not-visible": All fields are added ' .
+                                                             '(including the options above)</li>' .
+                                                             '</ul>';
+$string['coursecustomfieldsignored']                       = 'Ignore customfields';
+$string['coursecustomfieldsignored_description']           = '<p>Ignore customfields by selecting them in ' .
+                                                             'this multiselect field. ' .
+                                                             'Per default all fields are added to the course metadata when ' .
+                                                             'customfields are enabled for OER plugin.</p>' .
+                                                             '<p> Keep in mind that the visibility setting is also applied and ' .
+                                                             'fields are eventually not be shown, even if they are shown ' .
+                                                             'in this setting.</p>' .
+                                                             '<p>Field format: {fullname} ({category} {visibility})</p>';
+$string['customfield_help']                                = 'Course custom fields can be added in a similar way as ' .
+                                                             'the default course fields . They can also be overwritten so that ' .
+                                                             'an other value than the one set in course can be used . ' .
+                                                             'Also they can be ignored, to not add them to the course metadata ' .
+                                                             'of the released OER objects . ';
+$string['nofieldsincat']                                   = 'This customfield category does not have any fields to show.';

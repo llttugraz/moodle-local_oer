@@ -32,6 +32,47 @@ if ($hassiteconfig) {
                                              get_string('oermetadataheading', 'local_oer'),
                                              get_string('oermetadataheading_desc', 'local_oer')));
 
+    $settings->add(new admin_setting_configcheckbox('local_oer/coursecustomfields',
+                                                    get_string('coursecustomfields', 'local_oer'),
+                                                    get_string('coursecustomfields_description', 'local_oer'),
+                                                    '0'));
+
+    $visibletoall      = get_string('customfield_visibletoall', 'core_course');
+    $visibletoteachers = get_string('customfield_visibletoteachers', 'core_course');
+    $notvisible        = get_string('customfield_notvisible', 'core_course');
+    $visibilityoptions = [\core_course\customfield\course_handler::VISIBLETOALL      => $visibletoall,
+                          \core_course\customfield\course_handler::VISIBLETOTEACHERS => $visibletoteachers,
+                          \core_course\customfield\course_handler::NOTVISIBLE        => $notvisible,];
+
+    $settings->add(new admin_setting_configselect('local_oer/coursecustomfieldsvisibility',
+                                                  get_string('coursecustomfieldsvisibility', 'local_oer'),
+                                                  get_string('coursecustomfieldsvisibility_description', 'local_oer'),
+                                                  \core_course\customfield\course_handler::NOTVISIBLE, $visibilityoptions));
+    $settings->hide_if('local_oer/coursecustomfieldsvisibility', 'local_oer/coursecustomfields');
+
+    $customfields = \local_oer\metadata\coursecustomfield::get_course_customfields(-1);
+    $customselect = [];
+    foreach ($customfields as $category) {
+        foreach ($category['fields'] as $field) {
+            $visibility = $visibletoall;
+            switch ($field['settings']['visibility']) {
+                case \core_course\customfield\course_handler::VISIBLETOTEACHERS:
+                    $visibility = $visibletoteachers;
+                    break;
+                case  \core_course\customfield\course_handler::NOTVISIBLE:
+                    $visibility = $notvisible;
+            }
+            $customselect[$category['id'] . ':' . $field['id']] = $field['fullname'] . ' (' . $category['name'] . ' ' .
+                                                                  $visibility . ')';
+        }
+    }
+
+    $settings->add(new admin_setting_configmultiselect('local_oer/coursecustomfieldsignored',
+                                                       get_string('coursecustomfieldsignored', 'local_oer'),
+                                                       get_string('coursecustomfieldsignored_description', 'local_oer'),
+                                                       [], $customselect));
+    $settings->hide_if('local_oer/coursecustomfieldsignored', 'local_oer/coursecustomfields');
+
     $plugins = \local_oer\plugininfo\oercourseinfo::get_enabled_plugins();
     $select  = array_merge(['no_value' => get_string('no_value', 'local_oer')], $plugins);
     $settings->add(new admin_setting_configselect('local_oer/metadataaggregator',
@@ -73,6 +114,7 @@ if ($hassiteconfig) {
                                                     get_string('licensereplacement', 'local_oer'),
                                                     get_string('licensereplacement_description', 'local_oer'),
                                                     $licensereplacedefault));
+    $settings->hide_if('local_oer/licensereplacement', 'local_oer/uselicensereplacement');
 
     $settings->add(new admin_setting_heading('oerrelease',
                                              get_string('oerreleaseheading', 'local_oer'),
