@@ -40,9 +40,11 @@ if ($hassiteconfig) {
     $visibletoall      = get_string('customfield_visibletoall', 'core_course');
     $visibletoteachers = get_string('customfield_visibletoteachers', 'core_course');
     $notvisible        = get_string('customfield_notvisible', 'core_course');
-    $visibilityoptions = [\core_course\customfield\course_handler::VISIBLETOALL      => $visibletoall,
-                          \core_course\customfield\course_handler::VISIBLETOTEACHERS => $visibletoteachers,
-                          \core_course\customfield\course_handler::NOTVISIBLE        => $notvisible,];
+    $visibilityoptions = [
+            \core_course\customfield\course_handler::VISIBLETOALL      => $visibletoall,
+            \core_course\customfield\course_handler::VISIBLETOTEACHERS => $visibletoteachers,
+            \core_course\customfield\course_handler::NOTVISIBLE        => $notvisible
+    ];
 
     $settings->add(new admin_setting_configselect('local_oer/coursecustomfieldsvisibility',
                                                   get_string('coursecustomfieldsvisibility', 'local_oer'),
