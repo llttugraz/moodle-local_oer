@@ -25,10 +25,7 @@
 
 namespace local_oer;
 
-use core_course\customfield\course_handler;
 use local_oer\metadata\courseinfo;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class courseinfo_test
@@ -36,9 +33,16 @@ defined('MOODLE_INTERNAL') || die();
  * @coversDefaultClass \local_oer\metadata\courseinfo
  */
 class courseinfo_test extends \advanced_testcase {
+    /**
+     * Moodle courseid used in all tests.
+     *
+     * @var null
+     */
     private $courseid = null;
 
     /**
+     * Setup for all tests.
+     *
      * @return void
      */
     public function setUp(): void {
@@ -146,6 +150,15 @@ class courseinfo_test extends \advanced_testcase {
         $this->assertTrue(is_array(end($courses)->customfields));
     }
 
+    /**
+     * Test the metadata generator for courseinfo.
+     *
+     * @return void
+     * @throws \ReflectionException
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @covers ::generate_metadata
+     */
     public function test_generate_metadata() {
         $customcat1            = $this->getDataGenerator()->create_custom_field_category(['name' => 'unittest category 1']);
         $customcat2            = $this->getDataGenerator()->create_custom_field_category(['name' => 'category 2 for unittest']);
