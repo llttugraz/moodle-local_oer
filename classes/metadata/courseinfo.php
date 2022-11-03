@@ -131,14 +131,15 @@ class courseinfo {
         foreach ($users as $user) {
             $teachers[] = fullname($user);
         }
-        $info              = self::get_default_metadata_object($courseid);
-        $info->coursecode  = 'moodlecourse-' . $courseid;
-        $info->coursename  = $course->fullname;
-        $info->structure   = '';
-        $info->description = $this->simple_html_to_text_reduction($course->summary);
+        $info               = self::get_default_metadata_object($courseid);
+        $info->coursecode   = 'moodlecourse-' . $courseid;
+        $info->coursename   = $course->fullname;
+        $info->structure    = '';
+        $info->description  = $this->simple_html_to_text_reduction($course->summary);
         $info->lecturer     = implode(', ', $teachers);
         $infos              = ['default' => $info];
-        $info->customfields = coursecustomfield::get_course_customfields_with_applied_config($courseid);
+        $customfields       = coursecustomfield::get_course_customfields_with_applied_config($courseid);
+        $info->customfields = empty($customfields) ? null : json_encode($customfields);
 
         $external = get_config('local_oer', 'metadataaggregator');
         if ($external != 'no_value') {

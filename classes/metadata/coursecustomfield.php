@@ -81,7 +81,7 @@ class coursecustomfield {
         $handler      = \core_course\customfield\course_handler::create();
         $categories   = $handler->get_categories_with_fields();
         foreach ($categories as $category) {
-            $catid   = $category->get('id');
+            $catid   = (int) $category->get('id');
             $catname = $category->get('name');
             $fields  = [];
             foreach ($category->get_fields() as $field) {
