@@ -210,21 +210,24 @@ class courseinfo_form extends \moodleform {
      *
      * @param \MoodleQuickForm $mform
      * @param \stdClass        $course
-     * @param array            $data
-     * @param string           $identifier
-     * @param string           $type
-     * @param int              $maxlength
-     * @param int              $minlength
-     * @param bool             $required
+     * @param array            $data           The data to set for the form elements
+     * @param string           $identifier     Name of form element
+     * @param string           $type           Type of form element
+     * @param int              $maxlength      Maximum input length for text fields
+     * @param int              $minlength      Minimum input length for text fields
+     * @param bool             $required       Is this form field required?
      * @param mixed            $additionaldata Datatype depends on used form field.
+     * @param string           $shownname      For dynamic fields language strings cannot be prepared
+     * @param string           $helpstring     Same as the name for dynamic fields, provide a help string
+     * @param bool             $ignoreable     Can this field be ignored?
      * @return \MoodleQuickForm
      * @throws \coding_exception
      */
     private function form_default_element(\MoodleQuickForm $mform, \stdClass $course, array &$data,
                                           string           $identifier, string $type, int $maxlength = 0,
                                           int              $minlength = 0, bool $required = false,
-                                                           $additionaldata = false, $shownname = '',
-                                                           $helpstring = '', $ignoreable = false): \MoodleQuickForm {
+                                                           $additionaldata = false, string $shownname = '',
+                                          string           $helpstring = '', $ignoreable = false): \MoodleQuickForm {
         $name                 = $identifier . '_' . $course->coursecode;
         $shownname            = $shownname == '' ? get_string($identifier, 'local_oer') : $shownname;
         $checkbox             = $identifier . '_edited_' . $course->coursecode;

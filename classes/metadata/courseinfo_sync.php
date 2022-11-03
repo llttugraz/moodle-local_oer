@@ -188,11 +188,11 @@ class courseinfo_sync {
      * in the OER plugin, so no overwrite is possible. That means only need to check if something has changed to determine
      * if an update is needed.
      *
-     * @param $oldcourse
-     * @param $newcourse
+     * @param array $oldfields
+     * @param array $newfields
      * @return array
      */
-    private function compare_customfields($oldfields, $newfields): array {
+    private function compare_customfields(array $oldfields, array $newfields): array {
         if (empty($newfields)) {
             return [null, !empty($oldfields)];
         }
