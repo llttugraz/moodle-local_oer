@@ -249,7 +249,7 @@ class courseinfo_test extends \advanced_testcase {
                     "</ol>" .
                     $anchor .
                     $anchor .
-                    "</p>" . // \r\n Will be removed by trim.
+                    "</p>" . // Linebreak \r\n will be removed by trim.
                     '<img src="abcdef" alt="abc">';
         $result   = $this->html_to_text_reflection($text);
         $expected = "Hello there\r\n" .
