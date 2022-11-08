@@ -382,10 +382,8 @@ class coursecustomfield_test extends \advanced_testcase {
      * @covers ::load_course_customfields_from_oer
      */
     public function test_load_course_customfields_from_oer() {
-        set_config('coursecustomfields', 1, 'local_oer');
-        $data   = $this->data;
-        $syncer = new courseinfo_sync();
-        $syncer->sync_course($data['course1']->id);
+        $data = $this->data;
+        $this->set_settings_for_test($data['course1']->id, 1, 0, '');
 
         $fields = coursecustomfield::load_course_customfields_from_oer($data['course1']->id);
         $this->assert_fields_course_one($fields);
