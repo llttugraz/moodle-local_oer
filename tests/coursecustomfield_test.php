@@ -137,7 +137,8 @@ class coursecustomfield_test extends \advanced_testcase {
         $data->id                     = $course->id;
         $data->customfield_sem        = 'WS';
         $data->customfield_ata_editor = [
-                'text'   => '<p dir="ltr" style="text-align:left;">Textarea <a href="localhost">with</a> <img src="@@PLUGINFILE@@">a lots of text...</p>',
+                'text'   => '<p dir="ltr" style="text-align:left;">' .
+                            'Textarea <a href="localhost">with</a> <img src="@@PLUGINFILE@@">a lots of text...</p>',
                 'format' => '1',
                 'itemid' => 0,
         ];
@@ -286,14 +287,14 @@ class coursecustomfield_test extends \advanced_testcase {
     /**
      * Helper to prevent code duplication.
      *
-     * @param $courseid
-     * @param $enable
-     * @param $visibility
-     * @param $ignored
+     * @param int    $courseid   Moodle courseid
+     * @param int    $enable     Checkbox value, 1 or 0
+     * @param int    $visibility Visibility as defined for customfields
+     * @param string $ignored    Setting of ignored customfields Format catid:fieldid, ...
      * @return void
      * @throws \dml_exception
      */
-    private function set_settings_for_test($courseid, $enable, $visibility, $ignored) {
+    private function set_settings_for_test(int $courseid, int $enable, int $visibility, string $ignored) {
         set_config('coursecustomfields', $enable, 'local_oer');
         set_config('coursecustomfieldsvisibility', $visibility, 'local_oer');
         set_config('coursecustomfieldsignored', $ignored, 'local_oer');
@@ -393,10 +394,10 @@ class coursecustomfield_test extends \advanced_testcase {
     /**
      * Helper function to prevent code duplication.
      *
-     * @param $fields
+     * @param array $fields
      * @return void
      */
-    private function assert_fields_course_one($fields) {
+    private function assert_fields_course_one(array $fields) {
         $data = $this->data;
         $this->assertCount(3, $fields, 'There are three categories set up for the platform');
         $this->assertEquals((int) $data['cat1']->get('id'), $fields[0]['id']);
@@ -510,6 +511,8 @@ class coursecustomfield_test extends \advanced_testcase {
     }
 
     /**
+     * Test to get string value of select field data.
+     *
      * @return void
      * @covers ::get_text_of_select_field
      */
