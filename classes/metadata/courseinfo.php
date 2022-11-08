@@ -139,7 +139,7 @@ class courseinfo {
         $info->lecturer     = implode(', ', $teachers);
         $infos              = ['default' => $info];
         $customfields       = coursecustomfield::get_course_customfields_with_applied_config($courseid);
-        $info->customfields = empty($customfields) ? null : json_encode($customfields);
+        $info->customfields = empty($customfields) ? null : $customfields;
 
         $external = get_config('local_oer', 'metadataaggregator');
         if ($external != 'no_value') {
@@ -166,7 +166,7 @@ class courseinfo {
      * @return string
      * @throws \Exception
      */
-    private function simple_html_to_text_reduction(string $text) {
+    public static function simple_html_to_text_reduction(string $text) {
         preg_match_all('/(<a[^>]*>[^<]+<\/a>)/', $text, $urls);
         foreach ($urls[0] as $key => $url) {
             $a    = new \SimpleXMLElement($url);

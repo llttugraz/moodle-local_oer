@@ -63,7 +63,6 @@ class courseinfo_sync {
                         $sync['update'][] = $updatecourse;
                     }
                     unset($oldcourses[$key]);
-
                 }
             }
             if (!$found) {
@@ -77,6 +76,7 @@ class courseinfo_sync {
         }
         global $DB;
         foreach ($sync['create'] as $course) {
+            $course->customfields = empty($course->customfields) ? null : json_encode($course->customfields);
             $DB->insert_record('local_oer_courseinfo', $course);
         }
         foreach ($sync['update'] as $course) {
@@ -188,11 +188,11 @@ class courseinfo_sync {
      * in the OER plugin, so no overwrite is possible. That means only need to check if something has changed to determine
      * if an update is needed.
      *
-     * @param array $oldfields
-     * @param array $newfields
+     * @param array|null $oldfields
+     * @param array|null $newfields
      * @return array
      */
-    private function compare_customfields(array $oldfields, array $newfields): array {
+    public function compare_customfields(?array $oldfields, ?array $newfields): array {
         if (empty($newfields)) {
             return [null, !empty($oldfields)];
         }

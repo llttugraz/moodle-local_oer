@@ -55,7 +55,7 @@ class coursecustomfield {
             $fields = [];
             foreach ($category['fields'] as $field) {
                 $ignore = $category['id'] . ':' . $field['id'];
-                if ($field['settings']['visibility'] >= $visibility && strpos($ignored, $ignore) === false) {
+                if ($field['visibility'] >= $visibility && strpos($ignored, $ignore) === false) {
                     $fields[] = $field;
                 }
             }
@@ -75,6 +75,7 @@ class coursecustomfield {
      *
      * @param int $courseid Moodle course id
      * @return array
+     * @throws \Exception
      */
     public static function get_course_customfields(int $courseid): array {
         $customfields = [];
@@ -86,15 +87,27 @@ class coursecustomfield {
             $fields  = [];
             foreach ($category->get_fields() as $field) {
                 $fieldid   = (int) $field->get('id');
-                $fielddata = $handler->get_instance_data($courseid)[$fieldid];
-                $data      = trim(strip_tags($fielddata->get_value()));
-                $fields[]  = [
-                        'id'        => $fieldid,
-                        'shortname' => $field->get('shortname'),
-                        'fullname'  => $field->get('name'),
-                        'type'      => $field->get('type'),
-                        'settings'  => $field->get('configdata'),
-                        'data'      => $data,
+                $fielddata = $handler->get_instance_data($courseid, true)[$fieldid];
+                $type      = $field->get('type');
+                $settings  = $field->get('configdata');
+                switch ($type) {
+                    case 'select':
+                        $data = self::get_text_of_select_field($fielddata->get_value(), $settings['options']);
+                        break;
+                    case 'textarea':
+                        $data = courseinfo::simple_html_to_text_reduction($fielddata->get_value());
+                        break;
+                    default:
+                        // Make some basic cleaning to other fields.
+                        $data = trim(strip_tags($fielddata->get_value()));
+                }
+                $fields[] = [
+                        'id'         => $fieldid,
+                        'shortname'  => $field->get('shortname'),
+                        'fullname'   => $field->get('name'),
+                        'type'       => $field->get('type'),
+                        'visibility' => $settings['visibility'],
+                        'data'       => $data,
                 ];
             }
             $customfields[] = [
@@ -120,7 +133,7 @@ class coursecustomfield {
         global $DB;
         $customfields = $DB->get_field('local_oer_courseinfo', 'customfields',
                                        ['courseid' => $courseid, 'subplugin' => courseinfo::BASETYPE]);
-        return $customfields ? json_decode($customfields, true) : [];
+        return !empty($customfields) ? json_decode($customfields, true) : [];
     }
 
     /**
@@ -143,12 +156,11 @@ class coursecustomfield {
         ];
         foreach ($customfields as $category) {
             foreach ($category['fields'] as $field) {
-                $data       = $field['type'] == 'select' ? self::get_text_of_select_field($field) : $field['data'];
                 $snapshot[] = [
                         'shortname' => $field['shortname'],
                         'fullname'  => $field['fullname'],
                         'type'      => $typeconversion[$field['type']] ?? $field['type'],
-                        'data'      => $data,
+                        'data'      => $field['data'],
                         'category'  => $category['name'],
                 ];
             }
@@ -159,11 +171,13 @@ class coursecustomfield {
     /**
      * Return the text of a select field value.
      *
-     * @param array $field Customfield in array format of OER plugin.
+     * @param int    $value         The stored int value of the options
+     * @param string $selectoptions The string of the select options
      * @return string
      */
-    public static function get_text_of_select_field(array $field): string {
-        $options = explode("\r\n", $field['settings']['options']);
-        return $options[$field['data']];
+    public static function get_text_of_select_field(int $value, string $selectoptions): string {
+        // Customfields add an empty string as first position.
+        $options = array_merge([''], explode("\r\n", $selectoptions));
+        return $options[$value] ?? '';
     }
 }

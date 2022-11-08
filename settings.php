@@ -49,7 +49,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_oer/coursecustomfieldsvisibility',
                                                   get_string('coursecustomfieldsvisibility', 'local_oer'),
                                                   get_string('coursecustomfieldsvisibility_description', 'local_oer'),
-                                                  \core_course\customfield\course_handler::NOTVISIBLE, $visibilityoptions));
+                                                  \core_course\customfield\course_handler::VISIBLETOALL, $visibilityoptions));
     $settings->hide_if('local_oer/coursecustomfieldsvisibility', 'local_oer/coursecustomfields');
 
     $customfields = \local_oer\metadata\coursecustomfield::get_course_customfields(-1);
@@ -57,7 +57,7 @@ if ($hassiteconfig) {
     foreach ($customfields as $category) {
         foreach ($category['fields'] as $field) {
             $visibility = $visibletoall;
-            switch ($field['settings']['visibility']) {
+            switch ($field['visibility']) {
                 case \core_course\customfield\course_handler::VISIBLETOTEACHERS:
                     $visibility = $visibletoteachers;
                     break;

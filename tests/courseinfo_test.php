@@ -190,7 +190,7 @@ class courseinfo_test extends \advanced_testcase {
         $this->assertEquals('moodlecourse-' . $this->courseid, $course->coursecode);
         $this->assertEquals($mcourse->fullname, $course->coursename);
         $this->assertEquals('', $course->structure);
-        $this->assertEquals($this->html_to_text_reflection($mcourse->summary), $course->description);
+        $this->assertEquals(courseinfo::simple_html_to_text_reduction($mcourse->summary), $course->description);
         $lecturers = fullname($editingteacher1) . ', ' . fullname($editingteacher2);
         $this->assertEquals($lecturers, $course->lecturer);
         $this->assertNull($course->customfields);
@@ -206,12 +206,12 @@ class courseinfo_test extends \advanced_testcase {
                         'name'   => $customcat1->get('name'),
                         'fields' => [
                                 [
-                                        'id'        => (int) $field1->get('id'),
-                                        'shortname' => $field1->get('shortname'),
-                                        'fullname'  => $field1->get('name'),
-                                        'type'      => $field1->get('type'),
-                                        'settings'  => $field1->get('configdata'),
-                                        'data'      => "WS"
+                                        'id'         => (int) $field1->get('id'),
+                                        'shortname'  => $field1->get('shortname'),
+                                        'fullname'   => $field1->get('name'),
+                                        'type'       => $field1->get('type'),
+                                        'visibility' => $field1->get('configdata')['visibility'],
+                                        'data'       => "WS"
                                 ]
                         ],
                 ],
@@ -221,7 +221,7 @@ class courseinfo_test extends \advanced_testcase {
                         'fields' => [],
                 ]
         ];
-        $this->assertEquals(json_encode($expected), $course->customfields);
+        $this->assertEquals($expected, $course->customfields);
     }
 
     /**
@@ -234,7 +234,7 @@ class courseinfo_test extends \advanced_testcase {
     public function test_simple_html_to_text_reduction() {
         $anchor   = '<a href="https://irunaunittest.test">this text is lost</a>';
         $expected = "https://irunaunittest.test";
-        $result   = $this->html_to_text_reflection($anchor);
+        $result   = courseinfo::simple_html_to_text_reduction($anchor);
         $this->assertEquals($expected, $result);
         $text     = "<h1>Hello there</h1>" .
                     "<h3>Testtext</h3>" .
@@ -251,7 +251,7 @@ class courseinfo_test extends \advanced_testcase {
                     $anchor .
                     "</p>" . // Linebreak \r\n will be removed by trim.
                     '<img src="abcdef" alt="abc">';
-        $result   = $this->html_to_text_reflection($text);
+        $result   = courseinfo::simple_html_to_text_reduction($text);
         $expected = "Hello there\r\n" .
                     "Testtext\r\n" .
                     "\r\n" .
@@ -263,20 +263,5 @@ class courseinfo_test extends \advanced_testcase {
                     "\r\n" .
                     "https://irunaunittest.test https://irunaunittest.test";
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * Helper function used in some tests.
-     *
-     * @param string $text HTML text to reduce
-     * @return mixed
-     * @throws \ReflectionException
-     */
-    private function html_to_text_reflection(string $text) {
-        $reflection = new \ReflectionClass('\local_oer\metadata\courseinfo');
-        $htmltotext = $reflection->getMethod('simple_html_to_text_reduction');
-        $htmltotext->setAccessible(true);
-        $courseinfo = new courseinfo();
-        return $htmltotext->invokeArgs($courseinfo, [$text]);
     }
 }

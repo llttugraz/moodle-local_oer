@@ -381,7 +381,7 @@ $string['coursecustomfieldsvisibility_description']        = '<p>The visibility 
                                                              '<ul>' .
                                                              '<li>"Everyone": Only fields marked with this state are added</li>' .
                                                              '<li>"Teachers": "Teachers" and "Everyone" fields are added</li>' .
-                                                             '<li>"Not-visible": All fields are added ' .
+                                                             '<li>"Nobody": All fields are added ' .
                                                              '(including the options above)</li>' .
                                                              '</ul>';
 $string['coursecustomfieldsignored']                       = 'Ignore customfields';
