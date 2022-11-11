@@ -388,3 +388,4 @@ $string['requirementschanged_body']                        = 'Aufgrund geändert
                                                              '<a href="{$a->url}">{$a->course}</a> ' .
                                                              'für eine erneute Veröffentlichung angepasst werden:<br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';
+$string['multiplecourses']                                 = 'Diese Datei wurde in mehreren Kursen gefunden:';

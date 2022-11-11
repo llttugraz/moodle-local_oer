@@ -131,6 +131,19 @@ class get_file extends \external_api {
                                 )),
                         'requirementsmet' => new \external_value(PARAM_BOOL,
                                                                  'Boolean if all requirements for release are fulfilled'),
+                        'state'           => new \external_value(PARAM_INT, 'State of file as defined in filestate class.'),
+                        'multiple'        => new \external_value(PARAM_BOOL, 'File is used in multiple courses'),
+                        'editor'          => new \external_value(PARAM_INT, 'Courseid where file is edited.'),
+                        'courses'         => new \external_multiple_structure(
+                                new \external_single_structure(
+                                        [
+                                                'id'     => new \external_value(PARAM_INT, 'Id of course where file is used'),
+                                                'name'   => new \external_value(PARAM_TEXT, 'Name of course where file is used'),
+                                                'editor' => new \external_value(PARAM_BOOL,
+                                                                                'True if the file is edited in this course'),
+                                        ]
+                                )
+                        )
                 ]);
     }
 }

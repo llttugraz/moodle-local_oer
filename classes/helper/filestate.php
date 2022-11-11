@@ -25,6 +25,8 @@
 
 namespace local_oer\helper;
 
+use local_oer\logger;
+
 /**
  * Class filestate
  *
@@ -78,7 +80,11 @@ class filestate {
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
             list(, $course,) = get_context_info_array($contextid);
-            $courses[$course->id] = $course->fullname;
+            $courses[$course->id] = [
+                    'id'     => $course->id,
+                    'name'   => $course->fullname,
+                    'editor' => false,
+            ];
         }
 
         // Step 3: Determine OER file state. Is file being edited or already released?
@@ -88,8 +94,10 @@ class filestate {
         $editorid = 0;
         $oerfiles = $DB->get_records('local_oer_files', ['contenthash' => $contenthash], 'id ASC', 'courseid');
         if ($oerfiles && count($oerfiles) > 1) {
-            // TODO: should there be any notification for administrators to look into this problem?
-            return [self::STATE_FILE_ERROR, null];
+            $message = 'Ambiguous metadata for file ' . $contenthash .
+                       ' found. File has been edited in ' . count($oerfiles) . ' courses';
+            logger::add(array_key_first($oerfiles), logger::LOGERROR, $message);
+            return [self::STATE_FILE_ERROR, 0, []];
         } else if ($oerfiles && count($oerfiles) == 1) {
             $cid   = array_key_first($oerfiles);
             $state = self::STATE_FILE_EDITED;
@@ -101,9 +109,10 @@ class filestate {
                 $editorid = array_key_first($courses);
                 $DB->set_field('local_oer_files', 'courseid', $editorid, ['contenthash' => $contenthash]);
             }
+            $courses[$editorid]['editor'] = true;
         }
 
-        // TODO: should the snapshot(s) also be inherited?
+        // Snapshots will not be inherited to another course.
         if ($DB->record_exists('local_oer_snapshot', ['contenthash' => $contenthash])) {
             $state = self::STATE_FILE_RELEASED;
         }

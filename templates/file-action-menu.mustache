@@ -26,10 +26,28 @@
     }
 }}
 
-<a href="#" id="local_oer-action-menu-{{contenthash}}" title="{{#str}} edit, moodle{{/str}}"
-   class="btn-xs" data-action="edit-file" data-contenthash="{{contenthash}}" data-title="{{title}}">
-    <i class="icon fa fa-cog fa-fw" style="pointer-events:none"></i>
-</a>
+<div class="p-0 m-0">
+    <a href="#" id="local_oer-action-menu-{{contenthash}}" title="{{#str}} edit, moodle{{/str}}"
+       class="nav-link btn-xs" data-action="edit-file" data-contenthash="{{contenthash}}" data-title="{{title}}">
+        <i class="icon fa fa-cog fa-fw" style="pointer-events:none"></i>
+    </a>
+    {{#multiple}}
+        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="icon fa fa-copy fa-fw" style="pointer-events:none"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {{#str}} multiplecourses, local_oer{{/str}}
+            {{#courses}}
+                <a class="dropdown-item" href="{{globals.config.wwwroot}}/course/view.php?id={{id}}" target="_blank">
+                {{#editor}}
+                    <span class="badge badge-info">Editor</span>
+                {{/editor}}
+                {{name}}</a>
+            {{/courses}}
+        </div>
+    {{/multiple}}
+</div>
+
 {{^element.frozen}}
 {{#js}}
 require(['local_oer/filemenu'], function(action) {

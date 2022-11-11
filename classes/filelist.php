@@ -45,7 +45,7 @@ class filelist {
      * @throws \moodle_exception
      */
     public function __construct($courseid) {
-        $this->coursefiles = $this->get_files();
+        $this->coursefiles = self::get_course_files($courseid);
     }
 
     /**
@@ -75,7 +75,6 @@ class filelist {
 
         $fs = get_file_storage();
 
-        // TODO: separate the file loader into subplugins.
         foreach ($mod->cms as $cm) {
             $skip = false;
             switch ($cm->modname) {
@@ -99,10 +98,13 @@ class filelist {
                                          'sortorder DESC', false);
 
             foreach ($files as $file) {
-                $state = filestate::calculate_file_state($file->get_contenthash());
+                list($state, $editor, $courses) = filestate::calculate_file_state($file->get_contenthash());
                 $coursefiles[$file->get_contenthash()][] = [
-                        'file'   => $file,
-                        'module' => $cm,
+                        'file'    => $file,
+                        'module'  => $cm,
+                        'state'   => $state,
+                        'editor'  => $editor,
+                        'courses' => $courses,
                 ];
             }
         }
@@ -181,6 +183,10 @@ class filelist {
                     'modules'         => $modules,
                     'sections'        => $filesections,
                     'requirementsmet' => false,
+                    'state'           => $file[0]['state'],
+                    'multiple'        => count($file[0]['courses']) > 1,
+                    'editor'          => $file[0]['editor'],
+                    'courses'         => $file[0]['courses'],
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
             if ($DB->record_exists('local_oer_files',
