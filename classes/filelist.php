@@ -25,7 +25,7 @@
 
 namespace local_oer;
 
-use local_oer\helper\license;
+use local_oer\helper\filestate;
 use local_oer\helper\requirements;
 
 /**
@@ -45,42 +45,7 @@ class filelist {
      * @throws \moodle_exception
      */
     public function __construct($courseid) {
-        $mod         = get_fast_modinfo($courseid);
-        $coursefiles = [];
-
-        $fs = get_file_storage();
-
-        foreach ($mod->cms as $cm) {
-            $skip = false;
-            switch ($cm->modname) {
-                case 'folder':
-                    $component = 'mod_folder';
-                    $area      = 'content';
-                    break;
-                case 'resource':
-                    $component = 'mod_resource';
-                    $area      = 'content';
-                    break;
-                default:
-                    $component = '';
-                    $area      = '';
-                    $skip      = true;
-            }
-            if ($skip) {
-                continue;
-            }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false,
-                                         'sortorder DESC', false);
-
-            foreach ($files as $file) {
-                $coursefiles[] = [
-                        'file'   => $file,
-                        'module' => $cm,
-                ];
-            }
-        }
-
-        $this->coursefiles = $coursefiles;
+        $this->coursefiles = $this->get_files();
     }
 
     /**
@@ -134,6 +99,7 @@ class filelist {
                                          'sortorder DESC', false);
 
             foreach ($files as $file) {
+                $state = filestate::calculate_file_state($file->get_contenthash());
                 $coursefiles[$file->get_contenthash()][] = [
                         'file'   => $file,
                         'module' => $cm,
