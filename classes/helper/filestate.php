@@ -240,11 +240,21 @@ class filestate {
             ];
         }
 
+        switch($file['state']) {
+            case self::STATE_FILE_ERROR:
+                $alert = 'danger';
+                break;
+            case self::STATE_FILE_RELEASED:
+                $alert = 'success';
+                break;
+            default:
+                $alert = 'info';
+        }
+
         return $OUTPUT->render_from_template('local_oer/notwritable',
                                              [
                                                      'header'       => get_string('metadatanotwritable', 'local_oer'),
-                                                     'alert'        => $file['state'] == self::STATE_FILE_EDITED ?
-                                                             'info' : 'danger',
+                                                     'alert'        => $alert,
                                                      'reason'       => get_string('metadatanotwritable' . $file['state'],
                                                                                   'local_oer'),
                                                      'support'      => get_string('contactsupport', 'local_oer',
