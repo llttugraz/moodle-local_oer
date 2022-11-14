@@ -37,13 +37,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {{#str}} multiplecourses, local_oer{{/str}}
-            {{#courses}}
-                <a class="dropdown-item" href="{{globals.config.wwwroot}}/course/view.php?id={{id}}" target="_blank">
-                {{#editor}}
-                    <span class="badge badge-info">Editor</span>
-                {{/editor}}
-                {{name}}</a>
-            {{/courses}}
+            {{> local_oer/multiplecourses}}
         </div>
     {{/multiple}}
 </div>

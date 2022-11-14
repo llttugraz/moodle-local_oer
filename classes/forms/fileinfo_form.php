@@ -26,6 +26,7 @@
 namespace local_oer\forms;
 
 use local_oer\filelist;
+use local_oer\helper\filestate;
 use local_oer\helper\formhelper;
 use local_oer\helper\license;
 use local_oer\plugininfo\oerclassification;
@@ -46,16 +47,25 @@ class fileinfo_form extends \moodleform {
         global $DB, $OUTPUT;
         $reqfields = static::get_required_fields();
 
-        $files      = filelist::get_single_file($course['courseid'], $course['contenthash']);
-        $file       = $files[0]; // We just need the first entry, all others are duplicates if available.
-        $fromdb     = $DB->get_record('local_oer_files',
-                                      ['courseid' => $course['courseid'], 'contenthash' => $course['contenthash']]);
-        $preference = $DB->get_record('local_oer_preference', ['courseid' => $course['courseid']]);
+        $files = filelist::get_single_file($course['courseid'], $course['contenthash']);
+        $file  = $files[0]; // We just need the first entry, all others are duplicates if available.
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
         $mform->addElement('hidden', 'contenthash', null);
         $mform->setType('contenthash', PARAM_ALPHANUM);
+
+        if (!$file['writable']) {
+            $mform->addElement('hidden', 'nosave', true);
+            $mform->setType('contenthash', PARAM_BOOL);
+            $notwritable = filestate::formatted_notwritable_output_html($file);
+            $mform->addElement('html', $notwritable);
+            return;
+        }
+
+        $fromdb     = $DB->get_record('local_oer_files',
+                                      ['courseid' => $course['courseid'], 'contenthash' => $course['contenthash']]);
+        $preference = $DB->get_record('local_oer_preference', ['courseid' => $course['courseid']]);
 
         $mform->addElement('text', 'title', get_string('title', 'local_oer'), 'wrap="virtual"');
         $mform->setType('title', PARAM_TEXT);
@@ -468,7 +478,7 @@ class fileinfo_form extends \moodleform {
      * @param string $name
      * @return array
      */
-    private static function load_classification_plugin_values(string $name): array {
+    public static function load_classification_plugin_values(string $name): array {
         $frankenstyle = 'oerclassification_' . $name;
         $plugin       = '\\' . $frankenstyle . '\plugin';
         $url          = $plugin::url_to_external_resource();

@@ -75,7 +75,12 @@ export const showForm = (type, title, options) => {
         params: params,
     };
     let form = Fragment.loadFragment('local_oer', 'formdata', context, args);
-    form.done(function() {
+    form.done(function(data) {
+        // TODO: Better way to do this?
+        let nosave = data.includes('<input name="nosave" type="hidden" value="1" />');
+        if (nosave !== false) {
+            type = 'nosave';
+        }
         showFormModal(form, type, title, options);
     });
 };
@@ -83,8 +88,9 @@ export const showForm = (type, title, options) => {
 
 const showFormModal = (form, type, title, options) => {
     let element = document.getElementById("local_oer_files_main_area");
+    let modaltype = type === 'nosave' ? ModalFactory.types.CANCEL : ModalFactory.types.SAVE_CANCEL;
     ModalFactory.create({
-        type: ModalFactory.types.SAVE_CANCEL,
+        type: modaltype,
         title: title,
         body: form,
     }).then(function(modal) {

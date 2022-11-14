@@ -143,7 +143,8 @@ class get_file extends \external_api {
                                                                                 'True if the file is edited in this course'),
                                         ]
                                 )
-                        )
+                        ),
+                        'writable'        => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                 ]);
     }
 }

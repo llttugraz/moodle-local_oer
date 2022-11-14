@@ -25,6 +25,8 @@
 
 namespace local_oer\helper;
 
+use local_oer\classification;
+use local_oer\forms\fileinfo_form;
 use local_oer\logger;
 
 /**
@@ -61,7 +63,16 @@ class filestate {
      */
     const STATE_FILE_ERROR = 0;
 
-    public static function calculate_file_state(string $contenthash) {
+    /**
+     * Calculate the current file state for a file that has been found in a mod_resource or mod_folder activity.
+     *
+     * @param string $contenthash     Moodle file contenthash
+     * @param int    $currentcourseid Course where this function is currently called.
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function calculate_file_state(string $contenthash, int $currentcourseid) {
         $courses = [];
         global $DB;
         // Step 1: Load usage of contenthash.
@@ -117,6 +128,131 @@ class filestate {
             $state = self::STATE_FILE_RELEASED;
         }
 
-        return [$state, $editorid, $courses];
+        $writable = self::metadata_writable($state, $editorid == $currentcourseid);
+
+        return [$state, $editorid, $courses, $writable];
+    }
+
+    /**
+     * Resolve state and editor state of a file to a boolean value if the metadata is writable in a given course.
+     *
+     * @param int  $state  State of the file as calculated from this class.
+     * @param bool $editor Value if the course is the course that has edited this file.
+     * @return bool
+     */
+    public static function metadata_writable(int $state, bool $editor): bool {
+        switch ($state) {
+            case self::STATE_FILE_ERROR:
+            case self::STATE_FILE_RELEASED:
+                return false;
+            case self::STATE_FILE_NOT_EDITED:
+                return true;
+            case self::STATE_FILE_EDITED:
+                return $editor;
+        }
+        return false;
+    }
+
+    /**
+     * Generate a placeholder text to show when a file is not writable.
+     *
+     * @param array $file
+     * @return mixed
+     * @throws \coding_exception
+     */
+    public static function formatted_notwritable_output_html(array $file) {
+        global $OUTPUT, $DB;
+        $support = \core_user::get_support_user();
+        if ($file['state'] !== self::STATE_FILE_ERROR) {
+            $data      = $DB->get_record('local_oer_files',
+                                         ['courseid' => $file['editor'], 'contenthash' => $file['file']->get_contenthash()]);
+            $context   = formhelper::lom_context_list();
+            $resources = formhelper::lom_resource_types();
+            // It ain`t much, but it`s honest work.
+            $linebreak      = str_replace("\r\n", '<br>', $data->description);
+            $firstbreak     = strpos($linebreak, '<br>');
+            $firstline      = $firstbreak && $firstbreak < 80 ? $firstbreak : 80;
+            $simplemetadata = [
+                    [
+                            'name'  => get_string('title', 'local_oer'),
+                            'value' => $data->title
+                    ],
+                    [
+                            'name'     => get_string('description', 'local_oer'),
+                            'heading'  => substr($linebreak, 0, $firstline),
+                            'body'     => substr($linebreak, $firstline, strlen($linebreak)),
+                            'value'    => $data->description,
+                            'collapse' => true,
+                    ],
+                    [
+                            'name'  => get_string('context', 'local_oer'),
+                            'value' => $context[$data->context]
+                    ],
+                    [
+                            'name'  => get_string('license', 'local_oer'),
+                            'value' => license::get_license_fullname($data->license)
+                    ],
+                    [
+                            'name'  => get_string('language', 'local_oer'),
+                            'value' => $data->language
+                    ],
+                    [
+                            'name'  => get_string('resourcetype', 'local_oer'),
+                            'value' => $resources[$data->resourcetype]
+                    ],
+            ];
+            $tags           = explode(',', $data->tags);
+            $taglist        = [];
+            foreach ($tags as $tag) {
+                $taglist[] = ['value' => $tag];
+            }
+            $persons    = empty($data->persons) ? [] : json_decode($data->persons, true)['persons'];
+            $personlist = [];
+            foreach ($persons as $person) {
+                $personlist[] = $person;
+            }
+            $classification = json_decode($data->classification, true);
+            $classlist      = [];
+            foreach ($classification as $type => $entries) {
+                $frankenstyle = 'oerclassification_' . $type;
+                list($url, $classdata) = fileinfo_form::load_classification_plugin_values($type);
+                $values = [];
+                foreach ($entries as $entry) {
+                    $values[] = [
+                            'name' => $classdata[$entry],
+                            'code' => $entry,
+                    ];
+                }
+                $classlist[] = [
+                        'type'   => get_string('selectname', $frankenstyle),
+                        'url'    => $url,
+                        'values' => $values,
+                ];
+            }
+            $metadata = [
+                    'simple'             => $simplemetadata,
+                    'tags'               => !empty($taglist),
+                    'taglist'            => $taglist,
+                    'persons'            => !empty($personlist),
+                    'personlist'         => $personlist,
+                    'classification'     => !empty($classification),
+                    'classificationlist' => $classlist,
+            ];
+        }
+
+        return $OUTPUT->render_from_template('local_oer/notwritable',
+                                             [
+                                                     'header'       => get_string('metadatanotwritable', 'local_oer'),
+                                                     'alert'        => $file['state'] == self::STATE_FILE_EDITED ?
+                                                             'info' : 'danger',
+                                                     'reason'       => get_string('metadatanotwritable' . $file['state'],
+                                                                                  'local_oer'),
+                                                     'support'      => get_string('contactsupport', 'local_oer',
+                                                                                  ['support' => $support->email]),
+                                                     'multiple'     => count($file['courses']) > 1,
+                                                     'courses'      => array_values($file['courses']),
+                                                     'showmetadata' => $file['state'] != self::STATE_FILE_ERROR,
+                                                     'metadata'     => $metadata,
+                                             ]);
     }
 }

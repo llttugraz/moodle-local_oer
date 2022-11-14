@@ -368,3 +368,13 @@ $string['requirementschanged_body']                        = 'Due to changes in 
                                                              'be modified for republishing: <br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';
 $string['multiplecourses']                                 = 'This file has been found in multiple courses:';
+$string['metadatanotwritable']                             = 'The metadata of this file cannot be edited.';
+$string['reason']                                          = 'Reason';
+$string['metadatanotwritable0']                            = 'An error has been found. It seems that this file has been edited ' .
+                                                             'in multiple places.';
+$string['metadatanotwritable2']                            = 'The metadata of this file has already been edited ' .
+                                                             'in another course.';
+$string['metadatanotwritable3']                            = 'This file has already been released and cannot be edited anymore.';
+$string['contactsupport']                                  = 'For further information, please contact ' .
+                                                             '<a href="mailto:{$a->support}">{$a->support}</a>.';
+$string['showmetadata']                                    = 'Show stored metadata';
