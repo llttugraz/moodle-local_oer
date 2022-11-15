@@ -29,6 +29,7 @@ use local_oer\filelist;
 use local_oer\helper\filestate;
 use local_oer\helper\formhelper;
 use local_oer\helper\license;
+use local_oer\logger;
 use local_oer\plugininfo\oerclassification;
 
 /**
@@ -342,6 +343,14 @@ class fileinfo_form extends \moodleform {
             $record->contenthash = $fromform['contenthash'];
             $record              = $this->add_values_from_form($record, $fromform, $timestamp);
             $record->timecreated = $timestamp;
+            // Update 15.11.2022: File in multiple courses https://github.com/llttugraz/moodle-local_oer/issues/14 .
+            // Check if the contenthash is not already stored with another courseid.
+            if ($duplicate = $DB->get_record('local_oer_files', ['contenthash' => $record->contenthash])) {
+                logger::add($record->courseid, logger::LOGERROR,
+                            'Tried to create duplicate file entry for file ' . $record->contenthash . '.' .
+                            'This code should not be reachable');
+                return;
+            }
             $DB->insert_record('local_oer_files', $record);
         }
     }

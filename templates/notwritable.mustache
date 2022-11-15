@@ -35,7 +35,8 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 {{#str}} reason, local_oer {{/str}}:
 <div class="alert alert-{{alert}}">{{{reason}}}</div>
 {{#multiple}}
-    <p>{{#str}} courses {{/str}}:{{> local_oer/multiplecourses}}</p>
+    <p>{{#str}} multiplecourses, local_oer {{/str}}
+        {{> local_oer/multiplecourses}}</p>
 {{/multiple}}
 {{#showmetadata}}
     <p>
