@@ -87,7 +87,7 @@ class courseinfo {
      * Create the metadata array.
      * At least the metadata from the moodle course is returned.
      * If an external plugin is installed and selected, the external
-     * informations are added by calling the load_data method from the subplugin.
+     * information are added by calling the load_data method from the subplugin.
      *
      * @param int $courseid
      * @return array

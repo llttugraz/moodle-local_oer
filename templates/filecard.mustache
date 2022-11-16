@@ -36,6 +36,9 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     <div class="card shadow-sm mb-4">
         <div class="card-header container">
             <div class="row">
+                {{> local_oer/file-action-menu }}
+            </div>
+            <div class="row">
                 <div class="col-3">
                     <div class="d-flex justify-content-start align-items-top my-2">
                         {{#iconisimage}}
@@ -49,22 +52,8 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                         {{/iconisimage}}
                     </div>
                 </div>
-                <div class="col-9 pl-0 pt-1">
-                    <div class="row">
-                        <div class="col-10">
-                            <p class="card-title d-block m-0">
-                                <span title="{{title}}">{{title}}</span>
-                            </p>
-                        </div>
-                        <div class="d-flex pt-0 float-right mt-0 col-2">
-                            {{> local_oer/file-action-menu }}
-                        </div>
-                    </div>
-                    {{#ignore}}
-                        <div class="row m-0">
-                            <small><i class="icon fa fa-info-circle fa-fw" aria-hidden="true"></i>{{#str}} isignored, local_oer{{/str}}</small>
-                        </div>
-                    {{/ignore}}
+                <div class="col-sm pl-0 pt-1">
+                    <p class="card-title text-wrap d-block m-0">{{title}}</p>
                 </div>
             </div>
         </div>

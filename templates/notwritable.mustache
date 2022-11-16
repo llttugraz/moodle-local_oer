@@ -40,11 +40,12 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 {{/multiple}}
 {{#showmetadata}}
     <p>
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#local_oer_showmetadata_{{uniqid}}" aria-expanded="false"
+                aria-controls="local_oer_showmetadata_{{uniqid}}">
             {{#str}} showmetadata, local_oer {{/str}}
         </button>
     </p>
-    <div class="collapse" id="collapseExample">
+    <div class="collapse" id="local_oer_showmetadata_{{uniqid}}">
         <div class="card card-body">
             <div class="container">
                 {{#metadata.simple}}

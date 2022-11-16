@@ -78,6 +78,10 @@ function local_oer_extend_navigation(global_navigation $navigation) {
 /**
  * Load and store forms used in frontend.
  *
+ * @TODO: as this function grows with cases, a refactor would be necessary.
+ *      I think the form->render and save cases could be more generalized and
+ *      separated into different methods/functions.
+ *
  * @param array $args Arguments from JS call
  * @return string
  * @throws coding_exception
@@ -94,6 +98,7 @@ function local_oer_output_fragment_formdata(array $args): string {
     $formtype = clean_param($args['formtype'], PARAM_ALPHA);
     $context  = context_course::instance($courseid);
     require_capability('local/oer:edititems', $context);
+    $fromform = [];
 
     switch ($formtype) {
         case 'CourseinfoForm':
@@ -158,6 +163,27 @@ function local_oer_output_fragment_formdata(array $args): string {
                 return $mform->render();
             }
             $mform->update_metadata($fromform);
+            return '{"saved":"true"}';
+        case 'CourseToFileForm':
+            $params      = json_decode($args['params']);
+            $contenthash = clean_param($params->contenthash, PARAM_ALPHANUM);
+            $form        = new \local_oer\forms\coursetofile_form(null, ['contenthash' => $contenthash, 'courseid' => $courseid]);
+            return $form->render();
+        case 'CourseToFileFormSave':
+            if (!isset($args['params'])) {
+                return 'form data missing.';
+            }
+            $params = json_decode($args['params']);
+            $mform  = new \local_oer\forms\coursetofile_form(null, ['contenthash' => $params->contenthash,
+                                                                    'courseid'    => $courseid]);
+            parse_str($params->settings, $fromform);
+            $mform->set_data($fromform);
+            $errors = $mform->validation($fromform, []);
+            if (!empty($errors)) {
+                $mform->is_validated();
+                return $mform->render();
+            }
+            $mform->store_overwrite_data($fromform);
             return '{"saved":"true"}';
         default:
             return 'Unknown form type submitted.';

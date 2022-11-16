@@ -93,7 +93,7 @@ class filestate {
             list(, $course,) = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id'     => $course->id,
-                    'name'   => $course->fullname,
+                    'name'   => format_string($course->fullname),
                     'editor' => false,
             ];
         }
@@ -240,7 +240,7 @@ class filestate {
             ];
         }
 
-        switch($file['state']) {
+        switch ($file['state']) {
             case self::STATE_FILE_ERROR:
                 $alert = 'danger';
                 break;

@@ -138,13 +138,15 @@ class get_file extends \external_api {
                                 new \external_single_structure(
                                         [
                                                 'id'     => new \external_value(PARAM_INT, 'Id of course where file is used'),
-                                                'name'   => new \external_value(PARAM_TEXT, 'Name of course where file is used'),
+                                                'name'   => new \external_value(PARAM_TEXT,
+                                                                                'Name of course where file is used'),
                                                 'editor' => new \external_value(PARAM_BOOL,
                                                                                 'True if the file is edited in this course'),
                                         ]
                                 )
                         ),
                         'writable'        => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
+                        'coursetofile'    => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
                 ]);
     }
 }

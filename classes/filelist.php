@@ -27,6 +27,7 @@ namespace local_oer;
 
 use local_oer\helper\filestate;
 use local_oer\helper\requirements;
+use local_oer\metadata\coursetofile;
 
 /**
  * Class filelist
@@ -139,6 +140,7 @@ class filelist {
      */
     public static function get_simple_filelist(int $courseid, string $contenthash = ''): array {
         global $DB;
+        $overwritemetadata = get_config('local_oer', 'coursetofile');
         list($icons, $typegroup, $renderer) = self::prepare_file_icon_renderer($courseid);
         $files       = self::get_course_files($courseid);
         $list        = [];
@@ -149,6 +151,7 @@ class filelist {
             if (!empty($contenthash) && $file[0]['file']->get_contenthash() != $contenthash) {
                 continue;
             }
+
             $filesections = [];
             $modules      = [];
 
@@ -189,6 +192,7 @@ class filelist {
                     'editor'          => $file[0]['editor'],
                     'courses'         => $file[0]['courses'],
                     'writable'        => $file[0]['writable'],
+                    'coursetofile'    => $overwritemetadata == 1 && $file[0]['editor'] == $courseid
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
             // Search for the editor course, as the information shown is the same in all courses where the file is used.

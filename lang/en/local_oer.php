@@ -367,7 +367,9 @@ $string['requirementschanged_body']                        = 'Due to changes in 
                                                              '<a href="{$a->url}">{$a->course}</a> must ' .
                                                              'be modified for republishing: <br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';
-$string['multiplecourses']                                 = 'This file has been found in multiple courses:';
+$string['multiplecourses']                                 = 'Multiple courses use this file';
+$string['multiplecoursestofile']                           = 'Multiple courses use this file. You can also add course metadata ' .
+                                                             'that belongs to an other course than where the file is edited.';
 $string['metadatanotwritable']                             = 'The metadata of this file cannot be edited.';
 $string['reason']                                          = 'Reason';
 $string['metadatanotwritable0']                            = 'An error has been found. It seems that this file has been edited ' .
@@ -378,3 +380,22 @@ $string['metadatanotwritable3']                            = 'This file has alre
 $string['contactsupport']                                  = 'For further information, please contact ' .
                                                              '<a href="mailto:{$a->support}">{$a->support}</a>.';
 $string['showmetadata']                                    = 'Show stored metadata';
+$string['coursetofile']                                    = 'Overwrite coursemetada for each file';
+$string['coursetofile_info']                               = 'In this form all course metadata are listed which are available ' .
+                                                             'for this file. Here you can override the course settings, ' .
+                                                             'which course metadata will be attached to this file.';
+$string['coursetofile_description']                        = 'In courses, the course metadata can be edited. ' .
+                                                             'You can decide whether the metadata of the Moodle ' .
+                                                             'course and external courses that are linked to a Moodle ' .
+                                                             'course (subplugin) are attached to files. If this setting ' .
+                                                             'is enabled, this can also be overridden on a per file basis. ' .
+                                                             'Furthermore, the course metadata from other courses that ' .
+                                                             'use the same file can be attached.';
+$string['tocourse']                                        = 'link';
+$string['nocourseinfo']                                    = 'The course metadata of this course has not been synchronised for ' .
+                                                             'OER purposes yet. If you want to use course meteadata of this ' .
+                                                             'course, please open the OER view inside the course and edit the ' .
+                                                             'metadata.';
+$string['editor']                                          = 'Editor';
+$string['oneeditorselectederror']                          = 'At least one of the editor courses metadata ' .
+                                                             'options has to be selected.';

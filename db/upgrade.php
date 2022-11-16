@@ -667,6 +667,32 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022031600, 'local', 'oer');
     }
 
+    if ($oldversion < 2022111500) {
+
+        // Define table local_oer_coursetofile to be created.
+        $table = new xmldb_table('local_oer_coursetofile');
+
+        // Adding fields to table local_oer_coursetofile.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('coursecode', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('state', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_oer_coursetofile.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('foreigncourse', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('uniquefields', XMLDB_KEY_UNIQUE, ['contenthash', 'courseid', 'coursecode']);
+
+        // Conditionally launch create table for local_oer_coursetofile.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2022111500, 'local', 'oer');
+    }
+
     return true;
 }
 

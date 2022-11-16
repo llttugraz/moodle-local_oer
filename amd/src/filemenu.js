@@ -43,6 +43,9 @@ export const initActionMenuListener = (contenthash) => {
             case 'edit-file':
                 Output.showForm("FileinfoForm", title, {contenthash: ch});
                 break;
+            case 'course-to-file':
+                Output.showForm("CourseToFileForm", title, {contenthash: ch});
+                break;
         }
     });
 };

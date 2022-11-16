@@ -26,26 +26,40 @@
     }
 }}
 
-<div class="p-0 m-0">
-    <a href="#" id="local_oer-action-menu-{{contenthash}}" title="{{#str}} edit, moodle{{/str}}"
-       class="nav-link btn-xs" data-action="edit-file" data-contenthash="{{contenthash}}" data-title="{{title}}">
-        <i class="icon fa fa-cog fa-fw" style="pointer-events:none"></i>
-    </a>
+<div class="col-sm float-left">
     {{#multiple}}
-        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="icon fa fa-copy fa-fw" style="pointer-events:none"></i>
+        <a class="nav-link p-0 m-0 btn-xs" href="#" id="navbarDropdownCourselist-{{uniqid}}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="icon fa fa-copy fa-fw p-0 m-0" style="pointer-events:none"></i>
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownCourselist-{{uniqid}}">
             {{#str}} multiplecourses, local_oer{{/str}}
             {{> local_oer/multiplecourses}}
         </div>
     {{/multiple}}
+    {{#ignore}}
+        <div class="row m-0">
+            <small><i class="icon fa fa-info-circle fa-fw" aria-hidden="true"></i>{{#str}} isignored, local_oer{{/str}}</small>
+        </div>
+    {{/ignore}}
 </div>
-
-{{^element.frozen}}
+<div class="col-sm p-0 mr-1" id="local_oer-action-menu-{{contenthash}}">
+    <div class="float-right">
+        <a href="#" title="{{#str}} edit, moodle{{/str}}"
+           class="nav-link btn-xs p-0 m-0" data-action="edit-file" data-contenthash="{{contenthash}}" data-title="{{title}}">
+            <i class="icon fa fa-cog fa-fw p-0 m-0" style="pointer-events:none"></i>
+        </a>
+    </div>
+    {{#coursetofile}}
+        <div class="float-right">
+            <a href="#" title="{{#str}} coursetofile, local_oer{{/str}}"
+               class="nav-link btn-xs mr-3 mt-0 mb-0 ml-0 p-0" data-action="course-to-file" data-contenthash="{{contenthash}}" data-title="{{title}}">
+                <i class="icon fa fa-graduation-cap fa-fw p-0 m-0" style="pointer-events:none"></i>
+            </a>
+        </div>
+    {{/coursetofile}}
+</div>
 {{#js}}
 require(['local_oer/filemenu'], function(action) {
 action.initActionMenuListener("{{contenthash}}");
 });
 {{/js}}
-{{/element.frozen}}
