@@ -27,6 +27,7 @@ namespace local_oer;
 
 use local_oer\helper\license;
 use local_oer\helper\requirements;
+use local_oer\metadata\coursetofile;
 use local_oer\plugininfo\oercourseinfo;
 
 /**
@@ -97,8 +98,8 @@ class snapshot {
      * @throws \moodle_exception
      */
     public function create_snapshot_of_course_files() {
-        $files      = filelist::get_course_files($this->courseid);
-        $courseinfo = $this->get_active_courseinfo_metadata();
+        $files = filelist::get_course_files($this->courseid);
+        list($courses, $courseinfo) = $this->get_active_courseinfo_metadata();
         if (!$courseinfo) {
             logger::add($this->courseid, logger::LOGERROR, 'Course does not has courseinfo, maybe all entries are ignored');
             return;
@@ -106,7 +107,7 @@ class snapshot {
 
         foreach ($files as $filearray) {
             $file = $filearray[0]['file'];
-            $this->create_file_snapshot($file, $courseinfo);
+            $this->create_file_snapshot($file, $courseinfo, $courses);
         }
     }
 
@@ -122,7 +123,7 @@ class snapshot {
      * @return void
      * @throws \dml_exception
      */
-    private function create_file_snapshot(\stored_file $file, array $courseinfo) {
+    private function create_file_snapshot(\stored_file $file, array $courseinfo, array $courses) {
         global $DB, $USER;
         $fileinfo = $DB->get_record('local_oer_files', [
                 'courseid'    => $this->courseid,
@@ -134,7 +135,7 @@ class snapshot {
         }
         list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($fileinfo);
         if (!$release) {
-            // At least one criteria is not fulfilled, file cannot be released.
+            // At least one criterion is not fulfilled, file cannot be released.
             if ($fileinfo->state == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
                 logger::add($this->courseid, logger::LOGERROR, 'File with hash ' . $fileinfo->contenthash .
@@ -155,7 +156,8 @@ class snapshot {
         $snapshot->language       = $fileinfo->language;
         $snapshot->resourcetype   = $fileinfo->resourcetype;
         $snapshot->classification = $fileinfo->classification;
-        $snapshot->coursemetadata = json_encode($courseinfo);
+        $snapshot->coursemetadata = json_encode($this->get_overwritten_courseinfo_metadata($courseinfo, $fileinfo->contenthash,
+                                                                                           $courses));
         $snapshot->additionaldata = $this->add_external_metadata();
         $hash                     = hash('sha256', json_encode($snapshot));
         $snapshot->releasehash    = $hash;
@@ -202,22 +204,75 @@ class snapshot {
         $courses    = $DB->get_records('local_oer_courseinfo', ['courseid' => $this->courseid, 'ignored' => 0, 'deleted' => 0]);
         $courseinfo = [];
         foreach ($courses as $course) {
-            $courseinfo[] = [
-                    'identifier'     => $course->coursecode,
-                    'courseid'       => $course->external_courseid,
-                    'sourceid'       => $course->external_sourceid,
-                    'coursename'     => $course->coursename,
-                    'structure'      => $course->structure ?? '',
-                    'description'    => $course->description ?? '',
-                    'objective'      => $course->objectives ?? '',
-                    'organisation'   => $course->organisation ?? '',
-                    'courselanguage' => $course->language ?? '',
-                    'lecturer'       => $course->lecturer ?? '',
-            ];
+            $courseinfo[] = $this->extract_courseinfo_metadata($course);
         }
         if (empty($courseinfo)) {
             return false;
         }
+        // If courseinfo overwrite is disabled, we just need the courseinfo array. But when it is enabled.
+        // It is easier to build a new courseinfo array with the DB records.
+        return [$courses, $courseinfo];
+    }
+
+    /**
+     * When the overwritten state for course metadata is active load the changes and update the courseinfo array.
+     *
+     * @param array  $courseinfo  Courseinfo array as created for the whole course
+     * @param string $contenthash Moodle file contenthash
+     * @param array  $courses     Courses from local_oer_courseinfo table for this course
+     * @return array
+     * @throws \dml_exception
+     */
+    private function get_overwritten_courseinfo_metadata(array $courseinfo, string $contenthash, array $courses) {
+        if (!get_config('coursetofile', 'local_oer')) {
+            return $courseinfo;
+        }
+
+        global $DB;
+        $courseinfo = [];
+
+        $remove     = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash,
+                                                                  'state'       => coursetofile::COURSETOFILE_DISABLED]);
+        $sql        = "SELECT * FROM {local_oer_courseinfo} ci " .
+                      "JOIN {local_oer_coursetofile} ctf ON ci.courseid = ctf.courseid AND ci.coursecode = ctf.coursecode" .
+                      "WHERE ctf.contenthash = :contenthash AND ctf.state = :state";
+        $addcourses = $DB->get_records_sql($sql, ['contenthash' => $contenthash, 'state' => coursetofile::COURSETOFILE_ENABLED]);
+
+        foreach ($courses as $key => $course) {
+            foreach ($remove as $rm) {
+                if ($course->courseid == $rm->courseid &&
+                    $course->coursecode == $rm->coursecode &&
+                    $rm->state == coursetofile::COURSETOFILE_DISABLED
+                ) {
+                    unset($courses[$key]);
+                }
+            }
+        }
+        foreach ($addcourses as $course) {
+            $courseinfo[] = $this->extract_courseinfo_metadata($course);
+        }
         return $courseinfo;
+    }
+
+    /**
+     * Extract the necessary metadata for the release.
+     *
+     * @param \stdClass $course Course record from local_oer_courseinfo table
+     * @return array
+     */
+    private function extract_courseinfo_metadata(\stdClass $course) {
+        // TODO: this part will cause a merge conflict with customfields issue.
+        return [
+                'identifier'     => $course->coursecode,
+                'courseid'       => $course->external_courseid,
+                'sourceid'       => $course->external_sourceid,
+                'coursename'     => $course->coursename,
+                'structure'      => $course->structure ?? '',
+                'description'    => $course->description ?? '',
+                'objective'      => $course->objectives ?? '',
+                'organisation'   => $course->organisation ?? '',
+                'courselanguage' => $course->language ?? '',
+                'lecturer'       => $course->lecturer ?? '',
+        ];
     }
 }

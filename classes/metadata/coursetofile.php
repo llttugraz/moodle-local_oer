@@ -40,13 +40,13 @@ class coursetofile {
      * State to overwrite course metadata entries for a given file.
      * Disabled: Course metadata will not be added to file.
      */
-    const COURSETOFILE_DISABLED = 0;
+    const COURSETOFILE_DISABLED = "0";
 
     /**
      * State to overwrite course metadata entries for a given file.
      * Enabled: Course metadata will be added to file.
      */
-    const COURSETOFILE_ENABLED = 1;
+    const COURSETOFILE_ENABLED = "1";
 
     /**
      * Return a list of all courses this file can have metadata from.
@@ -70,10 +70,11 @@ class coursetofile {
      * @throws \dml_exception
      */
     public static function get_courses_metadata_for_file(string $contenthash, int $courseid, array $courses = []): array {
+        global $DB;
         if (empty($courses)) {
             list(, , $courses,) = filestate::calculate_file_state($contenthash, $courseid);
         }
-        $overwrites  = self::load_overwrites_for_file($contenthash);
+        $overwrites  = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash]);
         $owformatted = [];
         foreach ($overwrites as $ow) {
             $owformatted[$ow->courseid . $ow->coursecode] = $ow->state;
@@ -83,8 +84,8 @@ class coursetofile {
             $data            = $metadata->load_metadata_from_database($course['id']);
             $currentcourse   = $courseid == $course['id'];
             $reducedmetadata = [];
-            foreach ($data as $id => $content) {
-                $reduced = [
+            foreach ($data as $content) {
+                $reduced           = [
                         'parent'     => $course['id'],
                         'coursecode' => $content->coursecode,
                         'state'      => (int) ($currentcourse && !$content->ignored),
@@ -105,43 +106,5 @@ class coursetofile {
         }
 
         return $courses;
-    }
-
-    /**
-     * Store a course metadata overwrite for a file.
-     *
-     * @param string $contenthash Moodle contenthash for file.
-     * @param int    $courseid    Moodle courseid. Parent of where the course metadata comes from.
-     * @param string $coursecode  Coursecode of metadata, moodle or external course.
-     * @param int    $state       State of overwrite (enable or disable for this file)
-     * @return void
-     * @throws \dml_exception
-     */
-    public static function store_overwrite(string $contenthash, int $courseid, string $coursecode, int $state) {
-        global $DB;
-        if ($record = $DB->get_record('local_oer_coursetofile',
-                                      ['contenthash' => $contenthash, 'courseid' => $courseid, 'coursecode' => $coursecode])) {
-            $record->state = $state;
-            $DB->update_record('local_oer_coursetofile', $record);
-        } else {
-            $record              = new \stdClass();
-            $record->contenthash = $contenthash;
-            $record->courseid    = $courseid;
-            $record->coursecode  = $coursecode;
-            $record->state       = $state;
-            $DB->insert_record('local_oer_coursetofile', $record);
-        }
-    }
-
-    /**
-     * Load all overwrites made for a file.
-     *
-     * @param string $contenthash Moodle contenthash of file.
-     * @return array
-     * @throws \dml_exception
-     */
-    public static function load_overwrites_for_file(string $contenthash) {
-        global $DB;
-        return $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash]);
     }
 }

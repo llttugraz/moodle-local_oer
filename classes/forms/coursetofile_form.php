@@ -25,7 +25,6 @@
 
 namespace local_oer\forms;
 
-use local_oer\metadata\courseinfo;
 use local_oer\metadata\coursetofile;
 
 /**
@@ -148,12 +147,13 @@ class coursetofile_form extends \moodleform {
      * @throws \dml_exception
      */
     public function store_overwrite_data(array $data) {
-        global $DB;
+        global $DB, $USER;
         $table = 'local_oer_coursetofile';
         $file  = $this->_customdata;
         foreach ($data as $key => $state) {
             $course = explode(self::COURSEINFO_SEPARATOR, $key);
-            if (count($course) == 2 && ($state === "0" || $state === "1")
+            if (count($course) == 2 &&
+                ($state === coursetofile::COURSETOFILE_DISABLED || $state === coursetofile::COURSETOFILE_ENABLED)
                 && $DB->record_exists('local_oer_courseinfo',
                                       ['courseid' => $course[0], 'coursecode' => $course[1]])) {
                 $params = [
@@ -165,19 +165,24 @@ class coursetofile_form extends \moodleform {
                                          ['courseid'   => $course[0],
                                           'coursecode' => $course[1]]);
                 if (($file['courseid'] == $course[0] && $ignore != $state) ||
-                    ($file['courseid'] != $course[0] && $state == "0")) {
+                    ($file['courseid'] != $course[0] && $state == coursetofile::COURSETOFILE_DISABLED)) {
                     // For editor course only store different values, and for others.
                     // Only store enabled values.
                     $DB->delete_records($table, $params);
                 } else if ($owexist = $DB->get_record($table, $params)) {
-                    $owexist->state = $state;
+                    $owexist->state        = $state;
+                    $owexist->usermodified = $USER->id;
+                    $owexist->timemodified = time();
                     $DB->update_record($table, $owexist);
                 } else {
-                    $ow              = new \stdClass();
-                    $ow->contenthash = $file['contenthash'];
-                    $ow->courseid    = $course[0];
-                    $ow->coursecode  = $course[1];
-                    $ow->state       = $state;
+                    $ow               = new \stdClass();
+                    $ow->contenthash  = $file['contenthash'];
+                    $ow->courseid     = $course[0];
+                    $ow->coursecode   = $course[1];
+                    $ow->state        = $state;
+                    $ow->usermodified = $USER->id;
+                    $ow->timecreated  = time();
+                    $ow->timemodified = time();
                     $DB->insert_record($table, $ow);
                 }
             }
