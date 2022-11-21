@@ -381,7 +381,7 @@ $string['contactsupport']                                  = 'For further inform
                                                              '<a href="mailto:{$a->support}">{$a->support}</a>.';
 $string['showmetadata']                                    = 'Show stored metadata';
 $string['coursetofile']                                    = 'Overwrite coursemetada for each file';
-$string['coursetofile_info']                               = 'In this form all course metadata are listed which are available ' .
+$string['coursetofile_info']                               = 'In this form course metadata is listed which is available ' .
                                                              'for this file. Here you can override the course settings, ' .
                                                              'which course metadata will be attached to this file.';
 $string['coursetofile_description']                        = 'In courses, the course metadata can be edited. ' .
