@@ -142,6 +142,12 @@ class coursetofile_form extends \moodleform {
     }
 
     /**
+     * Store the form data to the local_oer_coursetofile table.
+     * Data is only stored if it differs from default value.
+     *
+     * For other courses the default is disabled. So only  enabled values are stored.
+     * For the course where the file is edited also the case for disabling course metadata is possible.
+     *
      * @param array $data
      * @return void
      * @throws \dml_exception

@@ -78,7 +78,7 @@ function local_oer_extend_navigation(global_navigation $navigation) {
 /**
  * Load and store forms used in frontend.
  *
- * @TODO: as this function grows with cases, a refactor would be necessary.
+ * TODO: as this function grows with cases, a refactor would be necessary.
  *      I think the form->render and save cases could be more generalized and
  *      separated into different methods/functions.
  *

@@ -115,11 +115,12 @@ class snapshot {
      * Create a snapshot of the current file metadata.
      *
      * A hash of the metadata is generated and stored in the table. The hash is used to compare
-     * the metadata to older versions. When the hash is already stored, nothing has changed and it does not
+     * the metadata to older versions. When the hash is already stored, nothing has changed, and it does not
      * need to be stored.
      *
      * @param \stored_file $file       Moodle stored file object
      * @param array        $courseinfo List of all courses (internal and external) linked to this file
+     * @param array        $courses    Courses from local_oer_courseinfo table for this course
      * @return void
      * @throws \dml_exception
      */

@@ -72,7 +72,7 @@ class coursetofile {
     public static function get_courses_metadata_for_file(string $contenthash, int $courseid, array $courses = []): array {
         global $DB;
         if (empty($courses)) {
-            list(, , $courses,) = filestate::calculate_file_state($contenthash, $courseid);
+            list(, , $courses, $writable) = filestate::calculate_file_state($contenthash, $courseid);
         }
         $overwrites  = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash]);
         $owformatted = [];

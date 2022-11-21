@@ -90,7 +90,7 @@ class filestate {
         // Step 2: Extract courseids from contexts.
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            list(, $course,) = get_context_info_array($contextid);
+            list(, $course, $cm) = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id'     => $course->id,
                     'name'   => format_string($course->fullname),
