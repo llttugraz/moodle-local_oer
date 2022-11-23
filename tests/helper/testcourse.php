@@ -176,12 +176,17 @@ class testcourse {
      *
      * @param \stdClass               $course
      * @param \testing_data_generator $generator
+     * @param string                  $filename If empty, random filename is generated
+     * @param int|null                $draftid  If null, moodle is asked for unused draft id
+     * @param string                  $content  If empty, random bytes are written
      * @return \stdClass
      */
-    public function generate_resource(\stdClass $course, \testing_data_generator $generator) {
+    public function generate_resource(\stdClass $course, \testing_data_generator $generator, string $filename = '',
+                                      ?int      $draftid = null, string $content = '') {
         $record         = new \stdClass();
         $record->course = $course;
-        $record->files  = $this->generate_file();
+        list($draftid, $file) = $this->generate_file($filename, $draftid, $content);
+        $record->files = $draftid;
         return $generator->create_module('resource', $record);
     }
 
@@ -189,13 +194,14 @@ class testcourse {
      * Generate a file with moodle file_storage.
      * Only the draft id is required for the module generators.
      *
-     * @param string   $filename
-     * @param int|null $draftid
-     * @return int
+     * @param string   $filename If empty, random filename is generated
+     * @param int|null $draftid  If null, moodle is asked for unused draft id
+     * @param string   $content  If empty, random bytes are written
+     * @return array
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function generate_file(string $filename = '', ?int $draftid = null) {
+    public function generate_file(string $filename = '', ?int $draftid = null, string $content = '') {
         global $USER;
         if ($filename == '') {
             $filename = 'Testfile' . rand(1000000, 1000000000);
@@ -204,7 +210,7 @@ class testcourse {
         $fs          = get_file_storage();
         $usercontext = \context_user::instance($USER->id);
         $draftid     = !is_null($draftid) ? $draftid : file_get_unused_draft_itemid();
-        $content     = random_bytes(rand(1, 1000));
+        $content     = $content == '' ? random_bytes(rand(1, 1000)) : $content;
 
         $filerecord = array(
                 'contextid' => $usercontext->id,
@@ -216,7 +222,7 @@ class testcourse {
                 'sortorder' => 1,
         );
         $file       = $fs->create_file_from_string($filerecord, $content);
-        return $draftid;
+        return [$draftid, $file];
     }
 
     /**

@@ -25,7 +25,6 @@
 
 namespace local_oer\helper;
 
-use local_oer\classification;
 use local_oer\forms\fileinfo_form;
 use local_oer\logger;
 
@@ -107,8 +106,8 @@ class filestate {
         if ($oerfiles && count($oerfiles) > 1) {
             $message = 'Ambiguous metadata for file ' . $contenthash .
                        ' found. File has been edited in ' . count($oerfiles) . ' courses';
-            logger::add(array_key_first($oerfiles), logger::LOGERROR, $message);
-            return [self::STATE_FILE_ERROR, 0, []];
+            logger::add($currentcourseid, logger::LOGERROR, $message);
+            return [self::STATE_FILE_ERROR, 0, [], false];
         } else if ($oerfiles && count($oerfiles) == 1) {
             $cid   = array_key_first($oerfiles);
             $state = self::STATE_FILE_EDITED;
