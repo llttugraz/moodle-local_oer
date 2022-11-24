@@ -667,6 +667,21 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022031600, 'local', 'oer');
     }
 
+    if ($oldversion < 2022102000) {
+
+        // Define field customfields to be added to local_oer_courseinfo.
+        $table = new xmldb_table('local_oer_courseinfo');
+        $field = new xmldb_field('customfields', XMLDB_TYPE_TEXT, null, null, null, null, null, 'lecturer_edited');
+
+        // Conditionally launch add field customfields.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2022102000, 'local', 'oer');
+    }
+
     return true;
 }
 
