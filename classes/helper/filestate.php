@@ -75,7 +75,7 @@ class filestate {
         $courses = [];
         global $DB;
         // Step 1: Load usage of contenthash.
-        $sql    = "SELECT DISTINCT(contextid) FROM {files} " .
+        $sql    = "SELECT DISTINCT contextid FROM {files} " .
                   "WHERE contenthash = :contenthash " .
                   "AND (component = 'mod_resource' OR component = 'mod_folder')";
         $usages = $DB->get_records_sql($sql, ['contenthash' => $contenthash]);
