@@ -1,0 +1,120 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oer/notwritable
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * Various data about mappings
+
+    Example context (json):
+    {
+      "header": "notempty",
+      "alert": "info",
+      "reason": "example",
+      "showmetadata": false,
+      "support": "yes"
+    }
+  }}
+
+<h3>{{header}}</h3>
+{{#str}} reason, local_oer {{/str}}:
+<div class="alert alert-{{alert}}">{{{reason}}}</div>
+{{#multiple}}
+    <p>{{#str}} multiplecourses, local_oer {{/str}}
+        {{> local_oer/multiplecourses}}</p>
+{{/multiple}}
+{{#showmetadata}}
+    <p>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#local_oer_showmetadata_{{uniqid}}" aria-expanded="false"
+                aria-controls="local_oer_showmetadata_{{uniqid}}">
+            {{#str}} showmetadata, local_oer {{/str}}
+        </button>
+    </p>
+    <div class="collapse" id="local_oer_showmetadata_{{uniqid}}">
+        <div class="card card-body">
+            <div class="container">
+                {{#metadata.simple}}
+                    <div class="row">
+                        <div class="col-sm-2">
+                            {{name}}
+                        </div>
+                        <div class="col-sm">
+                            {{#collapse}}
+                                {{{heading}}}<span class="collapse" id="local_oer_{{uniqid}}">{{{body}}}</span>
+                                <a data-toggle="collapse" href="#local_oer_{{uniqid}}" role="button" aria-expanded="false"
+                                   aria-controls="local_oer_{{uniqid}}"> &raquo; </a>
+                            {{/collapse}}
+                            {{^collapse}}
+                                {{value}}
+                            {{/collapse}}
+                        </div>
+                    </div>
+                    <hr>
+                {{/metadata.simple}}
+                {{#metadata.tags}}
+                    <div class="row">
+                        <div class="col-sm-2">
+                            {{#str}} tags {{/str}}
+                        </div>
+                        <div class="col-sm">
+                            {{#metadata.taglist}}
+                                <span class="badge badge-info">{{value}}</span>
+                            {{/metadata.taglist}}
+                        </div>
+                    </div>
+                    <hr>
+                {{/metadata.tags}}
+                {{#metadata.persons}}
+                    <div class="row">
+                        <div class="col-sm-2">
+                            {{#str}} person, local_oer {{/str}}
+                        </div>
+                        <div class="col-sm">
+                            {{#metadata.personlist}}
+                                <span class="badge badge-info">{{role}}: {{firstname}} {{lastname}}</span>
+                            {{/metadata.personlist}}
+                        </div>
+                    </div>
+                    <hr>
+                {{/metadata.persons}}
+                {{#metadata.classification}}
+                    {{#metadata.classificationlist}}
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <a href="{{url}}" target="_blank">{{type}}</a>
+                            </div>
+                            <div class="col-sm">
+                                {{#values}}
+                                    <span class="badge badge-info">{{name}}</span>
+                                {{/values}}
+                            </div>
+                        </div>
+                    {{/metadata.classificationlist}}
+                    <hr>
+                {{/metadata.classification}}
+            </div>
+        </div>
+    </div>
+{{/showmetadata}}
+<br>
+<p>{{{support}}}</p>

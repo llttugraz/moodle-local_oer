@@ -15,25 +15,38 @@ You should have received a copy of the GNU General Public License
 along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_oer/activate_course
+    @template local_oer/notwritable
 
     Classes required for JS:
     * none
 
     Data attributes required for JS:
-    * courseid (Moodle courseid)
-    * context (Moodle course context)
+    * none
 
     Context variables required for this template:
-    * course
+    * Various data about mappings
 
     Example context (json):
     {
+        "courses": [
+            {
+                "id": "7",
+                "editor": true
+            },
+            {
+                "id": "42",
+                "editor": false
+            }
+        ]
     }
   }}
 
-<div class="mb-1 mr-1 d-flex align-items-center">
-    <button id="local_oer_preference_button" type="button" data-courseid="{{courseid}}" data-context="{{context}}" class="btn btn-outline-secondary">
-        <i class="icon fa fa-table fa-fw " aria-hidden="true"></i> {{#str}} preferencebutton, local_oer {{/str}}
-    </button>
-</div>
+
+{{#courses}}
+    <a class="dropdown-item" href="{{globals.config.wwwroot}}/course/view.php?id={{id}}" target="_blank">
+    {{#editor}}
+        <span class="badge badge-info">Editor</span>
+    {{/editor}}
+    {{name}}</a>
+{{/courses}}
+

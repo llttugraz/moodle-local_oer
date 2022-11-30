@@ -426,3 +426,38 @@ $string['coursecustomfieldsignored_description']           = '<p>Ignorieren Sie 
                                                              'werden, auch wenn sie in dieser Einstellung angezeigt werden.</p>' .
                                                              '<p>Feldformat: {Feldname} ({Kategorie} {Sichtbarkeit})</p>';
 $string['nofieldsincat']                                   = 'Diese Kategorie enthält keine Felder, die angezeigt werden können.';
+$string['multiplecourses']                                 = 'Mehrere Kurse verwenden diese Datei';
+$string['multiplecoursestofile']                           = 'Mehrere Kurse verwenden diese Datei. Sie können auch ' .
+                                                             'Kurs-Metadaten hinzufügen, die zu einem anderen Kurs ' .
+                                                             'gehören als dem, in dem die Datei bearbeitet wird.';
+$string['metadatanotwritable']                             = 'Die Metadaten dieser Datei können nicht editiert werden.';
+$string['reason']                                          = 'Grund';
+$string['metadatanotwritable0']                            = 'Ein Fehler ist aufgetreten. Diese Datei wurde in mehreren Kursen ' .
+                                                             'editiert.';
+$string['metadatanotwritable2']                            = 'Diese Datei wird bereits in einem anderen Kurs bearbeitet.';
+$string['metadatanotwritable3']                            = 'Diese Datei wurde bereits veröffentlicht und kann deshalb nicht ' .
+                                                             'mehr editiert werden.';
+$string['contactsupport']                                  = 'Für weitere Informationen kontaktieren Sie bitte ' .
+                                                             '<a href="mailto:{$a->support}">{$a->support}</a>.';
+$string['showmetadata']                                    = 'Gespeicherte Metadaten anzeigen';
+$string['coursetofile']                                    = 'Kursmetadaten bei Dateien überschreiben';
+$string['coursetofile_info']                               = 'In diesem Formular sind alle Kurs-Metadaten aufgelistet ' .
+                                                             'welche für diese Datei zur Verfügung stehen. Hier können ' .
+                                                             'sie die Kurseinstellungen, welche Kurs-Metadaten bei dieser ' .
+                                                             'Datei angehängt werden, überschreiben.';
+$string['coursetofile_description']                        = 'In Kursen können die Kursmetadaten bearbeitet werden. Dabei kann ' .
+                                                             'entschieden werden ob die Metadaten des Moodle Kurses und ' .
+                                                             'externer Kurse welche mit einem Moodle Kurs verbunden sind ' .
+                                                             '(Subplugin) an Dateien angehängt werden.' .
+                                                             'Ist diese Einstellung eingeschaltet, kann dies zusätzlich pro ' .
+                                                             'Datei überschrieben werden. Ausserdem können die Kursmetadaten ' .
+                                                             'aus anderen Kursen, welche die selbe ' .
+                                                             'Datei verwenden angehängt werden.';
+$string['tocourse']                                        = 'Zum Kurs';
+$string['nocourseinfo']                                    = 'Die Kurs-Metadaten dieses Kurses sind noch nicht für ' .
+                                                             'OER-Zwecke synchronisiert worden. Wenn Sie die Kurs-Metadaten ' .
+                                                             'dieses Kurses verwenden möchten, öffnen Sie bitte die OER-Ansicht ' .
+                                                             'innerhalb des Kurses und bearbeiten Sie die Metadaten.';
+$string['editor']                                          = 'Editor';
+$string['oneeditorselectederror']                          = 'Mindestens eine der Optionen für die Metadaten des ' .
+                                                             'editierenden Kurses muss ausgewählt sein.';

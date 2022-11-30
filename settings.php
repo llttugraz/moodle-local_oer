@@ -82,6 +82,11 @@ if ($hassiteconfig) {
                                                   get_string('metadataaggregator_description', 'local_oer'),
                                                   'no_value', $select));
 
+    $settings->add(new admin_setting_configcheckbox('local_oer/coursetofile',
+                                                    get_string('coursetofile', 'local_oer'),
+                                                    get_string('coursetofile_description', 'local_oer'),
+                                                    '0'));
+
     $requiredchoices = [
             'description'  => 'abstract',
             'context'      => 'context',
