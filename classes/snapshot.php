@@ -263,7 +263,7 @@ class snapshot {
      * @throws \dml_exception
      */
     private function extract_courseinfo_metadata(\stdClass $course) {
-        $info =  [
+        $info = [
                 'identifier'     => $course->coursecode,
                 'courseid'       => $course->external_courseid,
                 'sourceid'       => $course->external_sourceid,
