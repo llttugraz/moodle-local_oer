@@ -208,7 +208,7 @@ class snapshot {
             $courseinfo[] = $this->extract_courseinfo_metadata($course);
         }
         if (empty($courseinfo)) {
-            return false;
+            return [$courses, false];
         }
         // If courseinfo overwrite is disabled, we just need the courseinfo array. But when it is enabled.
         // It is easier to build a new courseinfo array with the DB records.
@@ -230,6 +230,7 @@ class snapshot {
         }
 
         global $DB;
+        $courseinfo = [];
 
         $remove     = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash,
                                                                   'state'       => coursetofile::COURSETOFILE_DISABLED]);
@@ -238,19 +239,18 @@ class snapshot {
                       "WHERE ctf.contenthash = :contenthash AND ctf.state = :state";
         $addcourses = $DB->get_records_sql($sql, ['contenthash' => $contenthash, 'state' => coursetofile::COURSETOFILE_ENABLED]);
 
-        foreach ($courses as $course) {
+        foreach ($courses as $key => $course) {
             foreach ($remove as $rm) {
                 if ($course->courseid == $rm->courseid &&
                     $course->coursecode == $rm->coursecode &&
                     $rm->state == coursetofile::COURSETOFILE_DISABLED
                 ) {
-                    foreach ($courseinfo as $key => $info) {
-                        if ($info['coursecode'] == $course->coursecode) {
-                            unset($courseinfo[$key]);
-                        }
-                    }
+                    unset($courses[$key]);
                 }
             }
+        }
+        foreach ($courses as $course) {
+            $courseinfo[] = $this->extract_courseinfo_metadata($course);
         }
         foreach ($addcourses as $course) {
             $courseinfo[] = $this->extract_courseinfo_metadata($course);

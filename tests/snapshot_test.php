@@ -25,6 +25,9 @@
 
 namespace local_oer;
 
+use local_oer\metadata\courseinfo_sync;
+use local_oer\metadata\coursetofile;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/helper/testcourse.php');
@@ -35,6 +38,15 @@ require_once(__DIR__ . '/helper/testcourse.php');
  * @coversDefaultClass \local_oer\snapshot
  */
 class snapshot_test extends \advanced_testcase {
+    public function test_get_latest_course_snapshot() {
+        $this->resetAfterTest();
+    }
+
+    public function test_get_file_history() {
+        $this->resetAfterTest();
+        // TODO: feature has to be implemented in snapshot.
+    }
+
     /**
      * Test if file snapshots are correctly taken from a testcourse.
      *
@@ -65,5 +77,220 @@ class snapshot_test extends \advanced_testcase {
         $helper->set_files_to($course->id, 2, true);
         $snapshot->create_snapshot_of_course_files();
         $this->assertEquals(2, $DB->count_records('local_oer_snapshot'), 'Two files have been released.');
+    }
+
+    public function test_create_file_snapshot() {
+        $this->resetAfterTest();
+        // TODO: write test.
+    }
+
+    /**
+     * Subplugins can add additional metadata. However, the base plugin does not add anything extra.
+     * The function returns null when only using the base plugin.
+     *
+     * This function has also to be tested in subplugins to test if the metadata that should be added
+     * is added correctly.
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function test_add_external_metadata() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $helper   = new testcourse();
+        $course   = $helper->generate_testcourse($this->getDataGenerator());
+        $snapshot = new snapshot($course->id);
+        $setstate = new \ReflectionMethod($snapshot, 'add_external_metadata');
+        $setstate->setAccessible(true);
+        $this->assertNull($setstate->invoke($snapshot));
+    }
+
+    /**
+     * Test if the courseinfo metadata of the editing course is read correctly.
+     *
+     * @return void
+     * @throws \ReflectionException
+     * @throws \dml_exception
+     */
+    public function test_get_active_courseinfo_metadata() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $helper   = new testcourse();
+        $course   = $helper->generate_testcourse($this->getDataGenerator());
+        $snapshot = new snapshot($course->id);
+        $setstate = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
+        $setstate->setAccessible(true);
+        // Test 1: Courseinfo sync has not been run yet. There is no active courseinfo in this course.
+        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        $this->assertEmpty($courses);
+        $this->assertEmpty($courseinfo);
+
+        // Test 2: After courseinfo has been synced, the moodle course is in array.
+        $sync = new courseinfo_sync();
+        $sync->sync_course($course->id);
+        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        $this->assertCount(1, $courses);
+        $this->assertCount(1, $courseinfo);
+
+        // Test 3: To emulate additional metadata added through subplugins a courseinfo entry will be added.
+        $entry = $this->set_additional_courseinfoentry($course->id);
+        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        $this->assertCount(2, $courses);
+        $this->assertCount(2, $courseinfo);
+        global $DB;
+        $DB->set_field('local_oer_courseinfo', 'ignored', 1, ['coursecode' => 'moodlecourse-' . $course->id]);
+        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        $this->assertCount(1, $courses);
+        $this->assertCount(1, $courseinfo);
+        $this->assertEquals('ExternalCourse', reset($courseinfo)['identifier']);
+    }
+
+    /**
+     * Files can overwrite the courseinfo set global in course. So there are multiple things to test here.
+     *
+     * - Setting disabled, nothing changes.
+     * - File enables/disables courseinfo from editor course.
+     * - File enables additional courseinfo from other course where file is used.
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function test_get_overwritten_courseinfo_metadata() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $contenthash = substr(hash('sha256', random_bytes(10)), 0, 40);
+        $helper      = new testcourse();
+        $course      = $helper->generate_testcourse($this->getDataGenerator());
+        $snapshot    = new snapshot($course->id);
+        $active      = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
+        $active->setAccessible(true);
+        $overwritten = new \ReflectionMethod($snapshot, 'get_overwritten_courseinfo_metadata');
+        $overwritten->setAccessible(true);
+        $sync = new courseinfo_sync();
+        $sync->sync_course($course->id);
+        // Test 1: Setting disabled.
+        set_config('coursetofile', 0, 'local_oer');
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(1, $courses);
+        $this->assertCount(1, $courseinfo);
+        $this->set_additional_courseinfoentry($course->id);
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(2, $courses);
+        $this->assertCount(2, $courseinfo);
+        // Test 2: Setting enabled, no state has been overwritten yet.
+        set_config('coursetofile', 1, 'local_oer');
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(2, $courses);
+        $this->assertCount(2, $courseinfo);
+        global $DB;
+        // Test 3: Setting enabled, state overwritten, remove a courseinfo at file level.
+        $state               = new \stdClass();
+        $state->contenthash  = $contenthash;
+        $state->courseid     = $course->id;
+        $state->coursecode   = 'moodlecourse-' . $course->id;
+        $state->state        = coursetofile::COURSETOFILE_DISABLED;
+        $state->usermodified = 2;
+        $state->timecreated  = time();
+        $state->timemodified = time();
+        $state->id           = $DB->insert_record('local_oer_coursetofile', $state);
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $this->assertCount(2, $courses);
+        $this->assertCount(2, $courseinfo);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(1, $courseinfo);
+        $this->assertEquals('ExternalCourse', reset($courseinfo)['identifier']);
+
+        // Test 4: Setting enabled, state overwritten, disable a courseinfo, add it on file level.
+        $state->state = coursetofile::COURSETOFILE_ENABLED;
+        $DB->set_field('local_oer_courseinfo', 'ignored', 1, ['coursecode' => 'moodlecourse-' . $course->id]);
+        $DB->update_record('local_oer_coursetofile', $state);
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $this->assertCount(1, $courses);
+        $this->assertCount(1, $courseinfo);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(2, $courseinfo);
+
+        // Test 5: Additional courseinfo from other course is added.
+        $this->set_additional_courseinfoentry(7);
+        unset($state->id);
+        $state->courseid = 7;
+        $state->coursecode   = 'ExternalCourse';
+        $DB->insert_record('local_oer_coursetofile', $state);
+        list($courses, $courseinfo) = $active->invoke($snapshot);
+        $this->assertCount(1, $courses);
+        $this->assertCount(1, $courseinfo);
+        $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
+        $this->assertCount(3, $courseinfo);
+    }
+
+    /**
+     * Simple test for a simple function.
+     * Check if the return array has all set fields.
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function test_extract_courseinfo_metadata() {
+        $this->resetAfterTest();
+
+        $entry    = $this->set_additional_courseinfoentry(7);
+        $snapshot = new snapshot(7);
+        $setstate = new \ReflectionMethod($snapshot, 'extract_courseinfo_metadata');
+        $setstate->setAccessible(true);
+        $metadata = $setstate->invoke($snapshot, $entry);
+        $this->assertEquals($entry->coursecode, $metadata['identifier']);
+        $this->assertEquals($entry->external_courseid, $metadata['courseid']);
+        $this->assertEquals($entry->external_sourceid, $metadata['sourceid']);
+        $this->assertEquals($entry->coursename, $metadata['coursename']);
+        $this->assertEquals($entry->structure, $metadata['structure']);
+        $this->assertEquals($entry->description, $metadata['description']);
+        $this->assertEquals($entry->objectives, $metadata['objective']);
+        $this->assertEquals($entry->organisation, $metadata['organisation']);
+        $this->assertEquals($entry->language, $metadata['courselanguage']);
+        $this->assertEquals($entry->lecturer, $metadata['lecturer']);
+        $this->assertCount(10, $metadata);
+    }
+
+    /**
+     * Add another courseinfo entry for a given courseid.
+     * This function does not check if the entry is valid, it just adds the same entry for every course given.
+     *
+     * @param int $courseid Moodle courseid
+     * @return \stdClass
+     * @throws \dml_exception
+     */
+    private function set_additional_courseinfoentry(int $courseid) {
+        global $DB;
+        $entry                      = new \stdClass();
+        $entry->courseid            = $courseid;
+        $entry->coursecode          = 'ExternalCourse';
+        $entry->deleted             = 0;
+        $entry->ignored             = 0;
+        $entry->external_courseid   = 12345;
+        $entry->external_sourceid   = 23456;
+        $entry->coursename          = 'External course for unit test';
+        $entry->coursename_edited   = 1;
+        $entry->structure           = 'Test';
+        $entry->structure_edited    = 0;
+        $entry->description         = 'Description';
+        $entry->description_edited  = 0;
+        $entry->objectives          = 'Objective';
+        $entry->objectives_edited   = 0;
+        $entry->organisation        = 'OER';
+        $entry->organisation_edited = 1;
+        $entry->language            = 'en';
+        $entry->language_edited     = 0;
+        $entry->lecturer            = 'Christian Ortner';
+        $entry->lecturer_edited     = 0;
+        $entry->subplugin           = 'other';
+        $entry->usermodified        = 2;
+        $time                       = time();
+        $entry->timecreated         = $time;
+        $entry->timemodified        = $time;
+        $DB->insert_record('local_oer_courseinfo', $entry);
+        return $entry;
     }
 }
