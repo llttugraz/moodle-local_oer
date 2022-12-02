@@ -109,10 +109,10 @@ class release {
             $replacement = explode("\r\n", $replacement);
             $list        = [];
             foreach ($replacement as $line) {
-                if (empty($line)) {
-                    continue;
+                $entry = explode('=>', $line);
+                if (empty($entry[1])) {
+                    continue; // Skip false or empty entries.
                 }
-                $entry           = explode('=>', $line);
                 $list[$entry[0]] = $entry[1];
             }
             if (isset($list[$fileinfo->license])) {
