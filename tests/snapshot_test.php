@@ -79,6 +79,13 @@ class snapshot_test extends \advanced_testcase {
         $this->assertEquals(2, $DB->count_records('local_oer_snapshot'), 'Two files have been released.');
     }
 
+    /**
+     * Test the creation of a file snapshot.
+     *
+     * TODO: define test steps.
+     *
+     * @return void
+     */
     public function test_create_file_snapshot() {
         $this->resetAfterTest();
         // TODO: write test.
@@ -216,8 +223,8 @@ class snapshot_test extends \advanced_testcase {
         // Test 5: Additional courseinfo from other course is added.
         $this->set_additional_courseinfoentry(7);
         unset($state->id);
-        $state->courseid = 7;
-        $state->coursecode   = 'ExternalCourse';
+        $state->courseid   = 7;
+        $state->coursecode = 'ExternalCourse';
         $DB->insert_record('local_oer_coursetofile', $state);
         list($courses, $courseinfo) = $active->invoke($snapshot);
         $this->assertCount(1, $courses);
