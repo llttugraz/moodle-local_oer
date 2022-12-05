@@ -95,7 +95,8 @@ class coursecustomfield {
                         $data = self::get_text_of_select_field($fielddata->get_value(), $settings['options']);
                         break;
                     case 'textarea':
-                        $data = courseinfo::simple_html_to_text_reduction($fielddata->get_value());
+                        $data = is_null($fielddata->get_value()) ? '' :
+                                courseinfo::simple_html_to_text_reduction($fielddata->get_value());
                         break;
                     default:
                         // Make some basic cleaning to other fields.
