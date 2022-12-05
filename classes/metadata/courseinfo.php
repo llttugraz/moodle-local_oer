@@ -135,7 +135,7 @@ class courseinfo {
         $info->coursecode   = 'moodlecourse-' . $courseid;
         $info->coursename   = $course->fullname;
         $info->structure    = '';
-        $info->description  = is_null($info->description) ? '' : self::simple_html_to_text_reduction($course->summary);
+        $info->description  = is_null($course->summary) ? '' : self::simple_html_to_text_reduction($course->summary);
         $info->lecturer     = implode(', ', $teachers);
         $infos              = ['default' => $info];
         $customfields       = coursecustomfield::get_course_customfields_with_applied_config($courseid);
