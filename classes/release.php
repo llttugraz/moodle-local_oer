@@ -139,7 +139,7 @@ class release {
                 'resourcetype'     => $resourcetypes[$fileinfo->resourcetype],
                 'language'         => $fileinfo->language,
                 'persons'          => json_decode($fileinfo->persons)->persons,
-                'tags'             => explode(',', $fileinfo->tags),
+                'tags'             => is_null($fileinfo->tags) || $fileinfo->tags == '' ? [] : explode(',', $fileinfo->tags),
                 'mimetype'         => $file->get_mimetype(),
                 'filesize'         => $file->get_filesize(),
                 'filecreationtime' => $file->get_timecreated(),

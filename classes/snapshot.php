@@ -61,7 +61,7 @@ class snapshot {
      */
     public function get_latest_course_snapshot() {
         global $DB;
-        $files  = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid]);
+        $files  = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id DESC');
         $result = [];
         foreach ($files as $file) {
             if (isset($result[$file->contenthash])) {
@@ -266,7 +266,7 @@ class snapshot {
      * @throws \dml_exception
      */
     private function extract_courseinfo_metadata(\stdClass $course) {
-        $info = [
+        $info         = [
                 'identifier'     => $course->coursecode,
                 'courseid'       => $course->external_courseid,
                 'sourceid'       => $course->external_sourceid,

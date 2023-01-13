@@ -79,7 +79,7 @@ class testcourse {
         $metadata->context        = 0;
         $metadata->license        = 'allrightsreserved';
         $metadata->persons        = '';
-        $metadata->tags           = '';
+        $metadata->tags           = null;
         $metadata->language       = 'en';
         $metadata->resourcetype   = 0;
         $metadata->classification = null;
