@@ -62,11 +62,11 @@ class snapshot {
      */
     public function get_latest_course_snapshot() {
         global $DB;
-        $files  = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id DESC');
+        $files  = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id ASC');
         $result = [];
         foreach ($files as $file) {
             if (isset($result[$file->contenthash])) {
-                if ($result[$file->contenthash]->timecreated < $file->timecreated) {
+                if ($result[$file->contenthash]->timecreated <= $file->timecreated) {
                     $result[$file->contenthash] = $file;
                 }
             } else {
