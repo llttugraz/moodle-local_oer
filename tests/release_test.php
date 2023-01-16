@@ -232,6 +232,15 @@ class release_test extends \advanced_testcase {
         set_config('coursecustomfieldsvisibility', 0, 'local_oer');
         set_config('coursecustomfieldsignored', '', 'local_oer');
         $helper->sync_course_info($course->id);
+        $snapshot->create_snapshot_of_course_files();
+        $snapshots                 = $snapshot->get_latest_course_snapshot();
+        $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $expectedcounts['general'] = 16; // New release should not have injected additional fields.
+        $expectedcounts['courses'] = 1;
+        $expectedcounts['course']  = [11]; // Moodle course now has additional customfield.
+        $this->assert_count_metadata($metadata, $expectedcounts);
+        $this->assert_metadata_default_fields($metadata);
+
         $DB->insert_record('local_oer_courseinfo', $courseinfo);
         $DB->insert_record('local_oer_courseinfo', $courseinfo2);
 
@@ -239,6 +248,7 @@ class release_test extends \advanced_testcase {
         $snapshots                 = $snapshot->get_latest_course_snapshot();
         $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
         $expectedcounts['general'] = 16; // New release should not have injected additional fields.
+        $expectedcounts['courses'] = 2;
         $expectedcounts['course']  = [11, 10]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
