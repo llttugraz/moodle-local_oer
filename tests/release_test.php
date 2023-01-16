@@ -115,7 +115,10 @@ class release_test extends \advanced_testcase {
 
         $snapshot = new snapshot($course->id);
         $snapshot->create_snapshot_of_course_files();
-        $snapshots      = $snapshot->get_latest_course_snapshot();
+        $snapshots = $snapshot->get_latest_course_snapshot();
+        $this->assertCount(1, $snapshots);
+        $keys = array_keys($snapshots);
+        $this->assertEquals($contenthash, reset($keys));
         $metadata       = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
         $expectedcounts = [
                 'general' => 16,
