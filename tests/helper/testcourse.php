@@ -235,11 +235,11 @@ class testcourse {
     public function get_contenthash_of_first_found_file($course) {
         global $DB;
         $module   = $DB->get_record('modules', ['name' => 'resource']);
-        $cms      = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id]);
+        $cms      = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id], 'id ASC');
         $resource = reset($cms);
         $context  = \context_module::instance($resource->id);
         // There is also a dot entry. So there are at least two records.
-        $files       = $DB->get_records('files', ['contextid' => $context->id]);
+        $files       = $DB->get_records('files', ['contextid' => $context->id], 'id ASC');
         $contenthash = null;
         foreach ($files as $file) {
             if ($file->filename != '.') {
