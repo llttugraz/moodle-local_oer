@@ -95,8 +95,7 @@ class filelist {
             if ($skip) {
                 continue;
             }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false,
-                                         'sortorder DESC', false);
+            $files = $fs->get_area_files($cm->context->id, $component, $area, false, 'id ASC', false);
 
             foreach ($files as $file) {
                 list($state, $editor, $courses, $writable) = filestate::calculate_file_state($file->get_contenthash(), $courseid);
