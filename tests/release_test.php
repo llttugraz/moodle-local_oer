@@ -249,16 +249,23 @@ class release_test extends \advanced_testcase {
         $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
         $expectedcounts['general'] = 16; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 2;
-        $expectedcounts['course']  = [11, 10]; // Moodle course now has additional customfield.
+        $expectedcounts['course']  = [10, true, 1]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
-        $this->assertIsArray(reset($metadata['courses'])->customfields);
-        $this->assertCount(1, reset($metadata['courses'])->customfields);
-        $this->assertEquals('sem', reset($metadata['courses'])->customfields[0]->shortname);
-        $this->assertEquals('semester', reset($metadata['courses'])->customfields[0]->fullname);
-        $this->assertEquals('text', reset($metadata['courses'])->customfields[0]->type);
-        $this->assertEquals('WS', reset($metadata['courses'])->customfields[0]->data);
-        $this->assertEquals($customcat1->get('name'), reset($metadata['courses'])->customfields[0]->category);
+        $moodlecourse = null;
+        foreach ($metadata['courses'] as $course) {
+            if (strpos($course->identifier, 'moodlecourse') !== false) {
+                $moodlecourse = $course;
+            }
+        }
+        $this->assertIsArray($moodlecourse->customfields);
+        $customfield = $moodlecourse->customfields[0];
+        $this->assertCount(1, $moodlecourse->customfields);
+        $this->assertEquals('sem', $customfield->shortname);
+        $this->assertEquals('semester', $customfield->fullname);
+        $this->assertEquals('text', $customfield->type);
+        $this->assertEquals('WS', $customfield->data);
+        $this->assertEquals($customcat1->get('name'), $customfield->category);
 
         // Test courseinfo from multiple moodle courses that use the same file.
         set_config('coursetofile', '1', 'local_oer');
@@ -278,7 +285,7 @@ class release_test extends \advanced_testcase {
         $snapshots                 = $snapshot->get_latest_course_snapshot();
         $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
         $expectedcounts['courses'] = 3;
-        $expectedcounts['course']  = [11, 10, 11];
+        $expectedcounts['course']  = [10, true, 1];
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
         $this->assertEquals('nosemester', $metadata['courses'][2]->customfields[0]->data);
@@ -310,8 +317,15 @@ class release_test extends \advanced_testcase {
         $this->assertCount($expectedcounts['persons'], $metadata['persons']);
         $this->assertCount($expectedcounts['tags'], $metadata['tags']);
         $this->assertCount($expectedcounts['courses'], $metadata['courses']);
-        foreach ($expectedcounts['course'] as $key => $value) {
-            $this->assertCount($value, (array) $metadata['courses'][$key]);
+        $fields       = $expectedcounts['course'][0];
+        $customfield  = $expectedcounts['course'][1] ?? false;
+        $amountfields = $expectedcounts['course'][2] ?? 0;
+        foreach ($metadata['courses'] as $course) {
+            if ($customfield && strpos($course->identifier, 'moodlecourse') !== false) {
+                $this->assertCount($fields + $amountfields, (array) $course);
+            } else {
+                $this->assertCount($fields, (array) $course);
+            }
         }
     }
 
