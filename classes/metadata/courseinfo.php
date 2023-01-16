@@ -47,7 +47,7 @@ class courseinfo {
      */
     public function load_metadata_from_database(int $courseid) {
         global $DB;
-        $records = $DB->get_records('local_oer_courseinfo', ['courseid' => $courseid]);
+        $records = $DB->get_records('local_oer_courseinfo', ['courseid' => $courseid], 'id ASC');
         foreach ($records as $key => $record) {
             if (!is_null($record->customfields)) {
                 $records[$key]->customfields = json_decode($record->customfields, true);
