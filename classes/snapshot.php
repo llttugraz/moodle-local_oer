@@ -27,6 +27,7 @@ namespace local_oer;
 
 use local_oer\helper\requirements;
 use local_oer\metadata\coursecustomfield;
+use local_oer\metadata\courseinfo;
 use local_oer\metadata\coursetofile;
 use local_oer\plugininfo\oercourseinfo;
 
@@ -266,7 +267,7 @@ class snapshot {
      * @throws \dml_exception
      */
     private function extract_courseinfo_metadata(\stdClass $course) {
-        $info         = [
+        $info = [
                 'identifier'     => $course->coursecode,
                 'courseid'       => $course->external_courseid,
                 'sourceid'       => $course->external_sourceid,
@@ -278,9 +279,26 @@ class snapshot {
                 'courselanguage' => $course->language ?? '',
                 'lecturer'       => $course->lecturer ?? '',
         ];
-        $customfields = coursecustomfield::get_customfields_for_snapshot($course->courseid);
-        if (!empty($customfields)) {
-            $info['customfields'] = $customfields;
+
+        return $this->add_customfields_to_snapshot($course, $info);
+    }
+
+    /**
+     * Add customfields to snapshot if enabled and moodlecourse.
+     *
+     * @param \stdClass $course Course object
+     * @param array     $info   Metadata array to extend
+     * @return array
+     * @throws \dml_exception
+     */
+    private function add_customfields_to_snapshot(\stdClass $course, array $info) {
+        if ($course->subplugin == courseinfo::BASETYPE
+            && strpos($course->coursecode, 'moodlecourse') !== false
+            && get_config('local_oer', 'coursecustomfields') == 1) {
+            $customfields = coursecustomfield::get_customfields_for_snapshot($course->courseid);
+            if (!empty($customfields)) {
+                $info['customfields'] = $customfields;
+            }
         }
         return $info;
     }

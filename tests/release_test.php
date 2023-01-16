@@ -25,6 +25,9 @@
 
 namespace local_oer;
 
+use local_oer\metadata\courseinfo_sync;
+use local_oer\metadata\coursetofile;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/helper/testcourse.php');
@@ -112,21 +115,26 @@ class release_test extends \advanced_testcase {
 
         $snapshot = new snapshot($course->id);
         $snapshot->create_snapshot_of_course_files();
-        $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $snapshots      = $snapshot->get_latest_course_snapshot();
+        $metadata       = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $expectedcounts = [
+                'general' => 16,
+                'persons' => 2,
+                'tags'    => 0,
+                'courses' => 1,
+                'course'  => [10],
+        ];
+        $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
-        // Test tags subarray.
-        $this->assertIsArray($metadata['tags']);
-        $this->assertEmpty($metadata['tags']);
         // Add some tags to metadata.
-        $tags = 'Impressive,UnitTest,Tags';
+        $tags                   = 'Impressive,UnitTest,Tags';
+        $expectedcounts['tags'] = 3;
         $DB->set_field('local_oer_files', 'tags', $tags, ['courseid' => $course->id, 'contenthash' => $contenthash]);
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
-        $this->assertIsArray($metadata['tags']);
-        $this->assertCount(3, $metadata['tags']);
 
         // Test license shortname replacement.
         $license = $metadata['license'];
@@ -138,12 +146,160 @@ class release_test extends \advanced_testcase {
         $license  = $metadata['license'];
         $this->assertEquals('replacedtextintest', $license['shortname']);
 
-        // TODO:
-        // Test course customfields - configurate customfields and test if data is present in release.
-        // TODO:
-        // Test courseinfo from multiple moodle courses that use the same file.
+        // Test multiple course metadata in same moodle course.
+        $courseinfo                      = new \stdClass();
+        $courseinfo->courseid            = $course->id;
+        $courseinfo->coursecode          = 'ADD1COURSE';
+        $courseinfo->deleted             = 0;
+        $courseinfo->ignored             = 0;
+        $courseinfo->external_courseid   = 123;
+        $courseinfo->external_sourceid   = 234;
+        $courseinfo->coursename          = 'External courseinfo added';
+        $courseinfo->coursename_edited   = 0;
+        $courseinfo->structure           = 'VO';
+        $courseinfo->structure_edited    = 0;
+        $courseinfo->description         = 'Add additional courseinfo to test multiple courseinfos in metadata';
+        $courseinfo->description_edited  = 0;
+        $courseinfo->objectives          = 'Unit test';
+        $courseinfo->objectives_edited   = 0;
+        $courseinfo->organisation        = 'LLT';
+        $courseinfo->organisation_edited = 0;
+        $courseinfo->language            = 'en';
+        $courseinfo->language_edited     = 0;
+        $courseinfo->lecturer            = 'Christian Ortner';
+        $courseinfo->lecturer_edited     = 0;
+        $courseinfo->customfields        = null;
+        $courseinfo->subplugin           = 'tugraz';
+        $courseinfo->usermodified        = 2;
+        $courseinfo->timecreated         = time();
+        $courseinfo->timemodified        = time();
+        $DB->insert_record('local_oer_courseinfo', $courseinfo);
+        $courseinfo2                    = clone($courseinfo);
+        $courseinfo2->coursecode        = 'ADD2COURSE';
+        $courseinfo2->external_courseid = 345;
+        $courseinfo2->ignored           = 1;
+        $DB->insert_record('local_oer_courseinfo', $courseinfo2);
 
-        // The section for additional data has to be tested by the subplugins that add data.
+        $expectedcounts['courses'] = 2;
+        $expectedcounts['course']  = [10, 10];
+
+        $snapshot->create_snapshot_of_course_files();
+        $snapshots = $snapshot->get_latest_course_snapshot();
+        $metadata  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $this->assert_count_metadata($metadata, $expectedcounts);
+        $this->assert_metadata_default_fields($metadata);
+
+        // Add additional data to latest snapshot, to test if additional data is added correctly to result.
+        $modifiedsnapshot                 = $snapshots[$contenthash];
+        $additionaldata                   = [
+                'semester'     => 'WS',
+                'hoursperunit' => 10,
+                'data'         => 5,
+                'persons'      => 'Conflict', // This conflicts with existing array, should not do anything.
+        ];
+        $modifiedsnapshot->additionaldata = json_encode($additionaldata);
+        $DB->update_record('local_oer_snapshot', $modifiedsnapshot);
+        $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $expectedcounts['general'] = $expectedcounts['general'] + 3; // Three new fields have been added.
+        $this->assert_count_metadata($metadata, $expectedcounts);
+        $this->assert_metadata_default_fields($metadata);
+        $this->assertArrayHasKey('semester', $metadata);
+        $this->assertArrayHasKey('hoursperunit', $metadata);
+        $this->assertArrayHasKey('data', $metadata);
+
+        // Test course customfields - configurate customfields and test if data is present in release.
+        $customcat1 = $this->getDataGenerator()->create_custom_field_category(['name' => 'First Category']);
+        $this->getDataGenerator()->create_custom_field(
+                [
+                        'name'       => 'semester',
+                        'shortname'  => 'sem',
+                        'type'       => 'text',
+                        'categoryid' => $customcat1->get('id'),
+                        'configdata' => [
+                                'visibility'   => 0,
+                                'defaultvalue' => 'nosemester'
+                        ]
+                ]);
+        $handler               = \core_course\customfield\course_handler::create();
+        $data                  = new \stdClass();
+        $data->id              = $course->id;
+        $data->customfield_sem = 'WS';
+        $handler->instance_form_save($data);
+        set_config('coursecustomfields', 1, 'local_oer');
+        set_config('coursecustomfieldsvisibility', 0, 'local_oer');
+        set_config('coursecustomfieldsignored', '', 'local_oer');
+        $helper->sync_course_info($course->id);
+        $DB->insert_record('local_oer_courseinfo', $courseinfo);
+        $DB->insert_record('local_oer_courseinfo', $courseinfo2);
+
+        $snapshot->create_snapshot_of_course_files();
+        $snapshots                 = $snapshot->get_latest_course_snapshot();
+        $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $expectedcounts['general'] = 16; // New release should not have injected additional fields.
+        $expectedcounts['course']  = [11, 10]; // Moodle course now has additional customfield.
+        $this->assert_count_metadata($metadata, $expectedcounts);
+        $this->assert_metadata_default_fields($metadata);
+        $this->assertIsArray(reset($metadata['courses'])->customfields);
+        $this->assertCount(1, reset($metadata['courses'])->customfields);
+        $this->assertEquals('sem', reset($metadata['courses'])->customfields[0]->shortname);
+        $this->assertEquals('semester', reset($metadata['courses'])->customfields[0]->fullname);
+        $this->assertEquals('text', reset($metadata['courses'])->customfields[0]->type);
+        $this->assertEquals('WS', reset($metadata['courses'])->customfields[0]->data);
+        $this->assertEquals($customcat1->get('name'), reset($metadata['courses'])->customfields[0]->category);
+
+        // Test courseinfo from multiple moodle courses that use the same file.
+        set_config('coursetofile', '1', 'local_oer');
+        $course2 = $this->getDataGenerator()->create_course();
+        $helper->generate_resource($course2, $this->getDataGenerator(), $file->get_filename(), null, $file->get_content());
+        $helper->sync_course_info($course2->id);
+        $coursetofile               = new \stdClass();
+        $coursetofile->contenthash  = $contenthash;
+        $coursetofile->courseid     = $course2->id;
+        $coursetofile->coursecode   = 'moodlecourse-' . $course2->id;
+        $coursetofile->state        = coursetofile::COURSETOFILE_ENABLED;
+        $coursetofile->usermodified = 2;
+        $coursetofile->timecreated  = time();
+        $coursetofile->timemodified = time();
+        $DB->insert_record('local_oer_coursetofile', $coursetofile);
+        $snapshot->create_snapshot_of_course_files();
+        $snapshots                 = $snapshot->get_latest_course_snapshot();
+        $metadata                  = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $expectedcounts['courses'] = 3;
+        $expectedcounts['course']  = [11, 10, 11];
+        $this->assert_count_metadata($metadata, $expectedcounts);
+        $this->assert_metadata_default_fields($metadata);
+        $this->assertEquals('nosemester', $metadata['courses'][2]->customfields[0]->data);
+    }
+
+    /**
+     * Count the array and nested arrays in the metadata returnvalue.
+     * Only dynamic values are tested with this method. License and persons always have
+     * 3 fields and are tested below in the field assert method.
+     *
+     * $expectedcounts = [
+     *   general => x,
+     *   persons => x,
+     *   tags => x,
+     *   courses => x,
+     *   course => [ // fields for each course, can differ when using customfields.
+     *     x, y,
+     *   ]
+     * ]
+     *
+     * @param array $metadata
+     * @param array $expectedcounts
+     * @return void
+     */
+    private function assert_count_metadata(array $metadata, array $expectedcounts) {
+        $this->assertIsArray($metadata);
+        $this->assertIsArray($expectedcounts);
+        $this->assertCount($expectedcounts['general'], $metadata);
+        $this->assertCount($expectedcounts['persons'], $metadata['persons']);
+        $this->assertCount($expectedcounts['tags'], $metadata['tags']);
+        $this->assertCount($expectedcounts['courses'], $metadata['courses']);
+        foreach ($expectedcounts['course'] as $key => $value) {
+            $this->assertCount($value, (array) $metadata['courses'][$key]);
+        }
     }
 
     /**
@@ -183,10 +339,8 @@ class release_test extends \advanced_testcase {
         // Tests for this scenario have to be implemented in the subplugins delivering the data.
         // Also, the file could be used in different courses, and the editor could add the metadata of those courses to the file.
         $this->assertIsArray($metadata['courses']);
-        $this->assertCount(1, $metadata['courses'], 'Only the moodle course is present');
         $cm = reset($metadata['courses']);
         $cm = (array) $cm;
-        $this->assertCount(10, $cm, 'Only the default fields should be present');
         $this->assertArrayHasKey('identifier', $cm);
         $this->assertArrayHasKey('courseid', $cm);
         $this->assertArrayHasKey('sourceid', $cm);
@@ -199,7 +353,6 @@ class release_test extends \advanced_testcase {
         $this->assertArrayHasKey('lecturer', $cm);
         // Test the person subarray.
         $this->assertIsArray($metadata['persons']);
-        $this->assertCount(2, $metadata['persons']);
         foreach ($metadata['persons'] as $person) {
             $person = (array) $person;
             $this->assertCount(3, $person);
@@ -207,6 +360,7 @@ class release_test extends \advanced_testcase {
             $this->assertArrayHasKey('lastname', $person);
             $this->assertArrayHasKey('role', $person);
         }
+        $this->assertIsArray($metadata['tags']);
     }
 
     /**
