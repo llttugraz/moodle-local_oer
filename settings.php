@@ -214,7 +214,7 @@ if (!function_exists('local_oer_reset_releasestate_if_necessary')) {
      */
     function local_oer_reset_releasestate_if_necessary() {
         global $DB, $USER;
-        $files   = $DB->get_records('local_oer_files', ['state' => 1]);
+        $files   = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
         $courses = [];
         foreach ($files as $file) {
             list($reqarray, $releasable, $release) = \local_oer\helper\requirements::metadata_fulfills_all_requirements($file);
