@@ -276,6 +276,9 @@ class courseinfo_form extends \moodleform {
         $updated = false;
         foreach ($courses as $course) {
             $update = false;
+            if ($course->subplugin == courseinfo::BASETYPE) {
+                $update = coursecustomfield::compare_difference($course->courseid);
+            }
             $update = $this->overwrite_disabled($course, 'coursename', $fromform, $update);
             $update = $this->overwrite_disabled($course, 'structure', $fromform, $update);
             $update = $this->overwrite_disabled($course, 'description', $fromform, $update);

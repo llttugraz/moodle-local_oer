@@ -181,4 +181,17 @@ class coursecustomfield {
         $options = array_merge([''], explode("\r\n", $selectoptions));
         return $options[$value] ?? '';
     }
+
+    /**
+     * Compare if the stored customfields are different from the fields which would be added.
+     *
+     * @param int $courseid Moodle courseid
+     * @return bool
+     * @throws \dml_exception
+     */
+    public static function compare_difference(int $courseid): bool {
+        $stored = self::get_course_customfields_with_applied_config($courseid, true);
+        $moodle = self::get_course_customfields_with_applied_config($courseid, false);
+        return hash('sha256', json_encode($stored)) != hash('sha256', json_encode($moodle));
+    }
 }
