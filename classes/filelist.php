@@ -138,7 +138,7 @@ class filelist {
      * @throws \moodle_exception
      */
     public static function get_simple_filelist(int $courseid, string $contenthash = ''): array {
-        global $DB;
+        global $DB, $CFG;
         $overwritemetadata = get_config('local_oer', 'coursetofile');
         list($icons, $typegroup, $renderer) = self::prepare_file_icon_renderer($courseid);
         $files       = self::get_course_files($courseid);
@@ -191,7 +191,8 @@ class filelist {
                     'editor'          => $file[0]['editor'],
                     'courses'         => $file[0]['courses'],
                     'writable'        => $file[0]['writable'],
-                    'coursetofile'    => $overwritemetadata == 1 && $file[0]['editor'] == $courseid
+                    'coursetofile'    => $overwritemetadata == 1 && $file[0]['editor'] == $courseid,
+                    'wwwroot'         => $CFG->wwwroot // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
             // Search for the editor course, as the information shown is the same in all courses where the file is used.
