@@ -160,7 +160,7 @@ class filestate {
      * @throws \coding_exception
      */
     public static function formatted_notwritable_output_html(array $file) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $CFG;
         $support = \core_user::get_support_user();
         if ($file['state'] !== self::STATE_FILE_ERROR) {
             $data      = $DB->get_record('local_oer_files',
@@ -262,6 +262,7 @@ class filestate {
                                                      'courses'      => array_values($file['courses']),
                                                      'showmetadata' => $file['state'] != self::STATE_FILE_ERROR,
                                                      'metadata'     => $metadata,
+                                                     'wwwroot'      => $CFG->wwwroot,
                                              ]);
     }
 }
