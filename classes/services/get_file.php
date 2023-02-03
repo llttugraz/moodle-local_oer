@@ -147,6 +147,7 @@ class get_file extends \external_api {
                         ),
                         'writable'        => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                         'coursetofile'    => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
+                        'wwwroot'         => new \external_value(PARAM_URL, 'wwwroot of moodle'),
                 ]);
     }
 }
