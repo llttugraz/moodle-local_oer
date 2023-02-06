@@ -370,8 +370,10 @@ $string['requirementschanged_small']                       = 'Open Educational R
 $string['coursecustomfields']                              = 'Add course customfields';
 $string['coursecustomfields_description']                  = 'When enabled, course custom fields are read from the system and ' .
                                                              'are added to the course metadata of the moodle course.';
-$string['customfieldcategory_help']                        = 'This is the name of a custom field category, below the fields of ' .
-                                                             'the category can be seen.';
+$string['customfieldcategory_help']                        = '<p>This is the name of a custom field category, below the fields of ' .
+                                                             'the category can be seen.</p>'.
+                                                             '<p>Customfields cannot be overwritten. ' .
+                                                             'Editing is only possible in the course settings.</p>';
 $string['coursecustomfieldsvisibility']                    = 'Set customfield visibility level';
 $string['coursecustomfieldsvisibility_description']        = '<p>The visibility level indicates the fields that are ' .
                                                              'added to the metadata. When a customfield is set up in Moodle, it ' .

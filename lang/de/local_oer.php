@@ -389,8 +389,10 @@ $string['requirementschanged_body']                        = 'Aufgrund geändert
                                                              'für eine erneute Veröffentlichung angepasst werden:<br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';
 $string['coursecustomfields']                              = 'Benutzerdefinierte Kursfelder hinzufügen';
-$string['customfieldcategory_help']                        = 'Dies ist der Name einer benutzerdefinierten Feldkategorie, ' .
-                                                             'darunter sind die Felder der Kategorie zu sehen.';
+$string['customfieldcategory_help']                        = '<p>Dies ist der Name einer benutzerdefinierten Feldkategorie, ' .
+                                                             'darunter sind die Felder der Kategorie zu sehen.</p>' .
+                                                             '<p>Benutzerdefinierte Felder können nicht überschrieben werden. ' .
+                                                             'Bearbeiten ist nur in den Kurseinstellungen möglich.</p>';
 $string['customfield_help']                                = 'Benutzerdefinierte Kursfelder können auf ähnliche Weise wie die ' .
                                                              'Standard-Kursfelder hinzugefügt werden. Sie können auch ' .
                                                              'überschrieben werden, so dass ein anderer Wert als der im Kurs ' .
