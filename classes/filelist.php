@@ -25,8 +25,9 @@
 
 namespace local_oer;
 
-use local_oer\helper\license;
+use local_oer\helper\filestate;
 use local_oer\helper\requirements;
+use local_oer\metadata\coursetofile;
 
 /**
  * Class filelist
@@ -45,42 +46,7 @@ class filelist {
      * @throws \moodle_exception
      */
     public function __construct($courseid) {
-        $mod         = get_fast_modinfo($courseid);
-        $coursefiles = [];
-
-        $fs = get_file_storage();
-
-        foreach ($mod->cms as $cm) {
-            $skip = false;
-            switch ($cm->modname) {
-                case 'folder':
-                    $component = 'mod_folder';
-                    $area      = 'content';
-                    break;
-                case 'resource':
-                    $component = 'mod_resource';
-                    $area      = 'content';
-                    break;
-                default:
-                    $component = '';
-                    $area      = '';
-                    $skip      = true;
-            }
-            if ($skip) {
-                continue;
-            }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false,
-                                         'sortorder DESC', false);
-
-            foreach ($files as $file) {
-                $coursefiles[] = [
-                        'file'   => $file,
-                        'module' => $cm,
-                ];
-            }
-        }
-
-        $this->coursefiles = $coursefiles;
+        $this->coursefiles = self::get_course_files($courseid);
     }
 
     /**
@@ -110,7 +76,6 @@ class filelist {
 
         $fs = get_file_storage();
 
-        // TODO: separate the file loader into subplugins.
         foreach ($mod->cms as $cm) {
             $skip = false;
             switch ($cm->modname) {
@@ -130,13 +95,17 @@ class filelist {
             if ($skip) {
                 continue;
             }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false,
-                                         'sortorder DESC', false);
+            $files = $fs->get_area_files($cm->context->id, $component, $area, false, 'id ASC', false);
 
             foreach ($files as $file) {
+                list($state, $editor, $courses, $writable) = filestate::calculate_file_state($file->get_contenthash(), $courseid);
                 $coursefiles[$file->get_contenthash()][] = [
-                        'file'   => $file,
-                        'module' => $cm,
+                        'file'     => $file,
+                        'module'   => $cm,
+                        'state'    => $state,
+                        'editor'   => $editor,
+                        'courses'  => $courses,
+                        'writable' => $writable,
                 ];
             }
         }
@@ -169,7 +138,8 @@ class filelist {
      * @throws \moodle_exception
      */
     public static function get_simple_filelist(int $courseid, string $contenthash = ''): array {
-        global $DB;
+        global $DB, $CFG;
+        $overwritemetadata = get_config('local_oer', 'coursetofile');
         list($icons, $typegroup, $renderer) = self::prepare_file_icon_renderer($courseid);
         $files       = self::get_course_files($courseid);
         $list        = [];
@@ -180,6 +150,7 @@ class filelist {
             if (!empty($contenthash) && $file[0]['file']->get_contenthash() != $contenthash) {
                 continue;
             }
+
             $filesections = [];
             $modules      = [];
 
@@ -215,12 +186,20 @@ class filelist {
                     'modules'         => $modules,
                     'sections'        => $filesections,
                     'requirementsmet' => false,
+                    'state'           => $file[0]['state'],
+                    'multiple'        => count($file[0]['courses']) > 1,
+                    'editor'          => $file[0]['editor'],
+                    'courses'         => $file[0]['courses'],
+                    'writable'        => $file[0]['writable'],
+                    'coursetofile'    => $overwritemetadata == 1 && $file[0]['editor'] == $courseid,
+                    'wwwroot'         => $CFG->wwwroot // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
+            // Search for the editor course, as the information shown is the same in all courses where the file is used.
             if ($DB->record_exists('local_oer_files',
-                                   ['courseid' => $courseid, 'contenthash' => $file[0]['file']->get_contenthash()])) {
+                                   ['courseid' => $entry['editor'], 'contenthash' => $file[0]['file']->get_contenthash()])) {
                 $record = $DB->get_record('local_oer_files',
-                                          ['courseid'    => $courseid,
+                                          ['courseid'    => $entry['editor'],
                                            'contenthash' => $file[0]['file']->get_contenthash()]);
                 list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
                 $snapshotsql              = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "

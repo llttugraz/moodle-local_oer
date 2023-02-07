@@ -367,3 +367,69 @@ $string['requirementschanged_body']                        = 'Due to changes in 
                                                              '<a href="{$a->url}">{$a->course}</a> must ' .
                                                              'be modified for republishing: <br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources metadata requirements have changed';
+$string['coursecustomfields']                              = 'Add course customfields';
+$string['coursecustomfields_description']                  = 'When enabled, course custom fields are read from the system and ' .
+                                                             'are added to the course metadata of the moodle course.';
+$string['customfieldcategory_help']                        = '<p>This is the name of a custom field category, below the fields of ' .
+                                                             'the category can be seen.</p>'.
+                                                             '<p>Customfields cannot be overwritten. ' .
+                                                             'Editing is only possible in the course settings.</p>';
+$string['coursecustomfieldsvisibility']                    = 'Set customfield visibility level';
+$string['coursecustomfieldsvisibility_description']        = '<p>The visibility level indicates the fields that are ' .
+                                                             'added to the metadata. When a customfield is set up in Moodle, it ' .
+                                                             'has to be defined which users can see the field. There are three ' .
+                                                             'options for that. In OER context these three options can be used as ' .
+                                                             'follows </p>' .
+                                                             '<ul>' .
+                                                             '<li>"Everyone": Only fields marked with this state are added</li>' .
+                                                             '<li>"Teachers": "Teachers" and "Everyone" fields are added</li>' .
+                                                             '<li>"Nobody": All fields are added ' .
+                                                             '(including the options above)</li>' .
+                                                             '</ul>';
+$string['coursecustomfieldsignored']                       = 'Ignore customfields';
+$string['coursecustomfieldsignored_description']           = '<p>Ignore customfields by selecting them in ' .
+                                                             'this multiselect field. ' .
+                                                             'Per default all fields are added to the course metadata when ' .
+                                                             'customfields are enabled for OER plugin.</p>' .
+                                                             '<p> Keep in mind that the visibility setting is also applied and ' .
+                                                             'fields are eventually not be shown, even if they are shown ' .
+                                                             'in this setting.</p>' .
+                                                             '<p>Field format: {fullname} ({category} {visibility})</p>';
+$string['customfield_help']                                = 'Course custom fields can be added in a similar way as ' .
+                                                             'the default course fields . They can also be overwritten so that ' .
+                                                             'an other value than the one set in course can be used . ' .
+                                                             'Also they can be ignored, to not add them to the course metadata ' .
+                                                             'of the released OER objects . ';
+$string['nofieldsincat']                                   = 'This customfield category does not have any fields to show.';
+$string['multiplecourses']                                 = 'Multiple courses use this file';
+$string['multiplecoursestofile']                           = 'Multiple courses use this file. You can also add course metadata ' .
+                                                             'that belongs to an other course than where the file is edited.';
+$string['metadatanotwritable']                             = 'The metadata of this file cannot be edited.';
+$string['reason']                                          = 'Reason';
+$string['metadatanotwritable0']                            = 'An error has been found. It seems that this file has been edited ' .
+                                                             'in multiple places.';
+$string['metadatanotwritable2']                            = 'The metadata of this file has already been edited ' .
+                                                             'in another course.';
+$string['metadatanotwritable3']                            = 'This file has already been released and cannot be edited anymore.';
+$string['contactsupport']                                  = 'For further information, please contact ' .
+                                                             '<a href="mailto:{$a->support}">{$a->support}</a>.';
+$string['showmetadata']                                    = 'Show stored metadata';
+$string['coursetofile']                                    = 'Overwrite coursemetada for each file';
+$string['coursetofile_info']                               = 'In this form course metadata is listed which is available ' .
+                                                             'for this file. Here you can override the course settings, ' .
+                                                             'which course metadata will be attached to this file.';
+$string['coursetofile_description']                        = 'In courses, the course metadata can be edited. ' .
+                                                             'You can decide whether the metadata of the Moodle ' .
+                                                             'course and external courses that are linked to a Moodle ' .
+                                                             'course (subplugin) are attached to files. If this setting ' .
+                                                             'is enabled, this can also be overridden on a per file basis. ' .
+                                                             'Furthermore, the course metadata from other courses that ' .
+                                                             'use the same file can be attached.';
+$string['tocourse']                                        = 'link';
+$string['nocourseinfo']                                    = 'The course metadata of this course has not been synchronised for ' .
+                                                             'OER purposes yet. If you want to use course meteadata of this ' .
+                                                             'course, please open the OER view inside the course and edit the ' .
+                                                             'metadata.';
+$string['editor']                                          = 'Editor';
+$string['oneeditorselectederror']                          = 'At least one of the editor courses metadata ' .
+                                                             'options has to be selected.';

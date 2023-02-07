@@ -388,3 +388,78 @@ $string['requirementschanged_body']                        = 'Aufgrund geändert
                                                              '<a href="{$a->url}">{$a->course}</a> ' .
                                                              'für eine erneute Veröffentlichung angepasst werden:<br><br>';
 $string['requirementschanged_small']                       = 'Open Educational Resources: Metadaten Anforderungen geändert';
+$string['coursecustomfields']                              = 'Benutzerdefinierte Kursfelder hinzufügen';
+$string['customfieldcategory_help']                        = '<p>Dies ist der Name einer benutzerdefinierten Feldkategorie, ' .
+                                                             'darunter sind die Felder der Kategorie zu sehen.</p>' .
+                                                             '<p>Benutzerdefinierte Felder können nicht überschrieben werden. ' .
+                                                             'Bearbeiten ist nur in den Kurseinstellungen möglich.</p>';
+$string['customfield_help']                                = 'Benutzerdefinierte Kursfelder können auf ähnliche Weise wie die ' .
+                                                             'Standard-Kursfelder hinzugefügt werden. Sie können auch ' .
+                                                             'überschrieben werden, so dass ein anderer Wert als der im Kurs ' .
+                                                             'eingestellte verwendet werden kann. ' .
+                                                             'Weiters ist es auch möglich diese zu ignorieren, um sie nicht zu ' .
+                                                             'den Kurs-Metadaten der freigegebenen OER-Objekte hinzuzufügen.';
+$string['coursecustomfields_description']                  = 'Wenn diese Option aktiviert ist, werden benutzerdefinierte ' .
+                                                             'Kursfelder (course customfields) aus dem System gelesen und zu ' .
+                                                             'den Kursmetadaten des Moodle-Kurses hinzugefügt.';
+$string['coursecustomfieldsvisibility']                    = 'Sichtbarkeit von benutzerdefinierten Feldern';
+$string['coursecustomfieldsvisibility_description']        = '<p>Die Sichtbarkeitsstufe gibt an, welche Felder zu den ' .
+                                                             'Metadaten hinzugefügt werden. Wenn ein benutzerdefiniertes ' .
+                                                             'Feld in Moodle eingerichtet wird, muss festgelegt werden, ' .
+                                                             'welche Nutzer das Feld sehen können. Hierfür gibt es drei ' .
+                                                             'Optionen. Im OER-Kontext können diese drei Optionen wie ' .
+                                                             'folgt verwendet werden.</p>' .
+                                                             '<ul>' .
+                                                             '<li>"Alle": Nur Felder, die mit diesem Status markiert sind, ' .
+                                                             'werden hinzugefügt</li>' .
+                                                             '<li>"Trainer:innen": Die Felder "Trainer:innen" und "Alle" ' .
+                                                             'werden hinzugefügt</li>' .
+                                                             '<li>"Nicht-sichtbar": Alle Felder werden hinzugefügt ' .
+                                                             '(einschließlich der anderen Optionen)</li>' .
+                                                             '</ul>';
+$string['coursecustomfieldsignored']                       = 'Benutzerdefinierte Felder ignorieren';
+$string['coursecustomfieldsignored_description']           = '<p>Ignorieren Sie benutzerdefinierte Felder, ' .
+                                                             'indem Sie sie diese in diesem Mehrfachauswahlfeld auswählen. ' .
+                                                             'Standardmäßig werden alle Felder zu den Kursmetadaten ' .
+                                                             'hinzugefügt, wenn benutzerdefinierte Felder für ' .
+                                                             'das OER-Plugin aktiviert sind.</p>' .
+                                                             '<p>Beachten Sie, dass die Sichtbarkeitseinstellung ebenfalls ' .
+                                                             'angewendet wird und die Felder eventuell nicht angezeigt ' .
+                                                             'werden, auch wenn sie in dieser Einstellung angezeigt werden.</p>' .
+                                                             '<p>Feldformat: {Feldname} ({Kategorie} {Sichtbarkeit})</p>';
+$string['nofieldsincat']                                   = 'Diese Kategorie enthält keine Felder, die angezeigt werden können.';
+$string['multiplecourses']                                 = 'Mehrere Kurse verwenden diese Datei';
+$string['multiplecoursestofile']                           = 'Mehrere Kurse verwenden diese Datei. Sie können auch ' .
+                                                             'Kurs-Metadaten hinzufügen, die zu einem anderen Kurs ' .
+                                                             'gehören als dem, in dem die Datei bearbeitet wird.';
+$string['metadatanotwritable']                             = 'Die Metadaten dieser Datei können nicht editiert werden.';
+$string['reason']                                          = 'Grund';
+$string['metadatanotwritable0']                            = 'Ein Fehler ist aufgetreten. Diese Datei wurde in mehreren Kursen ' .
+                                                             'editiert.';
+$string['metadatanotwritable2']                            = 'Diese Datei wird bereits in einem anderen Kurs bearbeitet.';
+$string['metadatanotwritable3']                            = 'Diese Datei wurde bereits veröffentlicht und kann deshalb nicht ' .
+                                                             'mehr editiert werden.';
+$string['contactsupport']                                  = 'Für weitere Informationen kontaktieren Sie bitte ' .
+                                                             '<a href="mailto:{$a->support}">{$a->support}</a>.';
+$string['showmetadata']                                    = 'Gespeicherte Metadaten anzeigen';
+$string['coursetofile']                                    = 'Kursmetadaten bei Dateien überschreiben';
+$string['coursetofile_info']                               = 'In diesem Formular sind alle Kurs-Metadaten aufgelistet ' .
+                                                             'welche für diese Datei zur Verfügung stehen. Hier können ' .
+                                                             'sie die Kurseinstellungen, welche Kurs-Metadaten bei dieser ' .
+                                                             'Datei angehängt werden, überschreiben.';
+$string['coursetofile_description']                        = 'In Kursen können die Kursmetadaten bearbeitet werden. Dabei kann ' .
+                                                             'entschieden werden ob die Metadaten des Moodle Kurses und ' .
+                                                             'externer Kurse welche mit einem Moodle Kurs verbunden sind ' .
+                                                             '(Subplugin) an Dateien angehängt werden.' .
+                                                             'Ist diese Einstellung eingeschaltet, kann dies zusätzlich pro ' .
+                                                             'Datei überschrieben werden. Ausserdem können die Kursmetadaten ' .
+                                                             'aus anderen Kursen, welche die selbe ' .
+                                                             'Datei verwenden angehängt werden.';
+$string['tocourse']                                        = 'Zum Kurs';
+$string['nocourseinfo']                                    = 'Die Kurs-Metadaten dieses Kurses sind noch nicht für ' .
+                                                             'OER-Zwecke synchronisiert worden. Wenn Sie die Kurs-Metadaten ' .
+                                                             'dieses Kurses verwenden möchten, öffnen Sie bitte die OER-Ansicht ' .
+                                                             'innerhalb des Kurses und bearbeiten Sie die Metadaten.';
+$string['editor']                                          = 'Editor';
+$string['oneeditorselectederror']                          = 'Mindestens eine der Optionen für die Metadaten des ' .
+                                                             'editierenden Kurses muss ausgewählt sein.';

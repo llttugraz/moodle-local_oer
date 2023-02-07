@@ -1,0 +1,86 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oer/notwritable
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * Various data about mappings
+
+    Example context (json):
+    {
+        "structure": "Exercise",
+        "description": "This is example json text",
+        "objectives": "This data is used for the ci to test the mustache template",
+        "language": "en",
+        "lecturer": "christian ortner"
+    }
+  }}
+
+<p>
+    <a href="#" role="button" data-toggle="collapse" data-target="#local_oer_showmetadata_{{uniqid}}" aria-expanded="false"
+       aria-controls="local_oer_showmetadata_{{uniqid}}">
+        {{#str}} showmetadata, local_oer {{/str}}
+    </a>
+</p>
+<div class="collapse" id="local_oer_showmetadata_{{uniqid}}">
+    <div class="card card-body">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} structure, local_oer {{/str}}</p>
+                    <p class="bg-light">{{structure}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} description, local_oer {{/str}}</p>
+                    <p class="bg-light">{{{description}}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} objectives, local_oer {{/str}}</p>
+                    <p class="bg-light">{{{objectives}}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} organisation, local_oer {{/str}}</p>
+                    <p class="bg-light">{{organisation}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} language, local_oer {{/str}}</p>
+                    <p class="bg-light">{{language}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <p class="badge badge-info">{{#str}} lecturer, local_oer {{/str}}</p>
+                    <p class="bg-light">{{lecturer}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

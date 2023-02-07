@@ -207,7 +207,7 @@ class requirement_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers ::local_oer_reset_releasestate_if_necessary
+     * @covers local_oer_reset_releasestate_if_necessary
      */
     public function test_local_oer_reset_releasestate_if_necessary() {
         $this->resetAfterTest();
@@ -287,7 +287,7 @@ class requirement_test extends \advanced_testcase {
         // Case 3: Files in both courses are released.
         $testcourse->set_files_to($course1->id, 5, true);
         $testcourse->set_files_to($course2->id, 5, true);
-        $this->assertCount(10, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(10, $DB->get_records('local_oer_files', ['state' => 1], 'id ASC'));
         $sink = $this->redirectMessages();
         local_oer_reset_releasestate_if_necessary();
         $messages = $sink->get_messages();

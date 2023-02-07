@@ -32,6 +32,11 @@ namespace local_oer\metadata;
  */
 class courseinfo {
     /**
+     * Defines the string for the moodle course metadata identifier.
+     */
+    const BASETYPE = 'base';
+
+    /**
      * Load the metadata of a course.
      * A moodle course can have multiple course metadata.
      * External systems could be linked to the course.
@@ -42,7 +47,13 @@ class courseinfo {
      */
     public function load_metadata_from_database(int $courseid) {
         global $DB;
-        return $DB->get_records('local_oer_courseinfo', ['courseid' => $courseid]);
+        $records = $DB->get_records('local_oer_courseinfo', ['courseid' => $courseid], 'id ASC');
+        foreach ($records as $key => $record) {
+            if (!is_null($record->customfields)) {
+                $records[$key]->customfields = json_decode($record->customfields, true);
+            }
+        }
+        return $records;
     }
 
     /**
@@ -76,7 +87,8 @@ class courseinfo {
         $info->language_edited     = 0;
         $info->lecturer            = '';
         $info->lecturer_edited     = 0;
-        $info->subplugin           = 'base';
+        $info->customfields        = null;
+        $info->subplugin           = self::BASETYPE;
         $info->usermodified        = $USER->id;
         $info->timecreated         = time();
         $info->timemodified        = time();
@@ -87,7 +99,7 @@ class courseinfo {
      * Create the metadata array.
      * At least the metadata from the moodle course is returned.
      * If an external plugin is installed and selected, the external
-     * informations are added by calling the load_data method from the subplugin.
+     * information is added by calling the load_data method from the subplugin.
      *
      * @param int $courseid
      * @return array
@@ -119,13 +131,15 @@ class courseinfo {
         foreach ($users as $user) {
             $teachers[] = fullname($user);
         }
-        $info              = self::get_default_metadata_object($courseid);
-        $info->coursecode  = 'moodlecourse-' . $courseid;
-        $info->coursename  = $course->fullname;
-        $info->structure   = '';
-        $info->description = trim(strip_tags($course->summary));
-        $info->lecturer    = implode(', ', $teachers);
-        $infos             = ['default' => $info];
+        $info               = self::get_default_metadata_object($courseid);
+        $info->coursecode   = 'moodlecourse-' . $courseid;
+        $info->coursename   = $course->fullname;
+        $info->structure    = '';
+        $info->description  = is_null($course->summary) ? '' : self::simple_html_to_text_reduction($course->summary);
+        $info->lecturer     = implode(', ', $teachers);
+        $infos              = ['default' => $info];
+        $customfields       = coursecustomfield::get_course_customfields_with_applied_config($courseid);
+        $info->customfields = empty($customfields) ? null : $customfields;
 
         $external = get_config('local_oer', 'metadataaggregator');
         if ($external != 'no_value') {
@@ -137,5 +151,31 @@ class courseinfo {
         }
 
         return $infos;
+    }
+
+    /**
+     * This is a very basic function to add some formatting to the reduced text fields.
+     * The format is based on some html tags that are found in the document.
+     *
+     * - Replace some closing texts with newline
+     * - Images are not used and are removed
+     * - Ordered lists are reduced to unordered lists
+     * - Urls: href will replace the text of the anchor
+     *
+     * @param string $text Text to remove html tags
+     * @return string
+     * @throws \Exception
+     */
+    public static function simple_html_to_text_reduction(string $text) {
+        preg_match_all('/(<a[^>]*>[^<]+<\/a>)/', $text, $urls);
+        foreach ($urls[0] as $key => $url) {
+            $a    = new \SimpleXMLElement($url);
+            $text = str_replace($urls[1][$key], $a['href'] . ' ', $text);
+        }
+        $breakline = ['</h1>', '</h2>', '</h3>', '</h4>', '</h5>', '</p>', '<br>', '</li>', '</ul>', '</ol>'];
+        $text      = str_replace($breakline, "\r\n", $text);
+        $text      = str_replace('<li>', '* ', $text);
+        $text      = html_entity_decode($text);
+        return trim(strip_tags($text));
     }
 }
