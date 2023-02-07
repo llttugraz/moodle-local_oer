@@ -25,6 +25,13 @@ After installation of the plugin, there are several settings that can be made:
 * `local_oer | releaseplugin` Select the upload plugin that will be used to upload released files to a repository.
 * List of installed subplugins. Enable or disable them. If a subplugin has settings, a settings link will be shown.
 
+### New settings in version v2.1.14
+
+* `local_oer | coursecustomfields` Add course customfields to the resulting coursemetadata
+* `local_oer | coursecustomfieldvisibility` The customfields have some visibility settings. The fields will be added to the course metadata respecting the visibility setting of the fields. Choose the level of visibility that will be added to the metadata.
+* `local_oer | coursecustomfieldsignored` Select customfields to ignore them. The selected fields will not be added to the course metadata.
+* `local_oer | coursetofile` When enabled, the course metadata can be selected for each file separately. The setting on course level will be applied per default, but can be overwritten per file. Also it is possible to add course metadata of other courses to a file, if the file is used in multiple courses.
+
 # Release snapshots
 
 The metadata of released files is stored in an extra snapshot table. A snapshot contains all metadata the file had on the release. When the metadata changes a new release will be created. Old releases remain in the table and can be seen as release history on `https://*yourmoodledomain*/local/oer/views/releasehistory.php` (WIP - current release only shows courses with amount of files)
@@ -81,7 +88,7 @@ JSON Format:
           "timereleased": "1648812704",
           "classification": [
             {
-              "type": "oefos",
+              "type": "oefos //requires oerclassification_oefos subplugin to be installed",
               "url": "https://www.data.gv.at/katalog/dataset/stat_ofos-2012",
               "values": [
                 {
