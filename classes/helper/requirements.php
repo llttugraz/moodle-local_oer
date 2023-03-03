@@ -129,7 +129,7 @@ class requirements {
                 if (empty($files)) {
                     continue;
                 }
-                $coursecontext = context_course::instance($course);
+                $coursecontext = \context_course::instance($course);
                 $sql           = "SELECT u.id FROM {user} u " .
                                  "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
                                  "JOIN {user_enrolments} ue ON u.id = ue.userid " .
