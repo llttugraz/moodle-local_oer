@@ -58,6 +58,7 @@ class filestate_test extends \advanced_testcase {
      * @throws \file_exception
      * @throws \moodle_exception
      * @throws \stored_file_creation_exception
+     * @covers ::calculate_file_state
      */
     public function test_calculate_file_state() {
         $this->resetAfterTest(true);
@@ -168,6 +169,7 @@ class filestate_test extends \advanced_testcase {
      * Returns a bool value if the current course can edit the current file.
      *
      * @return void
+     * @covers ::metadata_writable
      */
     public function test_metadata_writable() {
         $this->resetAfterTest(true);

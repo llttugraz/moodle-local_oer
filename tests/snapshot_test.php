@@ -38,10 +38,22 @@ require_once(__DIR__ . '/helper/testcourse.php');
  * @coversDefaultClass \local_oer\snapshot
  */
 class snapshot_test extends \advanced_testcase {
+    /**
+     * Test get latest course snapshot
+     *
+     * @return void
+     * @covers ::get_latest_course_snapshot
+     */
     public function test_get_latest_course_snapshot() {
         $this->resetAfterTest();
     }
 
+    /**
+     * Test get file history
+     *
+     * @return void
+     * @covers ::get_file_history
+     */
     public function test_get_file_history() {
         $this->resetAfterTest();
         // TODO: feature has to be implemented in snapshot.
@@ -85,6 +97,7 @@ class snapshot_test extends \advanced_testcase {
      * TODO: define test steps.
      *
      * @return void
+     * @covers ::create_file_snapshot
      */
     public function test_create_file_snapshot() {
         $this->resetAfterTest();
@@ -100,6 +113,7 @@ class snapshot_test extends \advanced_testcase {
      *
      * @return void
      * @throws \ReflectionException
+     * @covers ::add_external_metadata
      */
     public function test_add_external_metadata() {
         $this->resetAfterTest();
@@ -118,6 +132,7 @@ class snapshot_test extends \advanced_testcase {
      * @return void
      * @throws \ReflectionException
      * @throws \dml_exception
+     * @covers ::get_active_courseinfo_metadata
      */
     public function test_get_active_courseinfo_metadata() {
         $this->resetAfterTest();
@@ -128,25 +143,25 @@ class snapshot_test extends \advanced_testcase {
         $setstate = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
         $setstate->setAccessible(true);
         // Test 1: Courseinfo sync has not been run yet. There is no active courseinfo in this course.
-        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        [$courses, $courseinfo] = $setstate->invoke($snapshot);
         $this->assertEmpty($courses);
         $this->assertEmpty($courseinfo);
 
         // Test 2: After courseinfo has been synced, the moodle course is in array.
         $sync = new courseinfo_sync();
         $sync->sync_course($course->id);
-        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        [$courses, $courseinfo] = $setstate->invoke($snapshot);
         $this->assertCount(1, $courses);
         $this->assertCount(1, $courseinfo);
 
         // Test 3: To emulate additional metadata added through subplugins a courseinfo entry will be added.
         $entry = $this->set_additional_courseinfoentry($course->id);
-        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        [$courses, $courseinfo] = $setstate->invoke($snapshot);
         $this->assertCount(2, $courses);
         $this->assertCount(2, $courseinfo);
         global $DB;
         $DB->set_field('local_oer_courseinfo', 'ignored', 1, ['coursecode' => 'moodlecourse-' . $course->id]);
-        list($courses, $courseinfo) = $setstate->invoke($snapshot);
+        [$courses, $courseinfo] = $setstate->invoke($snapshot);
         $this->assertCount(1, $courses);
         $this->assertCount(1, $courseinfo);
         $this->assertEquals('ExternalCourse', reset($courseinfo)['identifier']);
@@ -161,6 +176,7 @@ class snapshot_test extends \advanced_testcase {
      *
      * @return void
      * @throws \ReflectionException
+     * @covers ::get_overwritten_courseinfo_metadata
      */
     public function test_get_overwritten_courseinfo_metadata() {
         $this->resetAfterTest();
@@ -177,18 +193,18 @@ class snapshot_test extends \advanced_testcase {
         $sync->sync_course($course->id);
         // Test 1: Setting disabled.
         set_config('coursetofile', 0, 'local_oer');
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
         $this->assertCount(1, $courses);
         $this->assertCount(1, $courseinfo);
         $this->set_additional_courseinfoentry($course->id);
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
         $this->assertCount(2, $courses);
         $this->assertCount(2, $courseinfo);
         // Test 2: Setting enabled, no state has been overwritten yet.
         set_config('coursetofile', 1, 'local_oer');
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
         $this->assertCount(2, $courses);
         $this->assertCount(2, $courseinfo);
@@ -203,7 +219,7 @@ class snapshot_test extends \advanced_testcase {
         $state->timecreated  = time();
         $state->timemodified = time();
         $state->id           = $DB->insert_record('local_oer_coursetofile', $state);
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $this->assertCount(2, $courses);
         $this->assertCount(2, $courseinfo);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
@@ -214,7 +230,7 @@ class snapshot_test extends \advanced_testcase {
         $state->state = coursetofile::COURSETOFILE_ENABLED;
         $DB->set_field('local_oer_courseinfo', 'ignored', 1, ['coursecode' => 'moodlecourse-' . $course->id]);
         $DB->update_record('local_oer_coursetofile', $state);
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $this->assertCount(1, $courses);
         $this->assertCount(1, $courseinfo);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
@@ -226,7 +242,7 @@ class snapshot_test extends \advanced_testcase {
         $state->courseid   = 7;
         $state->coursecode = 'ExternalCourse';
         $DB->insert_record('local_oer_coursetofile', $state);
-        list($courses, $courseinfo) = $active->invoke($snapshot);
+        [$courses, $courseinfo] = $active->invoke($snapshot);
         $this->assertCount(1, $courses);
         $this->assertCount(1, $courseinfo);
         $courseinfo = $overwritten->invoke($snapshot, $courseinfo, $contenthash, $courses);
@@ -239,6 +255,7 @@ class snapshot_test extends \advanced_testcase {
      *
      * @return void
      * @throws \ReflectionException
+     * @covers ::extract_courseinfo_metadata
      */
     public function test_extract_courseinfo_metadata() {
         $this->resetAfterTest();
