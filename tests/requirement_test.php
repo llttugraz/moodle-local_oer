@@ -203,11 +203,14 @@ class requirement_test extends \advanced_testcase {
      * This function also implicitly tests the message class, so no extra test for this class
      * is added.
      *
+     * This test covers the helper function reset_releasestate_if_necessary but calls the wrapper
+     * from the settings.php file.
+     *
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers local_oer_reset_releasestate_if_necessary
+     * @covers ::reset_releasestate_if_necessary
      */
     public function test_local_oer_reset_releasestate_if_necessary() {
         $this->resetAfterTest();

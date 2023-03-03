@@ -87,4 +87,62 @@ class requirements {
 
         return [$reqarray, $releasable, $release && $releasable];
     }
+
+    /**
+     * en the requirements change, the files that already have been set to release have to be tested against the
+     * new requirements and the state has to be set to 0 if the file does not meet the new requirements settings.
+     * Does not affect already made releases/snapshots as the requirements had other values back then.
+     *
+     * Also send a notification to affected users that the requirements have changed and some files have to be revisited.
+     *
+     * This function has been moved from settings.php to this helper. In the settings.php a wrapper remains, as there is a
+     * callback necessary for a setting.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public static function reset_releasestate_if_necessary() {
+        global $DB, $USER;
+        $files   = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        $courses = [];
+        foreach ($files as $file) {
+            [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($file);
+            if (!$release) {
+                $courses[$file->courseid][] = $file;
+                $file->state                = 0;
+                $file->usermodified         = $USER->id;
+                $file->timemodified         = time();
+                $DB->update_record('local_oer_files', $file);
+            }
+        }
+        if (!empty($courses)) {
+            foreach ($courses as $course => $files) {
+                // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
+                $filelist = \local_oer\filelist::get_course_files($course);
+                foreach ($files as $key => $file) {
+                    if (!isset($filelist[$file->contenthash])) {
+                        unset($files[$key]);
+                    }
+                }
+                if (empty($files)) {
+                    continue;
+                }
+                $coursecontext = context_course::instance($course);
+                $sql           = "SELECT u.id FROM {user} u " .
+                                 "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
+                                 "JOIN {user_enrolments} ue ON u.id = ue.userid " .
+                                 "JOIN {enrol} e ON e.id = ue.enrolid " .
+                                 "WHERE ul.type ='allow' AND e.courseid = :courseid";
+                $users         = $DB->get_records_sql($sql, ['courseid' => $course]);
+                foreach ($users as $userid) {
+                    if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
+                        $user = $DB->get_record('user', ['id' => $userid->id]);
+                        \local_oer\message::send_requirementschanged($user, $files, $course);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -213,45 +213,6 @@ if (!function_exists('local_oer_reset_releasestate_if_necessary')) {
      * @throws moodle_exception
      */
     function local_oer_reset_releasestate_if_necessary() {
-        global $DB, $USER;
-        $files   = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
-        $courses = [];
-        foreach ($files as $file) {
-            list($reqarray, $releasable, $release) = \local_oer\helper\requirements::metadata_fulfills_all_requirements($file);
-            if (!$release) {
-                $courses[$file->courseid][] = $file;
-                $file->state                = 0;
-                $file->usermodified         = $USER->id;
-                $file->timemodified         = time();
-                $DB->update_record('local_oer_files', $file);
-            }
-        }
-        if (!empty($courses)) {
-            foreach ($courses as $course => $files) {
-                // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
-                $filelist = \local_oer\filelist::get_course_files($course);
-                foreach ($files as $key => $file) {
-                    if (!isset($filelist[$file->contenthash])) {
-                        unset($files[$key]);
-                    }
-                }
-                if (empty($files)) {
-                    continue;
-                }
-                $coursecontext = context_course::instance($course);
-                $sql           = "SELECT u.id FROM {user} u " .
-                                 "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
-                                 "JOIN {user_enrolments} ue ON u.id = ue.userid " .
-                                 "JOIN {enrol} e ON e.id = ue.enrolid " .
-                                 "WHERE ul.type ='allow' AND e.courseid = :courseid";
-                $users         = $DB->get_records_sql($sql, ['courseid' => $course]);
-                foreach ($users as $userid) {
-                    if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
-                        $user = $DB->get_record('user', ['id' => $userid->id]);
-                        \local_oer\message::send_requirementschanged($user, $files, $course);
-                    }
-                }
-            }
-        }
+        \local_oer\helper\requirements::reset_releasestate_if_necessary();
     }
 }
