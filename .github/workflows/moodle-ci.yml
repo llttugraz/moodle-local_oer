@@ -107,7 +107,7 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --fail-on-warning
+        run: moodle-plugin-ci phpunit --coverage-text --fail-on-warning
 
       - name: Behat features
         if: ${{ always() }}

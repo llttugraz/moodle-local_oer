@@ -66,10 +66,10 @@ class filestate_test extends \advanced_testcase {
         $this->setAdminUser();
         global $DB;
         $testcourse = new testcourse();
-        $course1    = $this->getDataGenerator()->create_course();
-        $course2    = $this->getDataGenerator()->create_course();
-        $filename   = 'samefile';
-        $content    = 'some content that will result in the same contenthash';
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $filename = 'samefile';
+        $content = 'some content that will result in the same contenthash';
         list($draftid, $file) = $testcourse->generate_file($filename, null, $content);
         $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
         $testcourse->generate_resource($course2, $this->getDataGenerator(), $filename, null, $content);
@@ -80,12 +80,12 @@ class filestate_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
         $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
         $this->assert_file_state($file->get_contenthash(), $course1->id,
-                                 filestate::STATE_FILE_ERROR, 0,
-                                 0, false);
+                filestate::STATE_FILE_ERROR, 0,
+                0, false);
         $log = $DB->get_record('local_oer_log', ['courseid' => $course1->id]);
         $this->assertEquals(logger::LOGERROR, $log->type);
         $msg = 'Ambiguous metadata for file ' . $file->get_contenthash() .
-               ' found. File has been edited in ' . 2 . ' courses';
+                ' found. File has been edited in ' . 2 . ' courses';
         $this->assertEquals($msg, $log->message);
 
         // Tests for state 1.
@@ -94,22 +94,22 @@ class filestate_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
         $this->assert_file_state($file->get_contenthash(), $course1->id,
-                                 filestate::STATE_FILE_NOT_EDITED, 0,
-                                 2, true);
+                filestate::STATE_FILE_NOT_EDITED, 0,
+                2, true);
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_NOT_EDITED, 0,
-                                 2, true);
+                filestate::STATE_FILE_NOT_EDITED, 0,
+                2, true);
 
         // Tests for state 2.
         $testcourse->set_file_to_non_release($course1->id, $file);
         $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
         $this->assert_file_state($file->get_contenthash(), $course1->id,
-                                 filestate::STATE_FILE_EDITED, $course1->id,
-                                 2, true);
+                filestate::STATE_FILE_EDITED, $course1->id,
+                2, true);
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_EDITED, $course1->id,
-                                 2, false);
+                filestate::STATE_FILE_EDITED, $course1->id,
+                2, false);
 
         // Tests for state 3.
         $testcourse->set_file_to_release($course1->id, $file);
@@ -121,43 +121,50 @@ class filestate_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
         $this->assertTrue($DB->record_exists('local_oer_snapshot', ['contenthash' => $file->get_contenthash()]));
         $this->assert_file_state($file->get_contenthash(), $course1->id,
-                                 filestate::STATE_FILE_RELEASED, $course1->id,
-                                 2, false);
+                filestate::STATE_FILE_RELEASED, $course1->id,
+                2, false);
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_RELEASED, $course1->id,
-                                 2, false);
+                filestate::STATE_FILE_RELEASED, $course1->id,
+                2, false);
 
         // Test inheritance.
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_RELEASED, $course1->id,
-                                 2, false);
+                filestate::STATE_FILE_RELEASED, $course1->id,
+                2, false);
         delete_course($course1->id, false);
         // After the deletion of course 1 the file metadata will be inherited to course 2.
         // So course 2 has to be the editorid from now on.
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_RELEASED, $course2->id,
-                                 1, false);
+                filestate::STATE_FILE_RELEASED, $course2->id,
+                1, false);
         $DB->delete_records('local_oer_snapshot', ['contenthash' => $file->get_contenthash()]);
         $this->assert_file_state($file->get_contenthash(), $course2->id,
-                                 filestate::STATE_FILE_EDITED, $course2->id,
-                                 1, true);
+                filestate::STATE_FILE_EDITED, $course2->id,
+                1, true);
+
+        // Test if exception is thrown.
+        $this->expectException('\coding_exception');
+        $this->expectExceptionMessage('Something really unexpected happened, ' .
+                'a file contenthash (123' .
+                ') has been searched that is not used anywhere');
+        filestate::calculate_file_state('123', $course1->id);
     }
 
     /**
      * Helper function to test the filestates.
      *
-     * @param string $contenthash         Moodle file contenthash
-     * @param int    $courseid            Moodle courseid
-     * @param int    $expectedstate       filestate constant that is expected in this test
-     * @param int    $expectededitor      Moodle courseid of editing course that is expected in this test
-     * @param int    $expectedcoursecount Expected coursecount
-     * @param bool   $expectedwritable
+     * @param string $contenthash Moodle file contenthash
+     * @param int $courseid Moodle courseid
+     * @param int $expectedstate filestate constant that is expected in this test
+     * @param int $expectededitor Moodle courseid of editing course that is expected in this test
+     * @param int $expectedcoursecount Expected coursecount
+     * @param bool $expectedwritable
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
      */
     private function assert_file_state($contenthash, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
-                                       $expectedwritable) {
+            $expectedwritable) {
         list($state, $editorid, $courses, $writable) = filestate::calculate_file_state($contenthash, $courseid);
         $this->assertEquals($expectedstate, $state);
         $this->assertEquals($expectededitor, $editorid);
@@ -196,5 +203,39 @@ class filestate_test extends \advanced_testcase {
         // The function has been called with a non-defined state - so it should return false.
         $this->assertFalse(filestate::metadata_writable(12345, false));
         $this->assertFalse(filestate::metadata_writable(54321, true));
+    }
+
+    /**
+     * As the output of this function is a html string. The function is only run through to see php errors.
+     * It only tests if the result is a string. The content has to be tested in behat tests or manually.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \moodle_exception
+     * @throws \stored_file_creation_exception
+     * @covers \local_oer\helper\filestate::formatted_notwritable_output_html
+     */
+    public function test_formatted_notwritable_output_html() {
+        $this->resetAfterTest();
+
+        $this->setAdminUser();
+        $testcourse = new testcourse();
+        $course1 = $this->getDataGenerator()->create_course();
+        $filename = 'samefile';
+        $content = 'some content that will result in the same contenthash';
+        list($draftid, $file) = $testcourse->generate_file($filename, null, $content);
+        $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
+
+        $testcourse->set_file_to_non_release($course1->id, $file);
+        $files = filelist::get_single_file($course1->id, $file->get_contenthash());
+        $testfile = $files[0];
+        $this->assertIsString(filestate::formatted_notwritable_output_html($testfile));
+
+        $testcourse->set_file_to_release($course1->id, $file);
+        $files = filelist::get_single_file($course1->id, $file->get_contenthash());
+        $testfile = $files[0];
+        $this->assertIsString(filestate::formatted_notwritable_output_html($testfile));
     }
 }

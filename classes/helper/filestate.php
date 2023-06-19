@@ -156,12 +156,14 @@ class filestate {
      * Generate a placeholder text to show when a file is not writable.
      *
      * @param array $file
-     * @return mixed
+     * @return string
      * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public static function formatted_notwritable_output_html(array $file) {
+    public static function formatted_notwritable_output_html(array $file): string {
         global $OUTPUT, $DB, $CFG;
         $support = \core_user::get_support_user();
+        $metadata = [];
         if ($file['state'] !== self::STATE_FILE_ERROR) {
             $data      = $DB->get_record('local_oer_files',
                                          ['courseid' => $file['editor'], 'contenthash' => $file['file']->get_contenthash()]);
@@ -210,7 +212,7 @@ class filestate {
             foreach ($persons as $person) {
                 $personlist[] = $person;
             }
-            $classification = json_decode($data->classification, true);
+            $classification = json_decode($data->classification, true) ?? [];
             $classlist      = [];
             foreach ($classification as $type => $entries) {
                 $frankenstyle = 'oerclassification_' . $type;
