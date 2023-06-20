@@ -39,8 +39,11 @@ class license {
     /**
      * Test if the license is a creative commons license or public domain.
      *
+     * TODO: eventually change the name of the function, as test_ is the naming convention for unit tests.
+     *
      * @param string|null $licenseshort Shortname of license
      * @return bool
+     * @throws \coding_exception
      */
     public static function test_license_correct_for_upload(?string $licenseshort): bool {
         $licenses = \license_manager::get_active_licenses();
@@ -87,7 +90,7 @@ class license {
      * @throws \coding_exception
      */
     public static function get_licenses_select_data(bool $addnoprefval = false) {
-        $licenses      = \license_manager::get_active_licenses();
+        $licenses = \license_manager::get_active_licenses();
         $licenseselect = [];
         foreach ($licenses as $key => $license) {
             $licenseselect[$key] = $license->fullname;
