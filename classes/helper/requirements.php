@@ -41,7 +41,7 @@ class requirements {
      * @return array
      * @throws \dml_exception
      */
-    public static function metadata_fulfills_all_requirements(\stdClass $metadata) {
+    public static function metadata_fulfills_all_requirements(\stdClass $metadata): array {
         $reqarray              = [];
         $licenseobject         = license::get_license_by_shortname($metadata->license);
         $reqarray['title']     = !empty($metadata->title);
@@ -103,7 +103,7 @@ class requirements {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public static function reset_releasestate_if_necessary() {
+    public static function reset_releasestate_if_necessary(): void {
         global $DB, $USER;
         $files   = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
         $courses = [];

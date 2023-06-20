@@ -60,7 +60,7 @@ class courseinfo_test extends \advanced_testcase {
      */
     public function test_get_default_metadata_object() {
         $metadata = courseinfo::get_default_metadata_object($this->courseid);
-        $this->assertTrue(is_object($metadata));
+        $this->assertIsObject($metadata);
         $this->assertTrue(property_exists($metadata, 'courseid'));
         $this->assertEquals($this->courseid, $metadata->courseid);
         unset($metadata->courseid);

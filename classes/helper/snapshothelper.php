@@ -45,7 +45,7 @@ class snapshothelper {
      * @return void
      * @throws \dml_exception
      */
-    public static function create_snapshots_of_all_active_courses() {
+    public static function create_snapshots_of_all_active_courses(): void {
         global $DB;
         $courses = activecourse::get_list_of_courses();
         $before = $DB->count_records('local_oer_snapshot');

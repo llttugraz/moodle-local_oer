@@ -45,7 +45,7 @@ class courseinfo {
      * @return array
      * @throws \dml_exception
      */
-    public function load_metadata_from_database(int $courseid) {
+    public function load_metadata_from_database(int $courseid): array {
         global $DB;
         $records = $DB->get_records('local_oer_courseinfo', ['courseid' => $courseid], 'id ASC');
         foreach ($records as $key => $record) {
@@ -166,7 +166,7 @@ class courseinfo {
      * @return string
      * @throws \Exception
      */
-    public static function simple_html_to_text_reduction(string $text) {
+    public static function simple_html_to_text_reduction(string $text): string {
         preg_match_all('/(<a[^>]*>[^<]+<\/a>)/', $text, $urls);
         foreach ($urls[0] as $key => $url) {
             $a    = new \SimpleXMLElement($url);
