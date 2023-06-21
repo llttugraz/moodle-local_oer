@@ -180,6 +180,8 @@ class testcourse {
      * @param int|null                $draftid  If null, moodle is asked for unused draft id
      * @param string                  $content  If empty, random bytes are written
      * @return \stdClass
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      */
     public function generate_resource(\stdClass $course, \testing_data_generator $generator, string $filename = '',
                                       ?int      $draftid = null, string $content = '') {

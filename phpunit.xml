@@ -28,5 +28,9 @@
         <include>
             <directory suffix=".php">classes</directory>
         </include>
+        <exclude>
+            <file>classes/metadata/external_metadata.php</file>
+            <file>classes/classification.php</file>
+        </exclude>
     </coverage>
 </phpunit>
