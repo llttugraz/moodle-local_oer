@@ -27,7 +27,6 @@ namespace local_oer;
 
 use local_oer\helper\filestate;
 use local_oer\helper\requirements;
-use local_oer\metadata\coursetofile;
 
 /**
  * Class filelist
@@ -221,7 +220,7 @@ class filelist {
             }
             $list[] = $entry;
         }
-        // TODO - orphaned metadata is missing and has to be added..
+        // TODO: orphaned metadata is missing and has to be added..
         return [$list, $sections];
     }
 

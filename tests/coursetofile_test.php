@@ -77,7 +77,7 @@ class coursetofile_test extends \advanced_testcase {
         $helper = new testcourse();
         list($draftid, $sharedfile) = $helper->generate_file('shared', null, 'Shared file in multiple courses');
 
-        // Create a course and add the file to it (with a resource module)
+        // Create a course and add the file to it (with a resource module).
         $course1 = $this->getDataGenerator()->create_course();
 
         $record = new \stdClass();
