@@ -41,7 +41,7 @@ class user_selector_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
-     * @covers \local_oer\userlist\user_selector::constructor
+     * @covers \local_oer\userlist\user_selector::__construct
      * @covers \local_oer\userlist\user_selector::find_users
      */
     public function test_find_users() {
