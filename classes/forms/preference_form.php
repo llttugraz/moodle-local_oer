@@ -36,9 +36,11 @@ class preference_form extends \moodleform {
      * Mform definition function, required by moodleform.
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     protected function definition() {
-        $mform  = $this->_form;
+        $mform = $this->_form;
         $course = $this->_customdata;
 
         global $DB;
@@ -47,7 +49,7 @@ class preference_form extends \moodleform {
 
         $mform->addElement('html', get_string('preferenceinfoformhelp', 'local_oer'));
 
-        $data             = [];
+        $data = [];
         $data['courseid'] = $course['courseid'];
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
@@ -120,17 +122,17 @@ class preference_form extends \moodleform {
      * @return void
      * @throws \dml_exception
      */
-    public function update_metadata(array $fromform) {
+    public function update_metadata(array $fromform): void {
         global $DB;
-        $fromdb    = $DB->get_record('local_oer_preference', ['courseid' => $fromform['courseid']]);
+        $fromdb = $DB->get_record('local_oer_preference', ['courseid' => $fromform['courseid']]);
         $timestamp = time();
         if ($fromdb) {
             $record = $this->add_values_from_form($fromdb, $fromform, $timestamp);
             $DB->update_record('local_oer_preference', $record);
         } else {
-            $record              = new \stdClass();
-            $record->courseid    = $fromform['courseid'];
-            $record              = $this->add_values_from_form($record, $fromform, $timestamp);
+            $record = new \stdClass();
+            $record->courseid = $fromform['courseid'];
+            $record = $this->add_values_from_form($record, $fromform, $timestamp);
             $record->timecreated = $timestamp;
             $DB->insert_record('local_oer_preference', $record);
         }
@@ -140,21 +142,21 @@ class preference_form extends \moodleform {
      * Add the values from the form from frontend.
      *
      * @param \stdClass $record
-     * @param array     $fromform
-     * @param int       $timestamp
-     * @return mixed
+     * @param array $fromform
+     * @param int $timestamp
+     * @return \stdClass
      */
-    private function add_values_from_form(\stdClass $record, array $fromform, int $timestamp) {
+    private function add_values_from_form(\stdClass $record, array $fromform, int $timestamp): \stdClass {
         global $USER;
-        $record->context        = $fromform['context'] == 'nopref' ? null : $fromform['context'];
-        $record->license        = $fromform['license'] == 'nopref' ? null : $fromform['license'];
-        $record->persons        = $fromform['storedperson'] == '' ? null : $fromform['storedperson'];
-        $record->tags           = $fromform['storedtags'] == '' ? null : $fromform['storedtags'];
-        $record->language       = $fromform['language'] == 'nopref' ? null : $fromform['language'];
-        $record->resourcetype   = $fromform['resourcetype'] == 'nopref' ? null : $fromform['resourcetype'];
-        $record->state          = $fromform['ignore'] == 1 ? 2 : null; // Upload cannot be set in preferences.
-        $record->usermodified   = $USER->id;
-        $record->timemodified   = $timestamp;
+        $record->context = $fromform['context'] == 'nopref' ? null : $fromform['context'];
+        $record->license = $fromform['license'] == 'nopref' ? null : $fromform['license'];
+        $record->persons = $fromform['storedperson'] == '' ? null : $fromform['storedperson'];
+        $record->tags = $fromform['storedtags'] == '' ? null : $fromform['storedtags'];
+        $record->language = $fromform['language'] == 'nopref' ? null : $fromform['language'];
+        $record->resourcetype = $fromform['resourcetype'] == 'nopref' ? null : $fromform['resourcetype'];
+        $record->state = $fromform['ignore'] == 1 ? 2 : null; // Upload cannot be set in preferences.
+        $record->usermodified = $USER->id;
+        $record->timemodified = $timestamp;
         $record->classification = fileinfo_form::prepare_classification_values_to_store($fromform);
         return $record;
     }
