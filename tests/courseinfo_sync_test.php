@@ -36,9 +36,10 @@ class courseinfo_sync_test extends \advanced_testcase {
     /**
      * A stdClass that can be inserted in courseinfo table for testing purposes.
      *
+     * @param int $courseid Moodle courseid
      * @return \stdClass
      */
-    private function get_courseinfo_entry($courseid): \stdClass {
+    private function get_courseinfo_entry(int $courseid): \stdClass {
         global $USER;
         $entry = new \stdClass();
         $entry->courseid = $courseid;

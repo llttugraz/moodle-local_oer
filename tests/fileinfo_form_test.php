@@ -33,11 +33,11 @@ require_once(__DIR__ . '/helper/testcourse.php');
 require_once(__DIR__ . '/helper/fromform.php');
 
 /**
- * Class fileinfoform_test
+ * Class fileinfo_form_test
  *
  * @coversDefaultClass \local_oer\forms\fileinfo_form
  */
-class fileinfoform_test extends \advanced_testcase {
+class fileinfo_form_test extends \advanced_testcase {
     /**
      * Test the private function set_state.
      *

@@ -45,10 +45,12 @@ class person_form extends \moodleform {
         $mform->addElement('text', 'firstname', get_string('firstname'));
         $mform->addRule('firstname', get_string('required'), 'required', '', 'client');
         $mform->addRule('firstname', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->setType('firstname', PARAM_TEXT);
 
         $mform->addElement('text', 'lastname', get_string('lastname'));
         $mform->addRule('lastname', get_string('required'), 'required', '', 'client');
         $mform->addRule('lastname', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->setType('lastname', PARAM_TEXT);
 
         $mform->disable_form_change_checker();
     }
