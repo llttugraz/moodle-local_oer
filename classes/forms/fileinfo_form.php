@@ -480,14 +480,15 @@ class fileinfo_form extends \moodleform {
      *
      * @param string $name
      * @return array
-     * @codeCoverageIgnore
      */
     public static function load_classification_plugin_values(string $name): array {
+        // @codeCoverageIgnoreStart
         $frankenstyle = 'oerclassification_' . $name;
         $plugin = '\\' . $frankenstyle . '\plugin';
         $url = $plugin::url_to_external_resource();
         $selectdata = $plugin::get_select_data();
         return [$url, $selectdata];
+        // @codeCoverageIgnoreEnd
     }
 
     /**
