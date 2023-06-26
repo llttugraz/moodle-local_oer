@@ -206,10 +206,12 @@ class filelist {
                 list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
                 $snapshotsql = "SELECT MAX(timecreated) FROM {local_oer_snapshot} WHERE "
                         . "courseid = :courseid AND contenthash = :contenthash";
-                $snapshot = $DB->get_record_sql($snapshotsql,
+                $temp = $DB->get_record_sql($snapshotsql,
                         ['courseid' => $courseid,
                                 'contenthash' => $file[0]['file']->get_contenthash()]);
-                $snapshot->release = $snapshot->{'max(timecreated)'};
+                $temp = (array) $temp;
+                $snapshot = new \stdClass();
+                $snapshot->release = reset($temp);
                 $entry['id'] = $record->id;
                 $entry['title'] = $record->title;
                 $entry['timemodified'] = $record->timemodified > 0 ? userdate($record->timemodified) : '-';

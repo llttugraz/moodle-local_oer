@@ -70,6 +70,8 @@ class snapshothelper {
         global $DB;
         $sql = 'SELECT MAX(timecreated) FROM {local_oer_snapshot}';
         $latest = $DB->get_record_sql($sql);
-        return $latest->{'max(timecreated)'} ?? 0;
+        $latest = (array) $latest;
+        $timestamp = reset($latest);
+        return $timestamp ?? 0;
     }
 }
