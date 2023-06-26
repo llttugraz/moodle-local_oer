@@ -204,7 +204,7 @@ class filelist {
                         ['courseid' => $entry['editor'],
                                 'contenthash' => $file[0]['file']->get_contenthash()]);
                 list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
-                $snapshotsql = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "
+                $snapshotsql = "SELECT MAX(timecreated) AS 'release' FROM {local_oer_snapshot} WHERE "
                         . "courseid = :courseid AND contenthash = :contenthash";
                 $snapshot = $DB->get_record_sql($snapshotsql,
                         ['courseid' => $courseid,
