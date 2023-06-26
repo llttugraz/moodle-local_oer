@@ -31,6 +31,9 @@
         <exclude>
             <file>classes/metadata/external_metadata.php</file>
             <file>classes/classification.php</file>
+            <file>classes/plugininfo/oerclassification.php</file>
+            <file>classes/plugininfo/oercourseinfo.php</file>
+            <file>classes/plugininfo/oeruploader.php</file>
         </exclude>
     </coverage>
 </phpunit>

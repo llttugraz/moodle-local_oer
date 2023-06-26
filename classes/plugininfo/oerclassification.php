@@ -42,10 +42,12 @@ class oerclassification extends base {
      * Finds all enabled plugins, the result may include missing plugins.
      *
      * @return array|null of enabled plugins $pluginname=>$pluginname, null means unknown
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function get_enabled_plugins() {
         $enabledplugins = array();
-        $config         = get_config('local_oer', 'enabledclassificationplugins');
+        $config = get_config('local_oer', 'enabledclassificationplugins');
         if ($config) {
             $config = explode(',', $config);
             foreach ($config as $sp) {
@@ -56,7 +58,7 @@ class oerclassification extends base {
             }
         }
 
-        $enabled   = array();
+        $enabled = array();
         $installed = core_component::get_plugin_list('oerclassification');
         foreach ($installed as $plugin => $fulldir) {
             if (isset($enabledplugins[$plugin])) {
@@ -71,6 +73,8 @@ class oerclassification extends base {
      * Test if a given plugin is enabled
      *
      * @param string $plugin shortname of subplugin
+     * @return bool
+     * @throws \dml_exception
      */
     public static function plugin_is_enabled(string $plugin) {
         $config = get_config('local_oer', 'enabledclassificationplugins');
@@ -102,6 +106,7 @@ class oerclassification extends base {
      * TODO Return URL used for management of plugins of this type.
      *
      * @return moodle_url
+     * @throws \moodle_exception
      */
     public static function get_manage_url() {
         return new moodle_url('/admin/settings.php', array('section' => 'localpluginsoerclassification'));
@@ -120,12 +125,12 @@ class oerclassification extends base {
      * Load the settings for a specific submodule.
      *
      * @param part_of_admin_tree $adminroot
-     * @param string             $parentnodename
-     * @param bool               $hassiteconfig
+     * @param string $parentnodename
+     * @param bool $hassiteconfig
      */
     public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
-        $ADMIN      = $adminroot; // May be used in settings.php.
+        $ADMIN = $adminroot; // May be used in settings.php.
         $plugininfo = $this; // Also can be used inside settings.php.
 
         if (!$this->is_installed_and_upgraded()) {
@@ -136,7 +141,7 @@ class oerclassification extends base {
             return;
         }
 
-        $section  = $this->get_settings_section_name();
+        $section = $this->get_settings_section_name();
         $settings = new admin_settingpage($section, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
         include($this->full_path('settings.php')); // This may also set $settings to null.
 
