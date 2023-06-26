@@ -33,6 +33,32 @@ namespace local_oer;
  */
 class get_file_test extends \advanced_testcase {
     /**
+     * Type of external_value. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $value = 'external_value';
+    /**
+     * Type of external_single_structure. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $single = 'external_single_structure';
+    /**
+     * Type of external_multiple_structure. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $multi = 'external_multiple_structure';
+
+    /**
+     * Type of external_function_parameters. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $parameter = 'external_function_parameters';
+
+    /**
      * Set up the test environment.
      *
      * @return void
@@ -40,6 +66,14 @@ class get_file_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         require_once(__DIR__ . '/helper/testcourse.php');
+        global $CFG;
+        // In Moodle 4.2 the namespace core_external was added to external_api.
+        if ($CFG->version >= 2023042401) {
+            $this->value = 'core_external\\' . $this->value;
+            $this->single = 'core_external\\' . $this->single;
+            $this->multi = 'core_external\\' . $this->multi;
+            $this->parameter = 'core_external\\' . $this->parameter;
+        }
     }
 
     /**
@@ -50,12 +84,12 @@ class get_file_test extends \advanced_testcase {
      */
     public function test_service_parameters() {
         $parameters = \local_oer\services\get_file::service_parameters();
-        $this->assertEquals('external_function_parameters', get_class($parameters));
+        $this->assertEquals($this->parameter, get_class($parameters));
         $this->assertArrayHasKey('courseid', $parameters->keys);
-        $this->assertEquals('external_value', get_class($parameters->keys['courseid']));
+        $this->assertEquals($this->value, get_class($parameters->keys['courseid']));
         $this->assertEquals(PARAM_INT, $parameters->keys['courseid']->type);
         $this->assertArrayHasKey('contenthash', $parameters->keys);
-        $this->assertEquals('external_value', get_class($parameters->keys['contenthash']));
+        $this->assertEquals($this->value, get_class($parameters->keys['contenthash']));
         $this->assertEquals(PARAM_ALPHANUM, $parameters->keys['contenthash']->type);
     }
 
@@ -68,108 +102,108 @@ class get_file_test extends \advanced_testcase {
      */
     public function test_service_returns() {
         $returnvalue = \local_oer\services\get_file::service_returns();
-        $this->assertEquals('external_single_structure', get_class($returnvalue));
+        $this->assertEquals($this->single, get_class($returnvalue));
         $this->assertArrayHasKey('courseid', $returnvalue->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['courseid']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['courseid']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['courseid']->type);
         $this->assertArrayHasKey('context', $returnvalue->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['context']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['context']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['context']->type);
         $this->assertArrayHasKey('file', $returnvalue->keys);
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['file']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['file']));
         $this->assertArrayHasKey('id', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['id']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['id']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['id']->type);
         $this->assertArrayHasKey('contenthash', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['contenthash']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['contenthash']));
         $this->assertEquals(PARAM_ALPHANUM, $returnvalue->keys['file']->keys['contenthash']->type);
         $this->assertArrayHasKey('title', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['title']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['title']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['title']->type);
         $this->assertArrayHasKey('mimetype', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['mimetype']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['mimetype']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['mimetype']->type);
         $this->assertArrayHasKey('icon', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['icon']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['icon']));
         $this->assertEquals(PARAM_RAW, $returnvalue->keys['file']->keys['icon']->type);
         $this->assertArrayHasKey('icontype', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['icontype']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['icontype']));
         $this->assertEquals(PARAM_ALPHA, $returnvalue->keys['file']->keys['icontype']->type);
         $this->assertArrayHasKey('iconisimage', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['iconisimage']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['iconisimage']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['iconisimage']->type);
         $this->assertArrayHasKey('timemodified', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['timemodified']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['timemodified']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['timemodified']->type);
         $this->assertArrayHasKey('timeuploaded', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['timeuploaded']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['timeuploaded']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['timeuploaded']->type);
         $this->assertArrayHasKey('timeuploadedts', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['timeuploadedts']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['timeuploadedts']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['timeuploadedts']->type);
         $this->assertArrayHasKey('upload', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['upload']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['upload']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['upload']->type);
         $this->assertArrayHasKey('ignore', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['ignore']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['ignore']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['ignore']->type);
         $this->assertArrayHasKey('deleted', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['deleted']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['deleted']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['deleted']->type);
 
         $this->assertArrayHasKey('modules', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_multiple_structure', get_class($returnvalue->keys['file']->keys['modules']));
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['file']->keys['modules']->content));
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['modules']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['modules']->content));
         $this->assertArrayHasKey('moduleurl', $returnvalue->keys['file']->keys['modules']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['modules']->content->keys['moduleurl']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['modules']->content->keys['moduleurl']));
         $this->assertEquals(PARAM_URL, $returnvalue->keys['file']->keys['modules']->content->keys['moduleurl']->type);
         $this->assertArrayHasKey('modulename', $returnvalue->keys['file']->keys['modules']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['modules']->content->keys['modulename']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['modules']->content->keys['modulename']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['modules']->content->keys['modulename']->type);
 
-        $this->assertEquals('external_multiple_structure', get_class($returnvalue->keys['file']->keys['sections']));
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['file']->keys['sections']->content));
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['sections']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['sections']->content));
         $this->assertArrayHasKey('sectionnum', $returnvalue->keys['file']->keys['sections']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['sections']->content->keys['sectionnum']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['sections']->content->keys['sectionnum']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['sections']->content->keys['sectionnum']->type);
         $this->assertArrayHasKey('sectionname', $returnvalue->keys['file']->keys['sections']->content->keys);
-        $this->assertEquals('external_value',
+        $this->assertEquals($this->value,
                 get_class($returnvalue->keys['file']->keys['sections']->content->keys['sectionname']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['sections']->content->keys['sectionname']->type);
 
         $this->assertArrayHasKey('requirementsmet', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['requirementsmet']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['requirementsmet']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['requirementsmet']->type);
         $this->assertArrayHasKey('state', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['state']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['state']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['state']->type);
         $this->assertArrayHasKey('multiple', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['multiple']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['multiple']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['multiple']->type);
         $this->assertArrayHasKey('editor', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['editor']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['editor']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['editor']->type);
 
-        $this->assertEquals('external_multiple_structure', get_class($returnvalue->keys['file']->keys['courses']));
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['file']->keys['courses']->content));
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['courses']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['courses']->content));
         $this->assertArrayHasKey('id', $returnvalue->keys['file']->keys['courses']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['courses']->content->keys['id']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['courses']->content->keys['id']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['courses']->content->keys['id']->type);
         $this->assertArrayHasKey('name', $returnvalue->keys['file']->keys['courses']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['courses']->content->keys['name']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['courses']->content->keys['name']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['courses']->content->keys['name']->type);
         $this->assertArrayHasKey('editor', $returnvalue->keys['file']->keys['courses']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['courses']->content->keys['editor']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['courses']->content->keys['editor']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['courses']->content->keys['editor']->type);
 
         $this->assertArrayHasKey('writable', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['writable']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['writable']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['writable']->type);
         $this->assertArrayHasKey('coursetofile', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['coursetofile']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['coursetofile']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['coursetofile']->type);
         $this->assertArrayHasKey('wwwroot', $returnvalue->keys['file']->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['file']->keys['wwwroot']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['wwwroot']));
         $this->assertEquals(PARAM_URL, $returnvalue->keys['file']->keys['wwwroot']->type);
     }
 

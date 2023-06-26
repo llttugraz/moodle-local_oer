@@ -35,6 +35,32 @@ namespace local_oer;
  */
 class get_files_test extends \advanced_testcase {
     /**
+     * Type of external_value. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $value = 'external_value';
+    /**
+     * Type of external_single_structure. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $single = 'external_single_structure';
+    /**
+     * Type of external_multiple_structure. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $multi = 'external_multiple_structure';
+
+    /**
+     * Type of external_function_parameters. In Moodle 4.2 the namespace changes.
+     *
+     * @var string
+     */
+    private $parameter = 'external_function_parameters';
+
+    /**
      * Set up the test environment.
      *
      * @return void
@@ -42,6 +68,14 @@ class get_files_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         require_once(__DIR__ . '/helper/testcourse.php');
+        global $CFG;
+        // In Moodle 4.2 the namespace core_external was added to external_api.
+        if ($CFG->version >= 2023042401) {
+            $this->value = 'core_external\\' . $this->value;
+            $this->single = 'core_external\\' . $this->single;
+            $this->multi = 'core_external\\' . $this->multi;
+            $this->parameter = 'core_external\\' . $this->parameter;
+        }
     }
 
     /**
@@ -52,9 +86,9 @@ class get_files_test extends \advanced_testcase {
      */
     public function test_service_parameters() {
         $parameters = \local_oer\services\get_files::service_parameters();
-        $this->assertEquals('external_function_parameters', get_class($parameters));
+        $this->assertEquals($this->parameter, get_class($parameters));
         $this->assertArrayHasKey('courseid', $parameters->keys);
-        $this->assertEquals('external_value', get_class($parameters->keys['courseid']));
+        $this->assertEquals($this->value, get_class($parameters->keys['courseid']));
         $this->assertEquals(PARAM_INT, $parameters->keys['courseid']->type);
     }
 
@@ -66,28 +100,28 @@ class get_files_test extends \advanced_testcase {
      */
     public function test_service_returns() {
         $returnvalue = \local_oer\services\get_files::service_returns();
-        $this->assertEquals('external_single_structure', get_class($returnvalue));
+        $this->assertEquals($this->single, get_class($returnvalue));
         $this->assertArrayHasKey('courseid', $returnvalue->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['courseid']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['courseid']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['courseid']->type);
         $this->assertArrayHasKey('context', $returnvalue->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['context']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['context']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['context']->type);
 
-        $this->assertEquals('external_multiple_structure', get_class($returnvalue->keys['sections']));
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['sections']->content));
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['sections']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['sections']->content));
         $this->assertArrayHasKey('sectionnum', $returnvalue->keys['sections']->content->keys);
-        $this->assertEquals('external_value', get_class($returnvalue->keys['sections']->content->keys['sectionnum']));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['sections']->content->keys['sectionnum']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['sections']->content->keys['sectionnum']->type);
         $this->assertArrayHasKey('sectionname', $returnvalue->keys['sections']->content->keys);
-        $this->assertEquals('external_value',
+        $this->assertEquals($this->value,
                 get_class($returnvalue->keys['sections']->content->keys['sectionname']));
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['sections']->content->keys['sectionname']->type);
 
         // The main difference to get_file is the multiple structure for the files values.
-        $this->assertEquals('external_multiple_structure', get_class($returnvalue->keys['files']));
-        $this->assertEquals('external_single_structure', get_class($returnvalue->keys['files']->content));
-        $this->assertEquals('external_value', get_class($returnvalue->keys['files']->content->keys['contenthash']));
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['files']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['files']->content));
+        $this->assertEquals($this->value, get_class($returnvalue->keys['files']->content->keys['contenthash']));
     }
 
     /**
