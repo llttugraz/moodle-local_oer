@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/helper/testcourse.php');
 
 use local_oer\forms\coursetofile_form;
-use local_oer\metadata\coursetofile;
 
 /**
  * Class coursetofile_form_test
