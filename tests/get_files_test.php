@@ -30,6 +30,7 @@ namespace local_oer;
  *
  * Very similar to get_file. So the differences will be tested. But shared function is not tested again.
  *
+ * @runTestsInSeparateProcesses
  * @coversDefaultClass \local_oer\services\get_files
  */
 class get_files_test extends \advanced_testcase {
@@ -47,7 +48,7 @@ class get_files_test extends \advanced_testcase {
      * Test parameters.
      *
      * @return void
-     * @covers ::service_parameters
+     * @covers \local_oer\services\get_files::service_parameters
      */
     public function test_service_parameters() {
         $parameters = \local_oer\services\get_files::service_parameters();
@@ -61,7 +62,7 @@ class get_files_test extends \advanced_testcase {
      * Test if service returns has all necessary fields defined.
      *
      * @return void
-     * @covers ::service_returns
+     * @covers \local_oer\services\get_files::service_returns
      */
     public function test_service_returns() {
         $returnvalue = \local_oer\services\get_files::service_returns();
@@ -96,7 +97,7 @@ class get_files_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers ::service
+     * @covers \local_oer\services\get_files::service
      */
     public function test_service() {
         $this->setAdminUser();

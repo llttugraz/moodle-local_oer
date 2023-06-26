@@ -30,6 +30,9 @@ use local_oer\helper\requirements;
 
 /**
  * Class filelist
+ *
+ * TODO: I think this class should be refactored. Why is there a constructor which loads the filelist into a member.
+ * But also all other methods are static? The methods are too complicated and should be broken down.
  */
 class filelist {
     /**
@@ -70,7 +73,7 @@ class filelist {
      * @throws \moodle_exception
      */
     public static function get_course_files(int $courseid): array {
-        $mod         = get_fast_modinfo($courseid);
+        $mod = get_fast_modinfo($courseid);
         $coursefiles = [];
 
         $fs = get_file_storage();
@@ -80,16 +83,16 @@ class filelist {
             switch ($cm->modname) {
                 case 'folder':
                     $component = 'mod_folder';
-                    $area      = 'content';
+                    $area = 'content';
                     break;
                 case 'resource':
                     $component = 'mod_resource';
-                    $area      = 'content';
+                    $area = 'content';
                     break;
                 default:
                     $component = '';
-                    $area      = '';
-                    $skip      = true;
+                    $area = '';
+                    $skip = true;
             }
             if ($skip) {
                 continue;
@@ -99,11 +102,11 @@ class filelist {
             foreach ($files as $file) {
                 list($state, $editor, $courses, $writable) = filestate::calculate_file_state($file->get_contenthash(), $courseid);
                 $coursefiles[$file->get_contenthash()][] = [
-                        'file'     => $file,
-                        'module'   => $cm,
-                        'state'    => $state,
-                        'editor'   => $editor,
-                        'courses'  => $courses,
+                        'file' => $file,
+                        'module' => $cm,
+                        'state' => $state,
+                        'editor' => $editor,
+                        'courses' => $courses,
                         'writable' => $writable,
                 ];
             }
@@ -115,7 +118,7 @@ class filelist {
     /**
      * Load a single file and the module it is added.
      *
-     * @param int    $courseid    Moodle courseid
+     * @param int $courseid Moodle courseid
      * @param string $contenthash File contenthash
      * @return array|null
      * @throws \coding_exception
@@ -129,7 +132,7 @@ class filelist {
     /**
      * Loads a list of all files and their metadata for the frontend.
      *
-     * @param int    $courseid    Moodle courseid
+     * @param int $courseid Moodle courseid
      * @param string $contenthash File contenthash (optional if only one file should be loaded)
      * @return array
      * @throws \coding_exception
@@ -140,9 +143,9 @@ class filelist {
         global $DB, $CFG;
         $overwritemetadata = get_config('local_oer', 'coursetofile');
         list($icons, $typegroup, $renderer) = self::prepare_file_icon_renderer($courseid);
-        $files       = self::get_course_files($courseid);
-        $list        = [];
-        $sections    = [];
+        $files = self::get_course_files($courseid);
+        $list = [];
+        $sections = [];
         $nothumbnail = count($files) > 20;
 
         foreach ($files as $file) {
@@ -151,68 +154,68 @@ class filelist {
             }
 
             $filesections = [];
-            $modules      = [];
+            $modules = [];
 
             foreach ($file as $key => $duplicate) {
-                $section                          = [
-                        'sectionnum'  => $duplicate['module']->sectionnum,
+                $section = [
+                        'sectionnum' => $duplicate['module']->sectionnum,
                         'sectionname' => get_section_name($courseid, $duplicate['module']->sectionnum)
                 ];
-                $filesections[]                   = $section;
+                $filesections[] = $section;
                 $sections[$section['sectionnum']] = $section;
-                $modules[]                        = [
-                        'moduleurl'  => !is_null($duplicate['module']->url) ? $duplicate['module']->url->out() : '#',
+                $modules[] = [
+                        'moduleurl' => !is_null($duplicate['module']->url) ? $duplicate['module']->url->out() : '#',
                         'modulename' => $duplicate['module']->name ?? 'Module not found',
                 ];
             }
             list($icon, $icontype, $iconisimage) = self::select_file_icon_or_thumbnail($file[0]['file'], $renderer, $icons,
-                                                                                       $typegroup, $nothumbnail);
+                    $typegroup, $nothumbnail);
             $preference = $DB->get_record('local_oer_preference', ['courseid' => $courseid]);
-            $entry      = [
-                    'id'              => 0, // Record does not exist yet.
-                    'contenthash'     => $file[0]['file']->get_contenthash(),
-                    'title'           => $file[0]['file']->get_filename(),
-                    'mimetype'        => $file[0]['file']->get_mimetype(),
-                    'icon'            => $icon,
-                    'icontype'        => $icontype,
-                    'iconisimage'     => $iconisimage,
-                    'timemodified'    => '-',
-                    'timeuploaded'    => '-',
-                    'timeuploadedts'  => 0,
-                    'upload'          => 0,
-                    'ignore'          => $preference && $preference->state == 2 ? 1 : 0,
-                    'deleted'         => 0,
-                    'modules'         => $modules,
-                    'sections'        => $filesections,
+            $entry = [
+                    'id' => 0, // Record does not exist yet.
+                    'contenthash' => $file[0]['file']->get_contenthash(),
+                    'title' => $file[0]['file']->get_filename(),
+                    'mimetype' => $file[0]['file']->get_mimetype(),
+                    'icon' => $icon,
+                    'icontype' => $icontype,
+                    'iconisimage' => $iconisimage,
+                    'timemodified' => '-',
+                    'timeuploaded' => '-',
+                    'timeuploadedts' => 0,
+                    'upload' => 0,
+                    'ignore' => $preference && $preference->state == 2 ? 1 : 0,
+                    'deleted' => 0,
+                    'modules' => $modules,
+                    'sections' => $filesections,
                     'requirementsmet' => false,
-                    'state'           => $file[0]['state'],
-                    'multiple'        => count($file[0]['courses']) > 1,
-                    'editor'          => $file[0]['editor'],
-                    'courses'         => $file[0]['courses'],
-                    'writable'        => $file[0]['writable'],
-                    'coursetofile'    => $overwritemetadata == 1 && $file[0]['editor'] == $courseid,
-                    'wwwroot'         => $CFG->wwwroot // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
+                    'state' => $file[0]['state'],
+                    'multiple' => count($file[0]['courses']) > 1,
+                    'editor' => $file[0]['editor'],
+                    'courses' => $file[0]['courses'],
+                    'writable' => $file[0]['writable'],
+                    'coursetofile' => $overwritemetadata == 1 && $file[0]['editor'] == $courseid,
+                    'wwwroot' => $CFG->wwwroot // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
             ];
             // First, test if a file entry exist. Overwrite basic fields with file entries.
             // Search for the editor course, as the information shown is the same in all courses where the file is used.
             if ($DB->record_exists('local_oer_files',
-                                   ['courseid' => $entry['editor'], 'contenthash' => $file[0]['file']->get_contenthash()])) {
+                    ['courseid' => $entry['editor'], 'contenthash' => $file[0]['file']->get_contenthash()])) {
                 $record = $DB->get_record('local_oer_files',
-                                          ['courseid'    => $entry['editor'],
-                                           'contenthash' => $file[0]['file']->get_contenthash()]);
+                        ['courseid' => $entry['editor'],
+                                'contenthash' => $file[0]['file']->get_contenthash()]);
                 list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
-                $snapshotsql              = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "
-                                            . "courseid = :courseid AND contenthash = :contenthash";
-                $snapshot                 = $DB->get_record_sql($snapshotsql,
-                                                                ['courseid'    => $courseid,
-                                                                 'contenthash' => $file[0]['file']->get_contenthash()]);
-                $entry['id']              = $record->id;
-                $entry['title']           = $record->title;
-                $entry['timemodified']    = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
-                $entry['timeuploaded']    = !is_null($snapshot->release) ? userdate($snapshot->release) : '-';
-                $entry['timeuploadedts']  = $snapshot->release;
-                $entry['upload']          = $record->state == 1 ? 1 : 0;
-                $entry['ignore']          = $record->state == 2 ? 1 : 0;
+                $snapshotsql = "SELECT MAX(timecreated) as 'release' FROM {local_oer_snapshot} WHERE "
+                        . "courseid = :courseid AND contenthash = :contenthash";
+                $snapshot = $DB->get_record_sql($snapshotsql,
+                        ['courseid' => $courseid,
+                                'contenthash' => $file[0]['file']->get_contenthash()]);
+                $entry['id'] = $record->id;
+                $entry['title'] = $record->title;
+                $entry['timemodified'] = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
+                $entry['timeuploaded'] = !is_null($snapshot->release) ? userdate($snapshot->release) : '-';
+                $entry['timeuploadedts'] = $snapshot->release;
+                $entry['upload'] = $record->state == 1 ? 1 : 0;
+                $entry['ignore'] = $record->state == 2 ? 1 : 0;
                 $entry['requirementsmet'] = $releasable;
             }
             if (!empty($contenthash) && $file[0]['file']->get_contenthash() == $contenthash) {
@@ -228,7 +231,7 @@ class filelist {
      * Load a single file and the metadata of it for frontend.
      * This is a wrapper that calls get_simple_filelist with the optional contenthash parameter.
      *
-     * @param int    $courseid    Moodle courseid
+     * @param int $courseid Moodle courseid
      * @param string $contenthash File contenthash
      * @return array
      * @throws \coding_exception
@@ -251,8 +254,8 @@ class filelist {
         require_once($CFG->libdir . '/filelib.php');
         $context = \context_course::instance($courseid);
         $PAGE->set_context($context);
-        $types     = \get_mimetypes_array();
-        $icons     = [];
+        $types = \get_mimetypes_array();
+        $icons = [];
         $typegroup = [];
         foreach ($types as $type) {
             if (isset($type['icon'])) {
@@ -270,28 +273,28 @@ class filelist {
      * When the file is an image, a thumbnail is created.
      * When the file is not an image, the file icon is loaded instead.
      *
-     * @param \stored_file   $file
+     * @param \stored_file $file
      * @param \core_renderer $renderer
-     * @param array          $icons
-     * @param array          $typegroup
-     * @param bool           $nothumbnail
+     * @param array $icons
+     * @param array $typegroup
+     * @param bool $nothumbnail
      * @return array
      */
     private static function select_file_icon_or_thumbnail(\stored_file $file, \core_renderer $renderer, array $icons,
-                                                          array        $typegroup, bool $nothumbnail) {
+            array $typegroup, bool $nothumbnail) {
         $mimetype = $file->get_mimetype();
         if (isset($typegroup[$mimetype]) && $typegroup[$mimetype] == 'image' && !$nothumbnail) {
-            $icon        = $file->generate_image_thumbnail(60, 60);
-            $icontype    = strpos($icon, "�PNG\r\n") === 0 ? 'png' : 'jpeg';
+            $icon = $file->generate_image_thumbnail(60, 60);
+            $icontype = strpos($icon, "�PNG\r\n") === 0 ? 'png' : 'jpeg';
             $iconisimage = true;
-            $icon        = base64_encode($icon);
+            $icon = base64_encode($icon);
         } else {
-            $fullicon    = $renderer->pix_icon('f/' . $icons[$mimetype], '');
-            $icontype    = 'icon';
+            $fullicon = $renderer->pix_icon('f/' . $icons[$mimetype], '');
+            $icontype = 'icon';
             $iconisimage = false;
-            $iconpart    = explode('src="', $fullicon);
-            $iconurl     = explode('"', $iconpart[1]);
-            $icon        = $iconurl[0];
+            $iconpart = explode('src="', $fullicon);
+            $iconurl = explode('"', $iconpart[1]);
+            $icon = $iconurl[0];
         }
         return [$icon, $icontype, $iconisimage];
     }

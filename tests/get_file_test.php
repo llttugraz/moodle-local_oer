@@ -28,6 +28,7 @@ namespace local_oer;
 /**
  * Class get_file_test
  *
+ * @runTestsInSeparateProcesses
  * @coversDefaultClass \local_oer\services\get_file
  */
 class get_file_test extends \advanced_testcase {
@@ -45,7 +46,7 @@ class get_file_test extends \advanced_testcase {
      * Test parameters.
      *
      * @return void
-     * @covers ::service_parameters
+     * @covers \local_oer\services\get_file::service_parameters
      */
     public function test_service_parameters() {
         $parameters = \local_oer\services\get_file::service_parameters();
@@ -62,8 +63,8 @@ class get_file_test extends \advanced_testcase {
      * Test if service returns has all necessary fields defined.
      *
      * @return void
-     * @covers ::service_returns
-     * @covers ::external_file_return_value
+     * @covers \local_oer\services\get_file::service_returns
+     * @covers \local_oer\services\get_file::external_file_return_value
      */
     public function test_service_returns() {
         $returnvalue = \local_oer\services\get_file::service_returns();
@@ -179,7 +180,7 @@ class get_file_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers ::service
+     * @covers \local_oer\services\get_file::service
      */
     public function test_service() {
         $this->setAdminUser();
