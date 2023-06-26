@@ -48,6 +48,7 @@ class fromform {
      * @param int    $ignore
      * @param array  $tags    Tags in array format ['tag a','tag b'].
      * @return array
+     * @throws \Exception
      */
     public static function fileinfoform_submit(int $courseid, string $contenthash, string $title, string $description,
                                                int $context, string $license, string $language, int $resourcetype, array $persons,

@@ -7,7 +7,7 @@ In this repository a refactored version of the plugin can be found. This version
 
 # Requirements
 
-* [Moodle 3.9+](https://download.moodle.org/releases/latest/)
+* [Moodle 4.1+](https://download.moodle.org/releases/latest/)
 
 # Setup
 

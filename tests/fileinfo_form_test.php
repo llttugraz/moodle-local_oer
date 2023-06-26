@@ -283,4 +283,70 @@ class fileinfo_form_test extends \advanced_testcase {
         $this->assertTrue($record->timemodified > 0);
         $this->assertTrue($record->timecreated > 0);
     }
+
+    /**
+     * Test reset to preference method.
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::reset_form_data_to_preference_values
+     */
+    public function test_reset_form_data_to_preference_values() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        global $DB, $USER;
+
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
+        $contenthash = $testcourse->get_contenthash_of_first_found_file($course);
+
+        $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 0, 0);
+        $compare = $fromform;
+
+        // No preferences exist yet for this course. So there function will just return.
+        fileinfo_form::reset_form_data_to_preference_values($fromform);
+        $this->assertEquals($compare['courseid'], $fromform['courseid']);
+        $this->assertArrayNotHasKey('upload', $compare);
+        $this->assertArrayNotHasKey('upload', $fromform);
+        $this->assertArrayNotHasKey('ignore', $compare);
+        $this->assertArrayNotHasKey('ignore', $fromform);
+        $this->assertEquals($compare['license'], $fromform['license']);
+        $this->assertEquals($compare['storedperson'], $fromform['storedperson']);
+        $this->assertEquals($compare['storedtags'], $fromform['storedtags']);
+        $this->assertEquals($compare['resourcetype'], $fromform['resourcetype']);
+
+        $fromform['classification'] = null;
+        $fromform['state'] = 0;
+        $fromform['usermodified'] = $USER->id;
+        $fromform['timemodified'] = time();
+        $fromform['timecreated'] = time();
+        $fromform['persons'] = null;
+        $fromform['id'] = $DB->insert_record('local_oer_preference', $fromform);
+
+        // Now a preference has been stored. Run the reset again.
+        $newform = fromform::fileinfoform_submit($course->id, $contenthash, 'Reset to preference',
+                'The fields differ from the db entry', 2,
+                'allrightsreserved', 'de', 7, ['Frank Furter'], 1, 0);
+        fileinfo_form::reset_form_data_to_preference_values($newform);
+        $this->assertEquals($compare['courseid'], $newform['courseid']);
+        $this->assertEquals(0, $newform['upload']);
+        $this->assertEquals($compare['license'], $newform['license']);
+        $this->assertEquals('{"persons":[Frank Furter]}', $newform['storedperson'],
+                'As persons is null in preferences, it will not be overwritten.');
+        $this->assertEquals($compare['storedtags'], $newform['storedtags']);
+        $this->assertEquals($compare['resourcetype'], $newform['resourcetype']);
+        $this->assertArrayHasKey('ignore', $newform);
+        $this->assertEquals(0, $newform['ignore']);
+
+        $fromform['persons'] = '{"persons":[Bess Twishes]}';
+        $fromform['state'] = 1;
+        $DB->update_record('local_oer_preference', $fromform);
+        fileinfo_form::reset_form_data_to_preference_values($newform);
+        $this->assertEquals('{"persons":[Bess Twishes]}', $newform['storedperson']);
+        $this->assertArrayHasKey('ignore', $newform);
+        $this->assertEquals(1, $newform['ignore']);
+    }
 }

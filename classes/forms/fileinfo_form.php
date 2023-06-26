@@ -507,14 +507,15 @@ class fileinfo_form extends \moodleform {
         }
         $fromform['upload'] = 0; // Upload state is reset, it has to be set new because of possible different required values.
         $fromform['context'] = $preference->context ?? $fromform['context'];
-        $fromform['license'] = $preference->context ?? $fromform['license'];
-        $fromform['author'] = $preference->context ?? $fromform['author'];
+        $fromform['license'] = $preference->license ?? $fromform['license'];
         $fromform['storedperson'] = $preference->persons ?? $fromform['storedperson'];
         $fromform['storedtags'] = $preference->tags ?? $fromform['storedtags'];
         $fromform['language'] = $preference->language ?? $fromform['language'];
         $fromform['resourcetype'] = $preference->resourcetype ?? $fromform['resourcetype'];
         $fromform['ignore'] = $preference->state ?? $fromform['ignore'];
         if (!is_null($preference->classification)) {
+            // @codeCoverageIgnoreStart
+            // This code is not reachable without subplugins installed.
             $classification = json_decode($preference->classification);
             $classificationplugins = oerclassification::get_enabled_plugins();
             foreach ($classificationplugins as $plugin => $fullname) {
@@ -523,6 +524,7 @@ class fileinfo_form extends \moodleform {
                     $fromform[$frankenstyle] = $classification->$plugin;
                 }
             }
+            // @codeCoverageIgnoreEnd
         }
     }
 }
