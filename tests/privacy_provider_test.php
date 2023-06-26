@@ -25,6 +25,7 @@
 
 namespace local_oer;
 
+use core_privacy\local\metadata\collection;
 use core_privacy\local\request\transform;
 use \local_oer\privacy\provider;
 use \core_privacy\local\request\approved_contextlist;
@@ -40,6 +41,19 @@ use local_oer\userlist\userlist;
  */
 class privacy_provider_test extends provider_testcase {
     /**
+     * Test get metadata function.
+     *
+     * @return void
+     * @covers ::get_metadata
+     */
+    public function test_get_metadata() {
+        $this->resetAfterTest();
+        $collection = new collection('local_oer');
+        $collection = provider::get_metadata($collection);
+        $this->assertEquals('core_privacy\local\metadata\collection', get_class($collection));
+    }
+
+    /**
      * Add a user to the userlist table and return the created entry for unit test asserts.
      *
      * @param int $userid
@@ -48,11 +62,11 @@ class privacy_provider_test extends provider_testcase {
      */
     private function add_user_to_list(int $userid): \stdClass {
         global $DB;
-        $entry               = new \stdClass();
-        $entry->userid       = $userid;
-        $entry->type         = userlist::TYPE_A;
+        $entry = new \stdClass();
+        $entry->userid = $userid;
+        $entry->type = userlist::TYPE_A;
         $entry->usermodified = 2;
-        $entry->timecreated  = time();
+        $entry->timecreated = time();
         $entry->timemodified = time();
         $DB->insert_record('local_oer_userlist', $entry);
         return $entry;
@@ -89,8 +103,8 @@ class privacy_provider_test extends provider_testcase {
      */
     public function test_export_user_data() {
         $this->resetAfterTest();
-        $user    = $this->getDataGenerator()->create_user();
-        $user2   = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
         $context = \context_system::instance();
 
         $entry = $this->add_user_to_list($user->id);
@@ -172,9 +186,9 @@ class privacy_provider_test extends provider_testcase {
 
         $component = 'local_oer';
         $this->getDataGenerator()->create_user();
-        $user2         = $this->getDataGenerator()->create_user();
-        $user3         = $this->getDataGenerator()->create_user();
-        $course        = $this->getDataGenerator()->create_course();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
         $coursecontext = \context_course::instance($course->id);
 
         $userlist = new \core_privacy\local\request\userlist(\context_system::instance(), $component);
@@ -200,13 +214,14 @@ class privacy_provider_test extends provider_testcase {
      * @return void
      * @throws \dml_exception
      * @covers ::delete_data_for_users
+     * @covers ::delete_user_data
      */
     public function test_delete_data_for_users() {
         $this->resetAfterTest();
 
         $component = 'local_oer';
-        $user1     = $this->getDataGenerator()->create_user();
-        $user2     = $this->getDataGenerator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
 
         global $DB;
         $list = $DB->count_records('local_oer_userlist');
@@ -225,7 +240,7 @@ class privacy_provider_test extends provider_testcase {
         provider::get_users_in_context($userlist);
         $this->assertCount(2, $userlist);
         $expected = [$user1->id, $user2->id];
-        $actual   = $userlist->get_userids();
+        $actual = $userlist->get_userids();
         $this->assertEquals($expected, $actual);
 
         $approvedlist = new approved_userlist(\context_system::instance(), $component, $userlist->get_userids());
