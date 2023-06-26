@@ -48,7 +48,7 @@ class timewindow_test extends \advanced_testcase {
         set_config(time_settings::CONF_CUSTOMDATES, '', 'local_oer');
         time_settings::set_next_upload_window();
         $updatetime = get_config('local_oer', time_settings::RELEASETIME);
-        $compare    = new \DateTime("tomorrow $time");
+        $compare = new \DateTime("tomorrow $time");
         $this->assertEquals($compare->getTimestamp(), $updatetime);
     }
 
@@ -67,7 +67,7 @@ class timewindow_test extends \advanced_testcase {
         set_config(time_settings::CONF_CUSTOMDATES, '', 'local_oer');
         time_settings::set_next_upload_window();
         $updatetime = get_config('local_oer', time_settings::RELEASETIME);
-        $compare    = new \DateTime("Monday next week $time");
+        $compare = new \DateTime("Monday next week $time");
         $this->assertEquals($compare->getTimestamp(), $updatetime);
     }
 
@@ -86,7 +86,7 @@ class timewindow_test extends \advanced_testcase {
         set_config(time_settings::CONF_CUSTOMDATES, '', 'local_oer');
         time_settings::set_next_upload_window();
         $updatetime = get_config('local_oer', time_settings::RELEASETIME);
-        $compare    = new \DateTime("first day of next month $time");
+        $compare = new \DateTime("first day of next month $time");
         $this->assertEquals($compare->getTimestamp(), $updatetime);
     }
 
@@ -99,13 +99,13 @@ class timewindow_test extends \advanced_testcase {
      */
     public function test_custom_upload() {
         $this->resetAfterTest(true);
-        $time1   = '23:59';
-        $time2   = '00:00';
+        $time1 = '23:59';
+        $time2 = '00:00';
         $custom1 = '31.12'; // This test always results in current year setting.
         $custom2 = '01.01'; // This test always results in next year setting.
         // JFYI: UnitTests uses Australia/Perth timezone.
-        $year1    = date("Y");
-        $year2    = date("Y") + 1;
+        $year1 = date("Y");
+        $year2 = date("Y") + 1;
         $compare1 = new \DateTime();
         $compare1->setDate($year1, 12, 31);
         $compare1->setTime(23, 59);
@@ -135,11 +135,31 @@ class timewindow_test extends \advanced_testcase {
      */
     public function test_format_difference() {
         $this->resetAfterTest(true);
-        $now  = new \DateTime('now');
+        $now = new \DateTime('now');
         $week = clone $now;
         $week->add(new \DateInterval('P7D'));
 
         $result = time_settings::format_difference($week->getTimestamp() - $now->getTimestamp());
         $this->assertEquals('7 days, 0 hours and 0 minutes', $result, 'Eventually the language string has changed.');
+    }
+
+    /**
+     * Test get timeslot output.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     * @covers ::get_timeslot_output
+     */
+    public function test_get_timeslot_output() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        require_once(__DIR__ . '/helper/testcourse.php');
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
+        $helper->sync_course_info($course->id);
+        $helper->set_files_to($course->id, 5, true);
+        $this->assertIsString(time_settings::get_timeslot_output($course->id));
     }
 }
