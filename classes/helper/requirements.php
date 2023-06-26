@@ -42,14 +42,14 @@ class requirements {
      * @throws \dml_exception
      */
     public static function metadata_fulfills_all_requirements(\stdClass $metadata): array {
-        $reqarray              = [];
-        $licenseobject         = license::get_license_by_shortname($metadata->license);
-        $reqarray['title']     = !empty($metadata->title);
-        $reqarray['license']   = license::test_license_correct_for_upload($metadata->license) || is_null($licenseobject);
-        $people                = json_decode($metadata->persons);
-        $reqarray['persons']   = !empty($people->persons);
-        $required              = explode(',', get_config('local_oer', 'requiredfields'));
-        $storedclassifications = json_decode($metadata->classification);
+        $reqarray = [];
+        $licenseobject = license::get_license_by_shortname($metadata->license);
+        $reqarray['title'] = !empty($metadata->title);
+        $reqarray['license'] = license::test_license_correct_for_upload($metadata->license) || is_null($licenseobject);
+        $people = json_decode($metadata->persons);
+        $reqarray['persons'] = !empty($people->persons);
+        $required = explode(',', get_config('local_oer', 'requiredfields'));
+        $storedclassifications = !empty($metadata->classification) ? json_decode($metadata->classification) : null;
         foreach ($required as $field) {
             switch ($field) {
                 case 'description':
@@ -71,13 +71,13 @@ class requirements {
                     if (strpos($field, 'oerclassification') !== false) {
                         $name = explode('_', $field);
                         unset($name[0]);
-                        $name             = implode($name);
+                        $name = implode($name);
                         $reqarray[$field] = isset($storedclassifications->$name) && !empty($storedclassifications->$name);
                     }
             }
         }
 
-        $release    = $metadata->state == 1;
+        $release = $metadata->state == 1;
         $releasable = true;
         foreach ($reqarray as $value) {
             if ($value === false) {
@@ -105,15 +105,15 @@ class requirements {
      */
     public static function reset_releasestate_if_necessary(): void {
         global $DB, $USER;
-        $files   = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        $files = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
         $courses = [];
         foreach ($files as $file) {
             [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($file);
             if (!$release) {
                 $courses[$file->courseid][] = $file;
-                $file->state                = 0;
-                $file->usermodified         = $USER->id;
-                $file->timemodified         = time();
+                $file->state = 0;
+                $file->usermodified = $USER->id;
+                $file->timemodified = time();
                 $DB->update_record('local_oer_files', $file);
             }
         }
@@ -130,12 +130,12 @@ class requirements {
                     continue;
                 }
                 $coursecontext = \context_course::instance($course);
-                $sql           = "SELECT u.id FROM {user} u " .
-                                 "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
-                                 "JOIN {user_enrolments} ue ON u.id = ue.userid " .
-                                 "JOIN {enrol} e ON e.id = ue.enrolid " .
-                                 "WHERE ul.type ='allow' AND e.courseid = :courseid";
-                $users         = $DB->get_records_sql($sql, ['courseid' => $course]);
+                $sql = "SELECT u.id FROM {user} u " .
+                        "JOIN {local_oer_userlist} ul ON u.id = ul.userid " .
+                        "JOIN {user_enrolments} ue ON u.id = ue.userid " .
+                        "JOIN {enrol} e ON e.id = ue.enrolid " .
+                        "WHERE ul.type ='allow' AND e.courseid = :courseid";
+                $users = $DB->get_records_sql($sql, ['courseid' => $course]);
                 foreach ($users as $userid) {
                     if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
                         $user = $DB->get_record('user', ['id' => $userid->id]);

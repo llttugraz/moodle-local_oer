@@ -40,8 +40,6 @@ class get_files_test extends \advanced_testcase {
      */
     public function setUp(): void {
         $this->resetAfterTest();
-        global $CFG;
-        require_once($CFG->libdir . '/externallib.php');
         require_once(__DIR__ . '/helper/testcourse.php');
     }
 

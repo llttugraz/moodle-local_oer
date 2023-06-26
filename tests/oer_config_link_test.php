@@ -23,8 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_oer\time\time_form;
-use local_oer\time\time_settings;
+namespace local_oer;
 
 /**
  * Class oer_config_link_test
@@ -47,7 +46,7 @@ class oer_config_link_test extends \advanced_testcase {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
 
-        $url = new moodle_url('');
+        $url = new \moodle_url('');
         $setting = new \local_oer\time\oer_config_link('unittest', 'Unit test', $url);
         $this->assertIsString($setting->output_html([]));
     }
