@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_oer;
+
 /**
  * Class get_files_test
  *
@@ -93,9 +95,9 @@ class get_files_test extends \advanced_testcase {
      * Test service.
      *
      * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      * @covers ::service
      */
     public function test_service() {
@@ -109,7 +111,7 @@ class get_files_test extends \advanced_testcase {
         $this->assertArrayHasKey('courseid', $result);
         $this->assertEquals($course->id, $result['courseid']);
         $this->assertArrayHasKey('context', $result);
-        $this->assertEquals(context_course::instance($course->id)->id, $result['context']);
+        $this->assertEquals(\context_course::instance($course->id)->id, $result['context']);
         $this->assertArrayHasKey('sections', $result);
         $this->assertIsArray($result['sections']);
         $this->assertCount(1, $result['sections']);
