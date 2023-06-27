@@ -204,14 +204,10 @@ class filelist {
                         ['courseid' => $entry['editor'],
                                 'contenthash' => $file[0]['file']->get_contenthash()]);
                 list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($record);
-                $snapshotsql = "SELECT MAX(timecreated) FROM {local_oer_snapshot} WHERE "
-                        . "courseid = :courseid AND contenthash = :contenthash";
-                $temp = $DB->get_record_sql($snapshotsql,
-                        ['courseid' => $courseid,
-                                'contenthash' => $file[0]['file']->get_contenthash()]);
-                $temp = (array) $temp;
+                $timestamps = $DB->get_records('local_oer_snapshot', ['courseid' => $courseid, 'contenthash' => $contenthash],
+                        'timecreated DESC', 'id,timecreated', 0, 1);
                 $snapshot = new \stdClass();
-                $snapshot->release = reset($temp);
+                $snapshot->release = empty($timestamps) ? 0 : reset($timestamps)->timecreated;
                 $entry['id'] = $record->id;
                 $entry['title'] = $record->title;
                 $entry['timemodified'] = $record->timemodified > 0 ? userdate($record->timemodified) : '-';

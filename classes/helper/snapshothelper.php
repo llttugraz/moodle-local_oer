@@ -68,10 +68,7 @@ class snapshothelper {
      */
     public static function get_latest_snapshot_timestamp(): int {
         global $DB;
-        $sql = 'SELECT MAX(timecreated) FROM {local_oer_snapshot}';
-        $latest = $DB->get_record_sql($sql);
-        $latest = (array) $latest;
-        $timestamp = reset($latest);
-        return $timestamp ?? 0;
+        $timestamps = $DB->get_records('local_oer_snapshot', null, 'timecreated DESC', 'id,timecreated', 0, 1);
+        return empty($timestamps) ? 0 : reset($timestamps)->timecreated;
     }
 }
