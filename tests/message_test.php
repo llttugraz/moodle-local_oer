@@ -55,6 +55,7 @@ class message_test extends \advanced_testcase {
         $helper->sync_course_info($course->id);
         $this->waitForSecond();
         $files = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        $this->preventResetByRollback();
         unset_config('noemailever');
         $sink = $this->redirectEmails();
         \local_oer\message::send_requirementschanged($user, $files, $course->id);
