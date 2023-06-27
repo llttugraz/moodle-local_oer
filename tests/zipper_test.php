@@ -45,6 +45,7 @@ class zipper_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::separate_files_to_packages
+     * @covers ::__construct
      */
     public function test_separate_files_to_packages() {
         $this->resetAfterTest(true);
@@ -76,6 +77,8 @@ class zipper_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::compress_file_package
+     * @covers ::prepare_files_to_zip
+     * @covers ::create_metadata_json_temp
      */
     public function test_compress_file_package() {
         $this->resetAfterTest(true);

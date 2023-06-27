@@ -71,17 +71,17 @@ class release {
      * @throws \moodle_exception
      */
     public function get_released_files() {
-        $files    = filelist::get_course_files($this->courseid);
+        $files = filelist::get_course_files($this->courseid);
         $snapshot = new snapshot($this->courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
-        $release  = [];
+        $release = [];
         foreach ($files as $filearray) {
             $file = $filearray[0]['file'];
             if (!isset($metadata[$file->get_contenthash()])) {
                 continue;
             }
             $release[] = [
-                    'metadata'   => $this->get_file_release_metadata_json($file, $metadata[$file->get_contenthash()]),
+                    'metadata' => $this->get_file_release_metadata_json($file, $metadata[$file->get_contenthash()]),
                     'storedfile' => $file,
             ];
         }
@@ -92,22 +92,22 @@ class release {
      * Prepare the stored metadata of snapshot table for output.
      *
      * @param \stored_file $file
-     * @param \stdClass    $fileinfo
+     * @param \stdClass $fileinfo
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
     private function get_file_release_metadata_json(\stored_file $file, \stdClass $fileinfo): array {
         global $CFG;
-        $contexts       = formhelper::lom_context_list(false);
-        $resourcetypes  = formhelper::lom_resource_types(false);
+        $contexts = formhelper::lom_context_list(false);
+        $resourcetypes = formhelper::lom_resource_types(false);
         $classification = self::prepare_classification_fields($fileinfo->classification);
-        $licenseobject  = license::get_license_by_shortname($fileinfo->license);
-        $license        = $fileinfo->license;
+        $licenseobject = license::get_license_by_shortname($fileinfo->license);
+        $license = $fileinfo->license;
         if (get_config('local_oer', 'uselicensereplacement') == 1) {
             $replacement = get_config('local_oer', 'licensereplacement');
             $replacement = explode("\r\n", $replacement);
-            $list        = [];
+            $list = [];
             foreach ($replacement as $line) {
                 $entry = explode('=>', $line);
                 if (empty($entry[1])) {
@@ -122,30 +122,30 @@ class release {
 
         $fulllicense = [
                 'shortname' => $license,
-                'fullname'  => $licenseobject->fullname,
-                'source'    => $licenseobject->source,
+                'fullname' => $licenseobject->fullname,
+                'source' => $licenseobject->source,
         ];
 
         $coursecontext = \context_course::instance($this->courseid);
-        $metadata      = [
-                'title'            => $fileinfo->title,
-                'contenthash'      => $fileinfo->contenthash,
-                'fileurl'          => $CFG->wwwroot . '/pluginfile.php/' .
-                                      $coursecontext->id . '/local_oer/public/' .
-                                      $fileinfo->id . '/' . $fileinfo->contenthash,
-                'abstract'         => $fileinfo->description ?? '',
-                'license'          => $fulllicense,
-                'context'          => $contexts[$fileinfo->context],
-                'resourcetype'     => $resourcetypes[$fileinfo->resourcetype],
-                'language'         => $fileinfo->language,
-                'persons'          => json_decode($fileinfo->persons)->persons,
-                'tags'             => is_null($fileinfo->tags) || $fileinfo->tags == '' ? [] : explode(',', $fileinfo->tags),
-                'mimetype'         => $file->get_mimetype(),
-                'filesize'         => $file->get_filesize(),
+        $metadata = [
+                'title' => $fileinfo->title,
+                'contenthash' => $fileinfo->contenthash,
+                'fileurl' => $CFG->wwwroot . '/pluginfile.php/' .
+                        $coursecontext->id . '/local_oer/public/' .
+                        $fileinfo->id . '/' . $fileinfo->contenthash,
+                'abstract' => $fileinfo->description ?? '',
+                'license' => $fulllicense,
+                'context' => $contexts[$fileinfo->context],
+                'resourcetype' => $resourcetypes[$fileinfo->resourcetype],
+                'language' => $fileinfo->language,
+                'persons' => json_decode($fileinfo->persons)->persons,
+                'tags' => is_null($fileinfo->tags) || $fileinfo->tags == '' ? [] : explode(',', $fileinfo->tags),
+                'mimetype' => $file->get_mimetype(),
+                'filesize' => $file->get_filesize(),
                 'filecreationtime' => $file->get_timecreated(),
-                'timereleased'     => $fileinfo->timecreated,
-                'classification'   => $classification,
-                'courses'          => json_decode($fileinfo->coursemetadata)
+                'timereleased' => $fileinfo->timecreated,
+                'classification' => $classification,
+                'courses' => json_decode($fileinfo->coursemetadata)
         ];
 
         if ($fileinfo->additionaldata) {
@@ -172,22 +172,25 @@ class release {
             return [];
         }
         $classification = oerclassification::get_enabled_plugins();
-        $info           = ($fileinfo && $fileinfo != '') ? json_decode($fileinfo) : false;
+        $info = ($fileinfo && $fileinfo != '') ? json_decode($fileinfo) : false;
         if (!$fileinfo) {
             return [];
         }
         $result = [];
+
+        // @codeCoverageIgnoreStart
+        // This code is not reachable without subplugins installed.
         foreach ($classification as $key => $pluginname) {
             $frankenstyle = 'oerclassification_' . $key;
-            $plugin       = '\\' . $frankenstyle . '\plugin';
-            $url          = $plugin::url_to_external_resource();
-            $selectdata   = $plugin::get_select_data(false);
+            $plugin = '\\' . $frankenstyle . '\plugin';
+            $url = $plugin::url_to_external_resource();
+            $selectdata = $plugin::get_select_data(false);
 
             if (isset($info->$key)) {
                 if (!isset($result[$key])) {
                     $result[$key] = [
-                            'type'   => $key,
-                            'url'    => $url,
+                            'type' => $key,
+                            'url' => $url,
                             'values' => []
                     ];
                 }
@@ -197,12 +200,14 @@ class release {
                     }
                     $result[$key]['values'][] = [
                             'identifier' => $identifier,
-                            'name'       => $selectdata[$identifier],
+                            'name' => $selectdata[$identifier],
                     ];
                 }
             }
         }
+
         $result = array_values($result);
         return $result;
+        // @codeCoverageIgnoreEnd
     }
 }
