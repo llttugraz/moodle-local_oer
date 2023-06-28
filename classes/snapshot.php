@@ -183,6 +183,8 @@ class snapshot {
     private function add_external_metadata(): ?string {
         $activeaggregator = get_config('local_oer', 'metadataaggregator');
         $plugins          = oercourseinfo::get_enabled_plugins();
+        // @codeCoverageIgnoreStart
+        // This code is not reachable without subplugins installed.
         foreach ($plugins as $key => $name) {
             if ($key == $activeaggregator) {
                 $frankenstyle = 'oercourseinfo_' . $key;
@@ -190,6 +192,7 @@ class snapshot {
                 return json_encode($plugin::add_metadata_fields($this->courseid));
             }
         }
+        // @codeCoverageIgnoreEnd
         return null;
     }
 

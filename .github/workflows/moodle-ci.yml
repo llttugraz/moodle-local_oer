@@ -30,16 +30,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.3', '7.4', '8.0']
-        moodle-branch: ['MOODLE_39_STABLE','MOODLE_311_STABLE','MOODLE_401_STABLE']
+        php: ['7.4', '8.0', '8.1']
+        moodle-branch: ['MOODLE_311_STABLE', 'MOODLE_401_STABLE', 'MOODLE_402_STABLE']
         database: [pgsql, mariadb]
         exclude:
-        # Moodle 3.9 does not support PHP 8.0
-        - php: '8.0'
-          moodle-branch: 'MOODLE_39_STABLE'
-        # Moodle 4.1 does not support PHP 7.3
-        - php: '7.3'
-          moodle-branch: 'MOODLE_401_STABLE'
+        - php: '7.4'
+          moodle-branch: 'MOODLE_402_STABLE'
+        - php: '8.1'
+          moodle-branch: 'MOODLE_311_STABLE'
 
     steps:
       - name: Check out repository code
@@ -54,7 +52,7 @@ jobs:
           extensions: ${{ matrix.extensions }}
           ini-values: max_input_vars=5000
           # none to use phpdbg fallback. Specify pcov (Moodle 3.10 and up) or xdebug to use them instead.
-          coverage: none
+          coverage: pcov
 
       - name: Initialise moodle-plugin-ci
         run: |
@@ -105,13 +103,15 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 
-      - name: Grunt
-        if: ${{ always() }}
-        run: moodle-plugin-ci grunt --max-lint-warnings 0
+#      - name: Grunt
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci grunt --max-lint-warnings 0
+# Will be disabled temporarily to prevent stale error in Moodle 3.11.
+# It has been succesfully run for Moodle 4.1 and will be activated again as soon as 3.11 is not supported anymore
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --fail-on-warning
+        run: moodle-plugin-ci phpunit --coverage-text --fail-on-warning
 
       - name: Behat features
         if: ${{ always() }}

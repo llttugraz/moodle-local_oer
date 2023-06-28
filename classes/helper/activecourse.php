@@ -43,12 +43,12 @@ class activecourse {
      * @return array
      * @throws \dml_exception
      */
-    public static function get_list_of_courses($snapshot = false) {
+    public static function get_list_of_courses($snapshot = false): array {
         global $DB;
         $table = $snapshot ? '{local_oer_snapshot}' : '{local_oer_files}';
-        $sql   = "SELECT DISTINCT(courseid) FROM $table t ".
-                 "JOIN {course} c ON t.courseid = c.id ".
-                 "ORDER BY courseid ASC";
+        $sql = "SELECT DISTINCT(courseid) FROM $table t " .
+                "JOIN {course} c ON t.courseid = c.id " .
+                "ORDER BY courseid ASC";
         return $DB->get_records_sql($sql);
     }
 }

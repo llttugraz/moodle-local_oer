@@ -42,14 +42,14 @@ class fileinfo_form extends \moodleform {
      * @return void
      */
     protected function definition() {
-        $mform  = $this->_form;
+        $mform = $this->_form;
         $course = $this->_customdata;
 
         global $DB, $OUTPUT;
         $reqfields = static::get_required_fields();
 
         $files = filelist::get_single_file($course['courseid'], $course['contenthash']);
-        $file  = $files[0]; // We just need the first entry, all others are duplicates if available.
+        $file = $files[0]; // We just need the first entry, all others are duplicates if available.
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
@@ -64,8 +64,8 @@ class fileinfo_form extends \moodleform {
             return;
         }
 
-        $fromdb     = $DB->get_record('local_oer_files',
-                                      ['courseid' => $course['courseid'], 'contenthash' => $course['contenthash']]);
+        $fromdb = $DB->get_record('local_oer_files',
+                ['courseid' => $course['courseid'], 'contenthash' => $course['contenthash']]);
         $preference = $DB->get_record('local_oer_preference', ['courseid' => $course['courseid']]);
 
         $mform->addElement('text', 'title', get_string('title', 'local_oer'), 'wrap="virtual"');
@@ -75,16 +75,16 @@ class fileinfo_form extends \moodleform {
         $mform->addHelpButton('title', 'title', 'local_oer');
 
         $mform->addElement('textarea', 'description', get_string('filedescription', 'local_oer'),
-                           'wrap="virtual" rows="3" cols="60"');
+                'wrap="virtual" rows="3" cols="60"');
         $mform->addHelpButton('description', 'filedescription', 'local_oer');
         if (in_array('description', $reqfields)) {
             $mform->addRule('description', get_string('required'), 'required', '', 'client');
         }
 
-        $data                = [];
-        $data['courseid']    = $course['courseid'];
+        $data = [];
+        $data['courseid'] = $course['courseid'];
         $data['contenthash'] = $course['contenthash'];
-        $data['title']       = $fromdb->title ?? $file['file']->get_filename();
+        $data['title'] = $fromdb->title ?? $file['file']->get_filename();
         $data['description'] = $fromdb->description ?? '';
         // For some fields there are three posibilities.
         // Either default defined for form is used.
@@ -105,8 +105,8 @@ class fileinfo_form extends \moodleform {
         $data['storedperson'] = $fromdb->persons ?? '';
         $data['storedperson'] = !$fromdb && $preference && !is_null($preference->persons)
                 ? $preference->persons : $data['storedperson'];
-        $data['storedtags']   = $fromdb->tags ?? '';
-        $data['storedtags']   = !$fromdb && $preference && !is_null($preference->tags)
+        $data['storedtags'] = $fromdb->tags ?? '';
+        $data['storedtags'] = !$fromdb && $preference && !is_null($preference->tags)
                 ? $preference->tags : $data['storedtags'];
         if ($fromdb && isset($fromdb->language)) {
             $data['language'] = $fromdb->language;
@@ -140,12 +140,12 @@ class fileinfo_form extends \moodleform {
         $mform->disabledIf('ignore', 'upload', 'checked');
 
         $prefhtml = $OUTPUT->render_from_template('local_oer/preferenceform',
-                                                  [
-                                                          'enabled'     => $preference !== false,
-                                                          'saved'       => $fromdb !== false,
-                                                          'contenthash' => $course['contenthash'],
-                                                          'courseid'    => $course['courseid']
-                                                  ]);
+                [
+                        'enabled' => $preference !== false,
+                        'saved' => $fromdb !== false,
+                        'contenthash' => $course['contenthash'],
+                        'courseid' => $course['courseid']
+                ]);
         $mform->addElement('html', $prefhtml);
 
         $mform->disable_form_change_checker();
@@ -168,14 +168,14 @@ class fileinfo_form extends \moodleform {
      * to add all similar fields to both of the formulars.
      *
      * @param \MoodleQuickForm $mform
-     * @param bool             $addnopref True when an additional nopref field should be added to select fields.
+     * @param bool $addnopref True when an additional nopref field should be added to select fields.
      * @return void
      * @throws \coding_exception
      */
     public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref = false) {
         $reqfields = static::get_required_fields();
         $mform->addElement('select', 'context', get_string('context', 'local_oer'),
-                           formhelper::lom_context_list(true, $addnopref));
+                formhelper::lom_context_list(true, $addnopref));
         $mform->setDefault('context', $addnopref ? 'nopref' : 1);
         $mform->addHelpButton('context', 'context', 'local_oer');
         if (in_array('context', $reqfields)) {
@@ -183,7 +183,7 @@ class fileinfo_form extends \moodleform {
         }
 
         $mform->addElement('select', 'license', get_string('license', 'local_oer'),
-                           license::get_licenses_select_data($addnopref));
+                license::get_licenses_select_data($addnopref));
         $mform->setDefault('license', $addnopref ? 'nopref' : 'unknown');
         $mform->addHelpButton('license', 'license', 'local_oer');
         $mform->addRule('license', get_string('required'), 'required', '', 'client');
@@ -213,7 +213,7 @@ class fileinfo_form extends \moodleform {
         }
 
         $mform->addElement('select', 'language', get_string('language', 'local_oer'),
-                           formhelper::language_select_data($addnopref));
+                formhelper::language_select_data($addnopref));
         $mform->setDefault('language', $addnopref ? 'nopref' : 'de');
         $mform->addHelpButton('language', 'language', 'local_oer');
         if (in_array('language', $reqfields)) {
@@ -221,7 +221,7 @@ class fileinfo_form extends \moodleform {
         }
 
         $mform->addElement('select', 'resourcetype', get_string('resourcetype', 'local_oer'),
-                           formhelper::lom_resource_types(true, $addnopref));
+                formhelper::lom_resource_types(true, $addnopref));
         $mform->setDefault('resourcetype', $addnopref ? 'nopref' : 0);
         $mform->addHelpButton('resourcetype', 'resourcetype', 'local_oer');
         if (in_array('resourcetype', $reqfields)) {
@@ -235,8 +235,8 @@ class fileinfo_form extends \moodleform {
      * 1 .. upload selected
      * 2 .. ignore selected
      *
-     * @param array $data  Formular data to set
-     * @param int   $state State of upload/ignore 0,1 or 2
+     * @param array $data Formular data to set
+     * @param int $state State of upload/ignore 0,1 or 2
      * @return void
      */
     private function set_state(array &$data, int $state) {
@@ -264,7 +264,7 @@ class fileinfo_form extends \moodleform {
      * @throws \coding_exception
      */
     public function validation($data, $files) {
-        $errors    = [];
+        $errors = [];
         $reqfields = static::get_required_fields();
         if (isset($data['upload']) && isset($data['ignore']) && $data['upload'] == 1 && $data['ignore'] == 1) {
             $errors['ignore'] = get_string('uploadignoreerror', 'local_oer');
@@ -272,7 +272,7 @@ class fileinfo_form extends \moodleform {
 
         if (isset($data['upload']) && $data['upload'] == 1) {
             if (!license::test_license_correct_for_upload($data['license'])) {
-                $errors['upload']  = get_string('error_upload_license', 'local_oer');
+                $errors['upload'] = get_string('error_upload_license', 'local_oer');
                 $errors['license'] = get_string('error_license', 'local_oer');
             }
 
@@ -297,11 +297,14 @@ class fileinfo_form extends \moodleform {
             }
             $classifications = \local_oer\plugininfo\oerclassification::get_enabled_plugins();
             foreach ($classifications as $key => $classplugin) {
+                // @codeCoverageIgnoreStart
+                // This code is not reachable without subplugins installed.
                 if (in_array('oerclassification_' . $key, $reqfields) &&
-                    (empty($data['oerclassification_' . $key]) ||
-                     $data['oerclassification_' . $key] == '_qf__force_multiselect_submission')) {
+                        (empty($data['oerclassification_' . $key]) ||
+                                $data['oerclassification_' . $key] == '_qf__force_multiselect_submission')) {
                     $errors['oerclassification_' . $key] = get_string('error_upload_classification', 'local_oer');
                 }
+                // @codeCoverageIgnoreEnd
             }
 
         }
@@ -325,9 +328,9 @@ class fileinfo_form extends \moodleform {
      */
     public function update_metadata(array $fromform) {
         global $DB;
-        $files  = filelist::get_single_file($fromform['courseid'], $fromform['contenthash']);
+        $files = filelist::get_single_file($fromform['courseid'], $fromform['contenthash']);
         $fromdb = $DB->get_record('local_oer_files',
-                                  ['courseid' => $fromform['courseid'], 'contenthash' => $fromform['contenthash']]);
+                ['courseid' => $fromform['courseid'], 'contenthash' => $fromform['contenthash']]);
         // License is stored back to file.
         // When file is used more than once in a course, the license will be stored as the same for all files.
         foreach ($files as $file) {
@@ -338,17 +341,17 @@ class fileinfo_form extends \moodleform {
             $record = $this->add_values_from_form($fromdb, $fromform, $timestamp);
             $DB->update_record('local_oer_files', $record);
         } else {
-            $record              = new \stdClass();
-            $record->courseid    = $fromform['courseid'];
+            $record = new \stdClass();
+            $record->courseid = $fromform['courseid'];
             $record->contenthash = $fromform['contenthash'];
-            $record              = $this->add_values_from_form($record, $fromform, $timestamp);
+            $record = $this->add_values_from_form($record, $fromform, $timestamp);
             $record->timecreated = $timestamp;
             // Update 15.11.2022: File in multiple courses https://github.com/llttugraz/moodle-local_oer/issues/14 .
             // Check if the contenthash is not already stored with another courseid.
             if ($duplicate = $DB->get_record('local_oer_files', ['contenthash' => $record->contenthash])) {
                 logger::add($record->courseid, logger::LOGERROR,
-                            'Tried to create duplicate file entry for file ' . $record->contenthash . '.' .
-                            'This code should not be reachable');
+                        'Tried to create duplicate file entry for file ' . $record->contenthash . '.' .
+                        'This code should not be reachable');
                 return;
             }
             $DB->insert_record('local_oer_files', $record);
@@ -359,13 +362,13 @@ class fileinfo_form extends \moodleform {
      * Add the values from the form from frontend.
      *
      * @param \stdClass $record
-     * @param array     $fromform
-     * @param int       $timestamp
+     * @param array $fromform
+     * @param int $timestamp
      * @return mixed
      */
     private function add_values_from_form(\stdClass $record, array $fromform, int $timestamp) {
         global $USER;
-        $record->title       = trim($fromform['title']);
+        $record->title = trim($fromform['title']);
         $record->description = trim($fromform['description']);
         $this->set_value($record, $fromform, 'context', 0);
         $this->set_value($record, $fromform, 'license', 'unknown');
@@ -373,12 +376,12 @@ class fileinfo_form extends \moodleform {
         $this->set_value($record, $fromform, 'storedtags', '', 'tags');
         $this->set_value($record, $fromform, 'language', 'de');
         $this->set_value($record, $fromform, 'resourcetype', 0);
-        $state                  = isset($fromform['upload']) && $fromform['upload'] == 1 ? 1 : 0;
-        $state                  = isset($fromform['ignore']) && $fromform['ignore'] == 1 ? 2 : $state;
-        $record->state          = $state;
-        $record->preference     = $record->preference ?? 1;
-        $record->usermodified   = $USER->id;
-        $record->timemodified   = $timestamp;
+        $state = isset($fromform['upload']) && $fromform['upload'] == 1 ? 1 : 0;
+        $state = isset($fromform['ignore']) && $fromform['ignore'] == 1 ? 2 : $state;
+        $record->state = $state;
+        $record->preference = $record->preference ?? 1;
+        $record->usermodified = $USER->id;
+        $record->timemodified = $timestamp;
         $record->classification = self::prepare_classification_values_to_store($fromform);
         return $record;
     }
@@ -389,10 +392,10 @@ class fileinfo_form extends \moodleform {
      * If the field is not set in form, use the already set value.
      * If no value is set, use default value.
      *
-     * @param \stdClass   $record
-     * @param array       $fromform
-     * @param string      $field
-     * @param string      $default
+     * @param \stdClass $record
+     * @param array $fromform
+     * @param string $field
+     * @param string $default
      * @param string|null $fieldrecord
      * @return void
      */
@@ -414,8 +417,10 @@ class fileinfo_form extends \moodleform {
      */
     public static function prepare_classification_values_to_store(array $fromform) {
         $classification = oerclassification::get_enabled_plugins();
-        $result         = [];
+        $result = [];
         foreach ($classification as $plugin => $fullname) {
+            // @codeCoverageIgnoreStart
+            // This code is not reachable without subplugins installed.
             $frankenstyle = 'oerclassification_' . $plugin;
             // The autocomplete field submits a string when no selection has been made. Make sure this string is not stored.
             // TODO: Is this intended behaviour or am i missing here something?
@@ -424,41 +429,27 @@ class fileinfo_form extends \moodleform {
             } else {
                 unset($result[$plugin]);
             }
+            // @codeCoverageIgnoreEnd
         }
         return empty($result) ? null : json_encode($result);
-    }
-
-    /**
-     * Prepare the name for the classification field. The name for the field is the name of the subplugin.
-     *
-     * @param string $name
-     * @return string
-     */
-    private static function explode_classification_name(string $name): string {
-        $classification = explode('_', $name);
-        $classname      = $classification[1];
-        if (count($classification) > 2) {
-            // If there is a subplugin, which uses an underscore in the identifier.
-            unset($classification[0]);
-            $classname = implode('_', $classification);
-        }
-        return $classname;
     }
 
     /**
      * Shared function to prepare classification form fields.
      *
      * @param \MoodleQuickForm $mform
-     * @param \stdClass|null   $classificationdata
-     * @param array            $data
+     * @param \stdClass|null $classificationdata
+     * @param array $data
      * @return void
      * @throws \coding_exception
      */
     public static function prepare_classification_values_for_form(\MoodleQuickForm $mform, ?\stdClass $classificationdata,
-                                                                  array            &$data): void {
+            array &$data): void {
         $classification = oerclassification::get_enabled_plugins();
-        $reqfields      = static::get_required_fields();
+        $reqfields = static::get_required_fields();
         foreach ($classification as $key => $pluginname) {
+            // @codeCoverageIgnoreStart
+            // This code is not reachable without subplugins installed.
             $frankenstyle = 'oerclassification_' . $key;
             // Load classification data and add them to form 0..n classification plugins possible.
             list($url, $selectdata) = self::load_classification_plugin_values($key);
@@ -467,8 +458,8 @@ class fileinfo_form extends \moodleform {
             ];
             $mform->addElement('html', '<hr>');
             $select = $mform->createElement('autocomplete', $frankenstyle,
-                                            get_string('selectname', $frankenstyle),
-                                            $selectdata, $options);
+                    get_string('selectname', $frankenstyle),
+                    $selectdata, $options);
             $mform->addElement($select);
             $mform->addHelpButton($frankenstyle, 'selectname', $frankenstyle);
             if (in_array($frankenstyle, $reqfields)) {
@@ -478,21 +469,26 @@ class fileinfo_form extends \moodleform {
                 $data[$frankenstyle] = $classificationdata->$key;
             }
             $mform->addElement('html', '<hr>');
+            // @codeCoverageIgnoreEnd
         }
     }
 
     /**
      * Load selectdata and url from external classification plugin.
      *
+     * This method is ignored for code coverage because it is not reachable whithout subplugins.
+     *
      * @param string $name
      * @return array
      */
     public static function load_classification_plugin_values(string $name): array {
+        // @codeCoverageIgnoreStart
         $frankenstyle = 'oerclassification_' . $name;
-        $plugin       = '\\' . $frankenstyle . '\plugin';
-        $url          = $plugin::url_to_external_resource();
-        $selectdata   = $plugin::get_select_data();
+        $plugin = '\\' . $frankenstyle . '\plugin';
+        $url = $plugin::url_to_external_resource();
+        $selectdata = $plugin::get_select_data();
         return [$url, $selectdata];
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -510,17 +506,18 @@ class fileinfo_form extends \moodleform {
         if (!$preference) {
             return;
         }
-        $fromform['upload']       = 0; // Upload state is reset, it has to be set new because of possible different required values.
-        $fromform['context']      = $preference->context ?? $fromform['context'];
-        $fromform['license']      = $preference->context ?? $fromform['license'];
-        $fromform['author']       = $preference->context ?? $fromform['author'];
+        $fromform['upload'] = 0; // Upload state is reset, it has to be set new because of possible different required values.
+        $fromform['context'] = $preference->context ?? $fromform['context'];
+        $fromform['license'] = $preference->license ?? $fromform['license'];
         $fromform['storedperson'] = $preference->persons ?? $fromform['storedperson'];
-        $fromform['storedtags']   = $preference->tags ?? $fromform['storedtags'];
-        $fromform['language']     = $preference->language ?? $fromform['language'];
+        $fromform['storedtags'] = $preference->tags ?? $fromform['storedtags'];
+        $fromform['language'] = $preference->language ?? $fromform['language'];
         $fromform['resourcetype'] = $preference->resourcetype ?? $fromform['resourcetype'];
-        $fromform['ignore']       = $preference->state ?? $fromform['ignore'];
+        $fromform['ignore'] = $preference->state ?? $fromform['ignore'];
         if (!is_null($preference->classification)) {
-            $classification        = json_decode($preference->classification);
+            // @codeCoverageIgnoreStart
+            // This code is not reachable without subplugins installed.
+            $classification = json_decode($preference->classification);
             $classificationplugins = oerclassification::get_enabled_plugins();
             foreach ($classificationplugins as $plugin => $fullname) {
                 $frankenstyle = 'oerclassification_' . $plugin;
@@ -528,6 +525,7 @@ class fileinfo_form extends \moodleform {
                     $fromform[$frankenstyle] = $classification->$plugin;
                 }
             }
+            // @codeCoverageIgnoreEnd
         }
     }
 }

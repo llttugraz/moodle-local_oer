@@ -45,12 +45,12 @@ class courseinfo_sync {
      * @throws \dml_exception
      */
     public function sync_course(int $courseid): void {
-        $metadata   = new courseinfo();
+        $metadata = new courseinfo();
         $oldcourses = $metadata->load_metadata_from_database($courseid);
         $newcourses = $metadata->generate_metadata($courseid);
-        $sync       = [
-                'create'      => [],
-                'update'      => [],
+        $sync = [
+                'create' => [],
+                'update' => [],
                 'markdeleted' => [],
         ];
         foreach ($newcourses as $newcourse) {
@@ -86,12 +86,12 @@ class courseinfo_sync {
         foreach ($sync['markdeleted'] as $course) {
             $delete = false;
             if ($course->coursename_edited == 0 &&
-                $course->structure_edited == 0 &&
-                $course->description_edited == 0 &&
-                $course->objectives_edited == 0 &&
-                $course->organisation_edited == 0 &&
-                $course->language_edited == 0 &&
-                $course->lecturer_edited == 0) {
+                    $course->structure_edited == 0 &&
+                    $course->description_edited == 0 &&
+                    $course->objectives_edited == 0 &&
+                    $course->organisation_edited == 0 &&
+                    $course->language_edited == 0 &&
+                    $course->lecturer_edited == 0) {
                 $delete = true;
             }
             if ($delete) {
@@ -101,8 +101,8 @@ class courseinfo_sync {
                     // Course is just revisited, and already set to delete - skip.
                     continue;
                 }
-                $course->deleted      = 1;
-                $course->ignored      = 1;
+                $course->deleted = 1;
+                $course->ignored = 1;
                 $course->timemodified = time();
                 $DB->update_record('local_oer_courseinfo', $course);
             }
@@ -119,40 +119,40 @@ class courseinfo_sync {
      * @param \stdClass $newcourse
      * @return array
      */
-    private function compare_course($oldcourse, $newcourse) {
-        $updatecourse                      = courseinfo::get_default_metadata_object($oldcourse->courseid);
-        $updateneeded                      = false;
-        $updatecourse->id                  = $oldcourse->id;
-        $updatecourse->courseid            = $oldcourse->courseid;
-        $updatecourse->coursecode          = $oldcourse->coursecode;
-        $updatecourse->deleted             = $oldcourse->deleted;
-        $updatecourse->ignored             = $oldcourse->ignored;
-        $updatecourse->external_courseid   = $oldcourse->external_courseid;
-        $updatecourse->external_sourceid   = $oldcourse->external_sourceid;
-        $updatecourse->coursename          = $oldcourse->coursename_edited == 1 ? $oldcourse->coursename : $newcourse->coursename;
-        $updatecourse->coursename_edited   = $oldcourse->coursename_edited;
-        $updatecourse->structure           = $oldcourse->structure_edited == 1 ? $oldcourse->structure : $newcourse->structure;
-        $updatecourse->structure_edited    = $oldcourse->structure_edited;
-        $updatecourse->description         = $oldcourse->description_edited == 1 ? $oldcourse->description :
+    private function compare_course($oldcourse, $newcourse): array {
+        $updatecourse = courseinfo::get_default_metadata_object($oldcourse->courseid);
+        $updateneeded = false;
+        $updatecourse->id = $oldcourse->id;
+        $updatecourse->courseid = $oldcourse->courseid;
+        $updatecourse->coursecode = $oldcourse->coursecode;
+        $updatecourse->deleted = $oldcourse->deleted;
+        $updatecourse->ignored = $oldcourse->ignored;
+        $updatecourse->external_courseid = $oldcourse->external_courseid;
+        $updatecourse->external_sourceid = $oldcourse->external_sourceid;
+        $updatecourse->coursename = $oldcourse->coursename_edited == 1 ? $oldcourse->coursename : $newcourse->coursename;
+        $updatecourse->coursename_edited = $oldcourse->coursename_edited;
+        $updatecourse->structure = $oldcourse->structure_edited == 1 ? $oldcourse->structure : $newcourse->structure;
+        $updatecourse->structure_edited = $oldcourse->structure_edited;
+        $updatecourse->description = $oldcourse->description_edited == 1 ? $oldcourse->description :
                 $newcourse->description;
-        $updatecourse->description_edited  = $oldcourse->description_edited;
-        $updatecourse->objectives          = $oldcourse->objectives_edited == 1 ? $oldcourse->objectives : $newcourse->objectives;
-        $updatecourse->objectives_edited   = $oldcourse->objectives_edited;
-        $updatecourse->organisation        = $oldcourse->organisation_edited == 1 ? $oldcourse->organisation :
+        $updatecourse->description_edited = $oldcourse->description_edited;
+        $updatecourse->objectives = $oldcourse->objectives_edited == 1 ? $oldcourse->objectives : $newcourse->objectives;
+        $updatecourse->objectives_edited = $oldcourse->objectives_edited;
+        $updatecourse->organisation = $oldcourse->organisation_edited == 1 ? $oldcourse->organisation :
                 $newcourse->organisation;
         $updatecourse->organisation_edited = $oldcourse->organisation_edited;
-        $updatecourse->language            = $oldcourse->language_edited == 1 ? $oldcourse->language : $newcourse->language;
-        $updatecourse->language_edited     = $oldcourse->language_edited;
-        $updatecourse->lecturer            = $oldcourse->lecturer_edited == 1 ? $oldcourse->lecturer : $newcourse->lecturer;
-        $updatecourse->lecturer_edited     = $oldcourse->lecturer_edited;
-        $updatecourse->subplugin           = $oldcourse->subplugin;
-        $updatecourse->usermodified        = $newcourse->usermodified;
-        $updatecourse->timecreated         = $oldcourse->timecreated;
-        $updatecourse->timemodified        = $newcourse->timemodified;
+        $updatecourse->language = $oldcourse->language_edited == 1 ? $oldcourse->language : $newcourse->language;
+        $updatecourse->language_edited = $oldcourse->language_edited;
+        $updatecourse->lecturer = $oldcourse->lecturer_edited == 1 ? $oldcourse->lecturer : $newcourse->lecturer;
+        $updatecourse->lecturer_edited = $oldcourse->lecturer_edited;
+        $updatecourse->subplugin = $oldcourse->subplugin;
+        $updatecourse->usermodified = $newcourse->usermodified;
+        $updatecourse->timecreated = $oldcourse->timecreated;
+        $updatecourse->timemodified = $newcourse->timemodified;
         // This check has to be made against newcourse, oldcourse may not exist yet.
         if ($newcourse->subplugin == courseinfo::BASETYPE) {
             list($updatecourse->customfields, $updateneeded) = $this->compare_customfields($oldcourse->customfields,
-                                                                                           $newcourse->customfields);
+                    $newcourse->customfields);
         }
 
         if ($oldcourse->coursename_edited == 0 && $oldcourse->coursename != $newcourse->coursename) {

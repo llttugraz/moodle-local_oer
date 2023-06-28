@@ -38,36 +38,42 @@ class filehelper {
     /**
      * Format an integer to a readable filesize
      *
-     * @param int  $bytes
+     * TODO: Decimal point for byte is useless, should this be changed?
+     * TODO: Should there be some error handling for zero and negative numbers?
+     * (The method works for such integers, but it does not make any sense)
+     *
+     * @param int $bytes
      * @param bool $short
      * @return string
      */
-    public static function get_readable_filesize($bytes, $short = false) {
+    public static function get_readable_filesize(int $bytes, bool $short = false): string {
+        $unit = [' Byte', ' Kilobyte', ' Megabyte', ' Gigabyte', ' Terabyte'];
+        $unitshort = [' b', ' Kb', ' Mb', ' Gb', ' Tb'];
         $divisor = 1000;
-        $i       = 0;
-        while (($bytes / $divisor) > 1) {
+        $i = 0;
+        while (($bytes / $divisor) > 1 && $i < count($unit) - 1) {
             $bytes = $bytes / $divisor;
             $i++;
         }
-        $unit      = [' Byte', ' Kilobyte', ' Megabyte', ' Gigabyte', ' Terabyte'];
-        $unitshort = [' b', ' Kb', ' Mb', ' Gb', ' Tb'];
         return number_format(round($bytes, 1), 1) . ($short ? $unitshort[$i] : $unit[$i]);
     }
 
     /**
      * Create a moodle url from a file
      *
-     * @param object $file
-     * @param bool   $string
+     * TODO: Refactor! Remove mixed return type. Return type should be either string or moodle url.
+     *
+     * @param \stored_file $file
+     * @param bool $string
      * @return \moodle_url|string
      */
-    public static function get_file_url($file, $string = false) {
+    public static function get_file_url(\stored_file $file, bool $string = false) {
         $url = \moodle_url::make_pluginfile_url($file->get_contextid(),
-                                                $file->get_component(),
-                                                $file->get_filearea(),
-                                                $file->get_itemid(),
-                                                $file->get_filepath(),
-                                                $file->get_filename());
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename());
         return $string ? $url->out() : $url;
     }
 }

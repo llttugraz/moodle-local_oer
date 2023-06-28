@@ -27,6 +27,10 @@
 
 namespace local_oer\services;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . "/externallib.php");
+
 use local_oer\filelist;
 
 /**
@@ -65,7 +69,7 @@ class get_file extends \external_api {
 
     /**
      * Ajax function to call.
-     * Returns all informations the frontend needs to display one file.
+     * Returns information the frontend needs to display one file.
      *
      * @param int    $courseid
      * @param string $contenthash

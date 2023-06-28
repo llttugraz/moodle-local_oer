@@ -19,15 +19,35 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_oer;
 
-$plugin->version = 2023062800;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.2.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
+/**
+ * Class oer_config_link_test
+ *
+ * @coversDefaultClass \local_oer\time\oer_config_link
+ */
+class oer_config_link_test extends \advanced_testcase {
+    /**
+     * Test the time form validation element.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @covers ::__construct
+     * @covers ::output_html
+     */
+    public function test_output_html() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php');
+
+        $url = new \moodle_url('');
+        $setting = new \local_oer\time\oer_config_link('unittest', 'Unit test', $url);
+        $this->assertIsString($setting->output_html([]));
+    }
+}

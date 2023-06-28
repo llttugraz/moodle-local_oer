@@ -19,15 +19,32 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_oer;
 
-$plugin->version = 2023062800;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.2.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
+use local_oer\forms\person_form;
+
+/**
+ * Class person_form_test
+ *
+ * @coversDefaultClass \local_oer\forms\person_form
+ */
+class person_form_test extends \advanced_testcase {
+    /**
+     * Just to run through the code and test for PHP and Moodle warnings/errors.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @covers \local_oer\forms\person_form::validation
+     * @covers \local_oer\forms\person_form::definition
+     */
+    public function test_validation() {
+        $this->resetAfterTest();
+        $mform = new person_form();
+        $result = $mform->validation([], []);
+        $this->assertEmpty($result);
+    }
+}

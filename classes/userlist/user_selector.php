@@ -42,7 +42,7 @@ class user_selector extends \user_selector_base {
      * Set to true if the selector displays the ...
      * Allowed users on this service ...
      * Set to false if the selector displays the ...
-     * Other users (false is the default default).
+     * Other users (false is the default).
      *
      * @var bool
      */
@@ -62,7 +62,7 @@ class user_selector extends \user_selector_base {
     }
 
     /**
-     * Find allowed or not allowed users of a service (depend of $this->displayallowedusers)
+     * Find allowed or not allowed users of a service (depend on $this->displayallowedusers)
      *
      * @param string $search
      * @return array

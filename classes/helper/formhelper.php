@@ -33,10 +33,10 @@ class formhelper {
      * Extend the select arrays with a null value for the preference form.
      *
      * @param array $values
-     * @return \lang_string[]|string[]
+     * @return array
      * @throws \coding_exception
      */
-    public static function add_no_preference_value(array $values) {
+    public static function add_no_preference_value(array $values): array {
         return array_merge(['nopref' => get_string('nopreference', 'local_oer')], $values);
     }
 
@@ -67,16 +67,16 @@ class formhelper {
      */
     public static function lom_resource_types(bool $localization = true, bool $addnoprefval = false): array {
         $values = [
-                0  => $localization ? get_string('noselection', 'local_oer') : 'No selection',
-                1  => $localization ? get_string('figure', 'local_oer') : 'Figure',
-                2  => $localization ? get_string('diagram', 'local_oer') : 'Diagram',
-                3  => $localization ? get_string('narrative', 'local_oer') : 'Narrative',
-                4  => $localization ? get_string('experiment', 'local_oer') : 'Experiment',
-                5  => $localization ? get_string('questionnaire', 'local_oer') : 'Questionnaire',
-                6  => $localization ? get_string('graphic', 'local_oer') : 'Graphic',
-                7  => $localization ? get_string('contents', 'local_oer') : 'Contents',
-                8  => $localization ? get_string('presentationslide', 'local_oer') : 'Presentationslide',
-                9  => $localization ? get_string('problem', 'local_oer') : 'Problem',
+                0 => $localization ? get_string('noselection', 'local_oer') : 'No selection',
+                1 => $localization ? get_string('figure', 'local_oer') : 'Figure',
+                2 => $localization ? get_string('diagram', 'local_oer') : 'Diagram',
+                3 => $localization ? get_string('narrative', 'local_oer') : 'Narrative',
+                4 => $localization ? get_string('experiment', 'local_oer') : 'Experiment',
+                5 => $localization ? get_string('questionnaire', 'local_oer') : 'Questionnaire',
+                6 => $localization ? get_string('graphic', 'local_oer') : 'Graphic',
+                7 => $localization ? get_string('contents', 'local_oer') : 'Contents',
+                8 => $localization ? get_string('presentationslide', 'local_oer') : 'Presentationslide',
+                9 => $localization ? get_string('problem', 'local_oer') : 'Problem',
                 10 => $localization ? get_string('exam', 'local_oer') : 'Exam',
                 11 => $localization ? get_string('selfassesment', 'local_oer') : 'Selfassesment',
                 12 => $localization ? get_string('chart', 'local_oer') : 'Chart',
@@ -95,7 +95,7 @@ class formhelper {
      */
     public static function lom_role_types(bool $addnoprefval = false): array {
         $values = [
-                'Author'    => get_string('author', 'local_oer'),
+                'Author' => get_string('author', 'local_oer'),
                 'Publisher' => get_string('publisher', 'local_oer'),
         ];
         return $addnoprefval ? self::add_no_preference_value($values) : $values;
@@ -110,9 +110,9 @@ class formhelper {
      * @return array
      * @throws \coding_exception
      */
-    public static function language_select_data(bool $addnoprefval = false) {
+    public static function language_select_data(bool $addnoprefval = false): array {
         $controller = new \tool_langimport\controller();
-        $languages  = [
+        $languages = [
                 0 => get_string('noselection', 'local_oer'),
         ];
         foreach ($controller->availablelangs as $language) {

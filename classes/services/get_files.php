@@ -27,6 +27,10 @@
 
 namespace local_oer\services;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . "/externallib.php");
+
 use local_oer\filelist;
 
 /**

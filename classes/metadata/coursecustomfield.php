@@ -38,8 +38,8 @@ class coursecustomfield {
      * - visibility is checked and only fields are returned that match maximum visibility setting
      * - ignored fields are filtered away
      *
-     * @param int  $courseid Moodle courseid
-     * @param bool $stored   instead of loading the fields from Moodle directly, load the already stored OER version
+     * @param int $courseid Moodle courseid
+     * @param bool $stored instead of loading the fields from Moodle directly, load the already stored OER version
      * @return array
      * @throws \dml_exception
      */
@@ -48,9 +48,9 @@ class coursecustomfield {
             return [];
         }
         $customfields = $stored ? self::load_course_customfields_from_oer($courseid) : self::get_course_customfields($courseid);
-        $result       = [];
-        $visibility   = get_config('local_oer', 'coursecustomfieldsvisibility');
-        $ignored      = get_config('local_oer', 'coursecustomfieldsignored');
+        $result = [];
+        $visibility = get_config('local_oer', 'coursecustomfieldsvisibility');
+        $ignored = get_config('local_oer', 'coursecustomfieldsignored');
         foreach ($customfields as $category) {
             $fields = [];
             foreach ($category['fields'] as $field) {
@@ -60,8 +60,8 @@ class coursecustomfield {
                 }
             }
             $result[] = [
-                    'id'     => $category['id'],
-                    'name'   => $category['name'],
+                    'id' => $category['id'],
+                    'name' => $category['name'],
                     'fields' => $fields,
             ];
         }
@@ -79,17 +79,17 @@ class coursecustomfield {
      */
     public static function get_course_customfields(int $courseid): array {
         $customfields = [];
-        $handler      = \core_course\customfield\course_handler::create();
-        $categories   = $handler->get_categories_with_fields();
+        $handler = \core_course\customfield\course_handler::create();
+        $categories = $handler->get_categories_with_fields();
         foreach ($categories as $category) {
-            $catid   = (int) $category->get('id');
+            $catid = (int) $category->get('id');
             $catname = $category->get('name');
-            $fields  = [];
+            $fields = [];
             foreach ($category->get_fields() as $field) {
-                $fieldid   = (int) $field->get('id');
+                $fieldid = (int) $field->get('id');
                 $fielddata = $handler->get_instance_data($courseid, true)[$fieldid];
-                $type      = $field->get('type');
-                $settings  = $field->get('configdata');
+                $type = $field->get('type');
+                $settings = $field->get('configdata');
                 switch ($type) {
                     case 'select':
                         $data = self::get_text_of_select_field($fielddata->get_value(), $settings['options']);
@@ -103,17 +103,17 @@ class coursecustomfield {
                         $data = trim(strip_tags($fielddata->get_value()));
                 }
                 $fields[] = [
-                        'id'         => $fieldid,
-                        'shortname'  => $field->get('shortname'),
-                        'fullname'   => $field->get('name'),
-                        'type'       => $field->get('type'),
+                        'id' => $fieldid,
+                        'shortname' => $field->get('shortname'),
+                        'fullname' => $field->get('name'),
+                        'type' => $field->get('type'),
                         'visibility' => $settings['visibility'],
-                        'data'       => $data,
+                        'data' => $data,
                 ];
             }
             $customfields[] = [
-                    'id'     => $catid,
-                    'name'   => $catname,
+                    'id' => $catid,
+                    'name' => $catname,
                     'fields' => $fields,
             ];
         }
@@ -133,7 +133,7 @@ class coursecustomfield {
     public static function load_course_customfields_from_oer(int $courseid): array {
         global $DB;
         $customfields = $DB->get_field('local_oer_courseinfo', 'customfields',
-                                       ['courseid' => $courseid, 'subplugin' => courseinfo::BASETYPE]);
+                ['courseid' => $courseid, 'subplugin' => courseinfo::BASETYPE]);
         return !empty($customfields) ? json_decode($customfields, true) : [];
     }
 
@@ -147,22 +147,22 @@ class coursecustomfield {
      * @throws \dml_exception
      */
     public static function get_customfields_for_snapshot(int $courseid): array {
-        $customfields   = self::get_course_customfields_with_applied_config($courseid, true);
-        $snapshot       = [];
+        $customfields = self::get_course_customfields_with_applied_config($courseid, true);
+        $snapshot = [];
         $typeconversion = [
                 'checkbox' => 'bool',
-                'date'     => 'timestamp',
+                'date' => 'timestamp',
                 'textarea' => 'text',
-                'select'   => 'text',
+                'select' => 'text',
         ];
         foreach ($customfields as $category) {
             foreach ($category['fields'] as $field) {
                 $snapshot[] = [
                         'shortname' => $field['shortname'],
-                        'fullname'  => $field['fullname'],
-                        'type'      => $typeconversion[$field['type']] ?? $field['type'],
-                        'data'      => $field['data'],
-                        'category'  => $category['name'],
+                        'fullname' => $field['fullname'],
+                        'type' => $typeconversion[$field['type']] ?? $field['type'],
+                        'data' => $field['data'],
+                        'category' => $category['name'],
                 ];
             }
         }
@@ -172,7 +172,7 @@ class coursecustomfield {
     /**
      * Return the text of a select field value.
      *
-     * @param int    $value         The stored int value of the options
+     * @param int $value The stored int value of the options
      * @param string $selectoptions The string of the select options
      * @return string
      */

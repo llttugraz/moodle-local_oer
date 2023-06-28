@@ -33,11 +33,11 @@ require_once(__DIR__ . '/helper/testcourse.php');
 require_once(__DIR__ . '/helper/fromform.php');
 
 /**
- * Class fileinfoform_test
+ * Class fileinfo_form_test
  *
  * @coversDefaultClass \local_oer\forms\fileinfo_form
  */
-class fileinfoform_test extends \advanced_testcase {
+class fileinfo_form_test extends \advanced_testcase {
     /**
      * Test the private function set_state.
      *
@@ -58,14 +58,14 @@ class fileinfoform_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $testcourse  = new testcourse();
-        $course      = $testcourse->generate_testcourse($this->getDataGenerator());
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
         $contenthash = $testcourse->get_contenthash_of_first_found_file($course);
         $this->assertNotNull($contenthash);
 
-        $form     = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
+        $form = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
         $setstate = new \ReflectionMethod($form, 'set_state');
-        $data     = [];
+        $data = [];
         $setstate->setAccessible(true);
         $setstate->invokeArgs($form, [&$data, 0]);
         $this->assertTrue(isset($data['upload']));
@@ -83,11 +83,17 @@ class fileinfoform_test extends \advanced_testcase {
     /**
      * Test the validation of formdata in backend.
      * There are some requirements for releasing a file.
+     * It also covers the definition of the form to see PHP and Moodle warnings/errors.
      *
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
+     * @throws \moodle_exception
      * @covers ::validation
+     * @covers ::definition
+     * @covers ::add_shared_fields_to_form
+     * @covers ::get_required_fields
+     * @covers ::prepare_classification_values_for_form
      */
     public function test_validation() {
         $this->resetAfterTest();
@@ -96,81 +102,107 @@ class fileinfoform_test extends \advanced_testcase {
         $config = 'description,context';
         set_config('requiredfields', $config, 'local_oer');
 
-        $testcourse  = new testcourse();
-        $course      = $testcourse->generate_testcourse($this->getDataGenerator());
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
         $contenthash = $testcourse->get_contenthash_of_first_found_file($course);
         $this->assertNotNull($contenthash);
 
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                  'Test set state method', 1,
-                                                  'cc', 'en', 1, [], 0, 0);
-        $form     = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 0, 0);
+        $form = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
+        $errors = $form->validation($fromform, []);
         $this->assertEmpty($errors, 'No errors');
 
         // Upload and ignore is set, this should not be possible, but a validation has been added just to be sure.
-        $fromform           = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                            'Test set state method', 1,
-                                                            'cc', 'en', 1, [], 1, 0);
+        $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 1, 0);
         $fromform['ignore'] = 1;
-        $errors             = $form->validation($fromform, []);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['ignore']), 'Upload and ignore cannot be set both.');
         $this->assertEquals(get_string('uploadignoreerror', 'local_oer'), $errors['ignore'],
-                            'Upload and ignore cannot be set both.');
+                'Upload and ignore cannot be set both.');
 
         // Upload is activated, but wrong license is set.
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                  'Test set state method', 1,
-                                                  'allrightsreserved', 'en', 1,
-                                                  ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'], 1, 0);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 1,
+                'allrightsreserved', 'en', 1,
+                ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'], 1, 0);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['upload']), 'For releasing files an appropriate license is needed');
         $this->assertEquals(get_string('error_upload_license', 'local_oer'), $errors['upload'],
-                            'For releasing files an appropriate license is needed');
+                'For releasing files an appropriate license is needed');
         $this->assertTrue(isset($errors['license']), 'For releasing files an appropriate license is needed');
         $this->assertEquals(get_string('error_license', 'local_oer'), $errors['license'],
-                            'For releasing files an appropriate license is needed');
+                'For releasing files an appropriate license is needed');
 
         // Upload is activated, but author is not set.
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                  'Test set state method', 1,
-                                                  'cc', 'en', 1, [], 1, 0);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 1, 0);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['addpersons']), 'Release cannot be set when no person is added to metadata');
         $this->assertEquals(get_string('error_upload_author', 'local_oer'), $errors['addpersons'],
-                            'Upload cannot be set when no person is added to metadata');
+                'Upload cannot be set when no person is added to metadata');
 
         // Upload is activated, but no context is set.
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                  'Test set state method', 0,
-                                                  'cc', 'en', 1,
-                                                  ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
-                                                  1, 0);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 0,
+                'cc', 'en', 1,
+                ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
+                1, 0);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['context']), 'Release cannot be set when no context is set');
         $this->assertEquals(get_string('error_upload_context', 'local_oer'), $errors['context'],
-                            'Release cannot be set when no context is set');
+                'Release cannot be set when no context is set');
 
         // Title is required for file metadata.
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, '',
-                                                  'Test set state method', 0,
-                                                  'cc', 'en', 1,
-                                                  ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
-                                                  0, 0);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 0,
+                'cc', 'en', 1,
+                ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
+                0, 0);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['title']), 'Title cannot be empty');
 
         // Title cannot be longer than 255 characters.
-        $title    = str_pad('A', 300, 'B');
+        $title = str_pad('A', 300, 'B');
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, $title,
-                                                  'Test set state method', 0,
-                                                  'cc', 'en', 1,
-                                                  ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
-                                                  0, 0);
-        $errors   = $form->validation($fromform, []);
+                'Test set state method', 0,
+                'cc', 'en', 1,
+                ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
+                0, 0);
+        $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['title']), 'Maximum of 255 chars for title');
         $this->assertEquals(get_string('maximumchars', '', 255), $errors['title'],
-                            'Maximum of 255 chars for title');
+                'Maximum of 255 chars for title');
+
+        // Set all fields to required. Should trigger several errors.
+        set_config('requiredfields', 'description,context,tags,language,resourcetype', 'local_oer');
+        $form = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
+        $fromform = [
+                'courseid' => $course->id,
+                'contenthash' => $contenthash,
+                'language' => '0',
+                'resourcetype' => 0,
+                'upload' => 1,
+                'license' => 'cc',
+                'context' => 0,
+                'title' => 'Filename',
+                'storedperson' => '{"Author": "Unit tester"}',
+        ];
+        $errors = $form->validation($fromform, []);
+        $this->assertArrayHasKey('addpersons', $errors);
+        $this->assertArrayHasKey('context', $errors);
+        $this->assertArrayHasKey('tags', $errors);
+        $this->assertArrayHasKey('description', $errors);
+        $this->assertArrayHasKey('language', $errors);
+        $this->assertArrayHasKey('resourcetype', $errors);
+
+        // This should cover the file is not writable part.
+        $testcourse->set_files_to($course->id, 5, true);
+        new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
     }
 
     /**
@@ -181,13 +213,16 @@ class fileinfoform_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::update_metadata
+     * @covers ::add_values_from_form
+     * @covers ::set_value
+     * @covers ::prepare_classification_values_to_store
      */
     public function test_update_metadata() {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;
-        $testcourse  = new testcourse();
-        $course      = $testcourse->generate_testcourse($this->getDataGenerator());
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
         $contenthash = $testcourse->get_contenthash_of_first_found_file($course);
         $this->assertNotNull($contenthash);
 
@@ -195,9 +230,9 @@ class fileinfoform_test extends \advanced_testcase {
         $this->assertFalse($record, 'No files record exists yet.');
 
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
-                                                  'Test update metadata', 1,
-                                                  'cc', 'en', 1, [], 0, 0);
-        $form     = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
+                'Test update metadata', 1,
+                'cc', 'en', 1, [], 0, 0);
+        $form = new fileinfo_form(null, ['courseid' => $course->id, 'contenthash' => $contenthash]);
         $form->update_metadata($fromform);
 
         $record = $DB->get_record('local_oer_files', ['courseid' => $course->id, 'contenthash' => $contenthash]);
@@ -223,10 +258,10 @@ class fileinfoform_test extends \advanced_testcase {
         ];
 
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'changed title',
-                                                  'Lorem ipsum', 0,
-                                                  'allrightsreserved', 'de', 5,
-                                                  ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
-                                                  0, 1, $tags);
+                'Lorem ipsum', 0,
+                'allrightsreserved', 'de', 5,
+                ['{"role":"Author","firstname":"Christian","lastname":"Ortner"}'],
+                0, 1, $tags);
 
         $form->update_metadata($fromform);
         $this->assertTrue($DB->count_records('local_oer_files') == 1, 'The existing record should have been updated');
@@ -247,5 +282,71 @@ class fileinfoform_test extends \advanced_testcase {
         $this->assertEquals(2, $record->usermodified);
         $this->assertTrue($record->timemodified > 0);
         $this->assertTrue($record->timecreated > 0);
+    }
+
+    /**
+     * Test reset to preference method.
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers ::reset_form_data_to_preference_values
+     */
+    public function test_reset_form_data_to_preference_values() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        global $DB, $USER;
+
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
+        $contenthash = $testcourse->get_contenthash_of_first_found_file($course);
+
+        $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'Unittest',
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 0, 0);
+        $compare = $fromform;
+
+        // No preferences exist yet for this course. So there function will just return.
+        fileinfo_form::reset_form_data_to_preference_values($fromform);
+        $this->assertEquals($compare['courseid'], $fromform['courseid']);
+        $this->assertArrayNotHasKey('upload', $compare);
+        $this->assertArrayNotHasKey('upload', $fromform);
+        $this->assertArrayNotHasKey('ignore', $compare);
+        $this->assertArrayNotHasKey('ignore', $fromform);
+        $this->assertEquals($compare['license'], $fromform['license']);
+        $this->assertEquals($compare['storedperson'], $fromform['storedperson']);
+        $this->assertEquals($compare['storedtags'], $fromform['storedtags']);
+        $this->assertEquals($compare['resourcetype'], $fromform['resourcetype']);
+
+        $fromform['classification'] = null;
+        $fromform['state'] = 0;
+        $fromform['usermodified'] = $USER->id;
+        $fromform['timemodified'] = time();
+        $fromform['timecreated'] = time();
+        $fromform['persons'] = null;
+        $fromform['id'] = $DB->insert_record('local_oer_preference', $fromform);
+
+        // Now a preference has been stored. Run the reset again.
+        $newform = fromform::fileinfoform_submit($course->id, $contenthash, 'Reset to preference',
+                'The fields differ from the db entry', 2,
+                'allrightsreserved', 'de', 7, ['Frank Furter'], 1, 0);
+        fileinfo_form::reset_form_data_to_preference_values($newform);
+        $this->assertEquals($compare['courseid'], $newform['courseid']);
+        $this->assertEquals(0, $newform['upload']);
+        $this->assertEquals($compare['license'], $newform['license']);
+        $this->assertEquals('{"persons":[Frank Furter]}', $newform['storedperson'],
+                'As persons is null in preferences, it will not be overwritten.');
+        $this->assertEquals($compare['storedtags'], $newform['storedtags']);
+        $this->assertEquals($compare['resourcetype'], $newform['resourcetype']);
+        $this->assertArrayHasKey('ignore', $newform);
+        $this->assertEquals(0, $newform['ignore']);
+
+        $fromform['persons'] = '{"persons":[Bess Twishes]}';
+        $fromform['state'] = 1;
+        $DB->update_record('local_oer_preference', $fromform);
+        fileinfo_form::reset_form_data_to_preference_values($newform);
+        $this->assertEquals('{"persons":[Bess Twishes]}', $newform['storedperson']);
+        $this->assertArrayHasKey('ignore', $newform);
+        $this->assertEquals(1, $newform['ignore']);
     }
 }

@@ -43,11 +43,14 @@ class coursetofile_form extends \moodleform {
      * Mform definition function, required by moodleform.
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     protected function definition() {
         global $OUTPUT;
-        $mform   = $this->_form;
-        $file    = $this->_customdata;
+        $mform = $this->_form;
+        $file = $this->_customdata;
         $courses = coursetofile::get_courses_metadata_for_file($file['contenthash'], $file['courseid']);
 
         $mform->addElement('hidden', 'courseid', null);
@@ -55,7 +58,7 @@ class coursetofile_form extends \moodleform {
         $mform->addElement('hidden', 'contenthash', null);
         $mform->setType('contenthash', PARAM_ALPHANUM);
         $data = [
-                'courseid'    => $file['courseid'],
+                'courseid' => $file['courseid'],
                 'contenthash' => $file['contenthash'],
         ];
 
@@ -63,50 +66,50 @@ class coursetofile_form extends \moodleform {
 
         if (count($courses) > 1) {
             $mform->addElement('html',
-                               '<div class="alert alert-info">' . get_string('multiplecoursestofile', 'local_oer') . '</div>');
+                    '<div class="alert alert-info">' . get_string('multiplecoursestofile', 'local_oer') . '</div>');
         }
 
         foreach ($courses as $course) {
             $moodleurl = new \moodle_url('/course/view.php', ['id' => $course['id']]);
-            $url       = '<a target="_blank" href="' . $moodleurl->out() . '">' . get_string('tocourse', 'local_oer') . '</a>';
-            $editor    = $course['editor'] ? '<span class="badge badge-info">Editor</span>' : '';
-            $header    = '<h4 class="bg-light">' . $editor . $course['name'] . ' (' . $url . ')</h4>';
+            $url = '<a target="_blank" href="' . $moodleurl->out() . '">' . get_string('tocourse', 'local_oer') . '</a>';
+            $editor = $course['editor'] ? '<span class="badge badge-info">Editor</span>' : '';
+            $header = '<h4 class="bg-light">' . $editor . $course['name'] . ' (' . $url . ')</h4>';
             $mform->addElement('html', $header);
             if (empty($course['courseinfo'])) {
                 $mform->addElement('html',
-                                   '<div class="alert alert-warning">' .
-                                   get_string('nocourseinfo', 'local_oer') .
-                                   '</div>');
+                        '<div class="alert alert-warning">' .
+                        get_string('nocourseinfo', 'local_oer') .
+                        '</div>');
             }
             foreach ($course['courseinfo'] as $courseinfo) {
-                $identifier                            = $courseinfo['parent'] . self::COURSEINFO_SEPARATOR .
-                                                         $courseinfo['coursecode'];
-                $data[$identifier]                     = $courseinfo['state'];
+                $identifier = $courseinfo['parent'] . self::COURSEINFO_SEPARATOR .
+                        $courseinfo['coursecode'];
+                $data[$identifier] = $courseinfo['state'];
                 $courseinfo['metadata']['description'] = str_replace("\r\n", '<br>',
-                                                                     $courseinfo['metadata']['description']);
-                $courseinfo['metadata']['objectives']  = str_replace("\r\n", '<br>',
-                                                                     $courseinfo['metadata']['objectives']);
-                $nodata                                = '-';
-                $infodata                              = [
-                        'structure'    => empty($courseinfo['metadata']['structure']) ? $nodata :
+                        $courseinfo['metadata']['description']);
+                $courseinfo['metadata']['objectives'] = str_replace("\r\n", '<br>',
+                        $courseinfo['metadata']['objectives']);
+                $nodata = '-';
+                $infodata = [
+                        'structure' => empty($courseinfo['metadata']['structure']) ? $nodata :
                                 $courseinfo['metadata']['structure'],
-                        'description'  => empty($courseinfo['metadata']['description']) ? $nodata :
+                        'description' => empty($courseinfo['metadata']['description']) ? $nodata :
                                 $courseinfo['metadata']['description'],
-                        'objectives'   => empty($courseinfo['metadata']['objectives']) ? $nodata :
+                        'objectives' => empty($courseinfo['metadata']['objectives']) ? $nodata :
                                 $courseinfo['metadata']['objectives'],
                         'organisation' => empty($courseinfo['metadata']['organisation']) ? $nodata :
                                 $courseinfo['metadata']['organisation'],
-                        'language'     => empty($courseinfo['metadata']['language']) ? $nodata :
+                        'language' => empty($courseinfo['metadata']['language']) ? $nodata :
                                 $courseinfo['metadata']['language'],
-                        'lecturer'     => empty($courseinfo['metadata']['lecturer']) ? $nodata :
+                        'lecturer' => empty($courseinfo['metadata']['lecturer']) ? $nodata :
                                 $courseinfo['metadata']['lecturer'],
                 ];
 
                 $collapse = $OUTPUT->render_from_template('local_oer/courseinfo_collapse', $infodata);
                 $mform->addElement('advcheckbox', $identifier,
-                                   $courseinfo['metadata']['coursename'], $collapse,
-                                   array('group' => $courseinfo['parent']),
-                                   array(0, 1));
+                        $courseinfo['metadata']['coursename'], $collapse,
+                        array('group' => $courseinfo['parent']),
+                        array(0, 1));
             }
             $mform->addElement('html', '<hr>');
         }
@@ -126,7 +129,7 @@ class coursetofile_form extends \moodleform {
      * @throws \coding_exception
      */
     public function validation($data, $files) {
-        $file  = $this->_customdata;
+        $file = $this->_customdata;
         $error = [];
         $found = false;
         foreach ($data as $key => $value) {
@@ -155,39 +158,39 @@ class coursetofile_form extends \moodleform {
     public function store_overwrite_data(array $data) {
         global $DB, $USER;
         $table = 'local_oer_coursetofile';
-        $file  = $this->_customdata;
+        $file = $this->_customdata;
         foreach ($data as $key => $state) {
+            if (strpos($key, self::COURSEINFO_SEPARATOR) === false) {
+                continue;
+            }
             $course = explode(self::COURSEINFO_SEPARATOR, $key);
-            if (count($course) == 2 &&
-                ($state === coursetofile::COURSETOFILE_DISABLED || $state === coursetofile::COURSETOFILE_ENABLED)
-                && $DB->record_exists('local_oer_courseinfo',
-                                      ['courseid' => $course[0], 'coursecode' => $course[1]])) {
+            if ($DB->record_exists('local_oer_courseinfo', ['courseid' => $course[0], 'coursecode' => $course[1]])) {
                 $params = [
                         'contenthash' => $file['contenthash'],
-                        'courseid'    => $course[0],
-                        'coursecode'  => $course[1]
+                        'courseid' => $course[0],
+                        'coursecode' => $course[1]
                 ];
                 $ignore = $DB->get_field('local_oer_courseinfo', 'ignored',
-                                         ['courseid'   => $course[0],
-                                          'coursecode' => $course[1]]);
+                        ['courseid' => $course[0],
+                                'coursecode' => $course[1]]);
                 if (($file['courseid'] == $course[0] && $ignore != $state) ||
-                    ($file['courseid'] != $course[0] && $state == coursetofile::COURSETOFILE_DISABLED)) {
+                        ($file['courseid'] != $course[0] && $state == coursetofile::COURSETOFILE_DISABLED)) {
                     // For editor course only store different values, and for others.
                     // Only store enabled values.
                     $DB->delete_records($table, $params);
                 } else if ($owexist = $DB->get_record($table, $params)) {
-                    $owexist->state        = $state;
+                    $owexist->state = $state;
                     $owexist->usermodified = $USER->id;
                     $owexist->timemodified = time();
                     $DB->update_record($table, $owexist);
                 } else {
-                    $ow               = new \stdClass();
-                    $ow->contenthash  = $file['contenthash'];
-                    $ow->courseid     = $course[0];
-                    $ow->coursecode   = $course[1];
-                    $ow->state        = $state;
+                    $ow = new \stdClass();
+                    $ow->contenthash = $file['contenthash'];
+                    $ow->courseid = $course[0];
+                    $ow->coursecode = $course[1];
+                    $ow->state = $state;
                     $ow->usermodified = $USER->id;
-                    $ow->timecreated  = time();
+                    $ow->timecreated = time();
                     $ow->timemodified = time();
                     $DB->insert_record($table, $ow);
                 }

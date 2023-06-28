@@ -42,10 +42,24 @@ class snapshot_test extends \advanced_testcase {
      * Test get latest course snapshot
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      * @covers ::get_latest_course_snapshot
      */
     public function test_get_latest_course_snapshot() {
         $this->resetAfterTest();
+        global $DB;
+        $this->setAdminUser();
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
+        $helper->sync_course_info($course->id);
+        $snapshot = new snapshot($course->id);
+        $this->assertEmpty($snapshot->get_latest_course_snapshot());
+        $helper->set_files_to($course->id, 3, true);
+        $snapshot->create_snapshot_of_course_files();
+        $result = $snapshot->get_latest_course_snapshot();
+        $this->assertCount(3, $result);
     }
 
     /**
@@ -67,6 +81,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::create_snapshot_of_course_files
+     * @covers ::create_file_snapshot
      */
     public function test_create_snapshot_of_course_files() {
         $this->resetAfterTest();
@@ -76,7 +91,7 @@ class snapshot_test extends \advanced_testcase {
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
         $this->assertTrue($DB->record_exists('local_oer_courseinfo', ['courseid' => $course->id]),
-                          'There should be at least one courseinfo entry for testcourse');
+                'There should be at least one courseinfo entry for testcourse');
         $this->assertEmpty($DB->get_records('local_oer_snapshot'));
         $snapshot = new snapshot($course->id);
         $snapshot->create_snapshot_of_course_files();
@@ -85,7 +100,7 @@ class snapshot_test extends \advanced_testcase {
         $snapshot->create_snapshot_of_course_files();
         $snapshot->create_snapshot_of_course_files();
         $this->assertEquals(1, $DB->count_records('local_oer_snapshot'),
-                            'Although the release is called 2 times, only one file should be released because nothing changed');
+                'Although the release is called 2 times, only one file should be released because nothing changed');
         $helper->set_files_to($course->id, 2, true);
         $snapshot->create_snapshot_of_course_files();
         $this->assertEquals(2, $DB->count_records('local_oer_snapshot'), 'Two files have been released.');
@@ -118,8 +133,8 @@ class snapshot_test extends \advanced_testcase {
     public function test_add_external_metadata() {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $helper   = new testcourse();
-        $course   = $helper->generate_testcourse($this->getDataGenerator());
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
         $snapshot = new snapshot($course->id);
         $setstate = new \ReflectionMethod($snapshot, 'add_external_metadata');
         $setstate->setAccessible(true);
@@ -137,8 +152,8 @@ class snapshot_test extends \advanced_testcase {
     public function test_get_active_courseinfo_metadata() {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $helper   = new testcourse();
-        $course   = $helper->generate_testcourse($this->getDataGenerator());
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
         $snapshot = new snapshot($course->id);
         $setstate = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
         $setstate->setAccessible(true);
@@ -182,10 +197,10 @@ class snapshot_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $contenthash = substr(hash('sha256', random_bytes(10)), 0, 40);
-        $helper      = new testcourse();
-        $course      = $helper->generate_testcourse($this->getDataGenerator());
-        $snapshot    = new snapshot($course->id);
-        $active      = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
+        $snapshot = new snapshot($course->id);
+        $active = new \ReflectionMethod($snapshot, 'get_active_courseinfo_metadata');
         $active->setAccessible(true);
         $overwritten = new \ReflectionMethod($snapshot, 'get_overwritten_courseinfo_metadata');
         $overwritten->setAccessible(true);
@@ -210,15 +225,15 @@ class snapshot_test extends \advanced_testcase {
         $this->assertCount(2, $courseinfo);
         global $DB;
         // Test 3: Setting enabled, state overwritten, remove a courseinfo at file level.
-        $state               = new \stdClass();
-        $state->contenthash  = $contenthash;
-        $state->courseid     = $course->id;
-        $state->coursecode   = 'moodlecourse-' . $course->id;
-        $state->state        = coursetofile::COURSETOFILE_DISABLED;
+        $state = new \stdClass();
+        $state->contenthash = $contenthash;
+        $state->courseid = $course->id;
+        $state->coursecode = 'moodlecourse-' . $course->id;
+        $state->state = coursetofile::COURSETOFILE_DISABLED;
         $state->usermodified = 2;
-        $state->timecreated  = time();
+        $state->timecreated = time();
         $state->timemodified = time();
-        $state->id           = $DB->insert_record('local_oer_coursetofile', $state);
+        $state->id = $DB->insert_record('local_oer_coursetofile', $state);
         [$courses, $courseinfo] = $active->invoke($snapshot);
         $this->assertCount(2, $courses);
         $this->assertCount(2, $courseinfo);
@@ -239,7 +254,7 @@ class snapshot_test extends \advanced_testcase {
         // Test 5: Additional courseinfo from other course is added.
         $this->set_additional_courseinfoentry(7);
         unset($state->id);
-        $state->courseid   = 7;
+        $state->courseid = 7;
         $state->coursecode = 'ExternalCourse';
         $DB->insert_record('local_oer_coursetofile', $state);
         [$courses, $courseinfo] = $active->invoke($snapshot);
@@ -256,11 +271,12 @@ class snapshot_test extends \advanced_testcase {
      * @return void
      * @throws \ReflectionException
      * @covers ::extract_courseinfo_metadata
+     * @covers ::add_customfields_to_snapshot
      */
     public function test_extract_courseinfo_metadata() {
         $this->resetAfterTest();
 
-        $entry    = $this->set_additional_courseinfoentry(7);
+        $entry = $this->set_additional_courseinfoentry(7);
         $snapshot = new snapshot(7);
         $setstate = new \ReflectionMethod($snapshot, 'extract_courseinfo_metadata');
         $setstate->setAccessible(true);
@@ -288,32 +304,32 @@ class snapshot_test extends \advanced_testcase {
      */
     private function set_additional_courseinfoentry(int $courseid) {
         global $DB;
-        $entry                      = new \stdClass();
-        $entry->courseid            = $courseid;
-        $entry->coursecode          = 'ExternalCourse';
-        $entry->deleted             = 0;
-        $entry->ignored             = 0;
-        $entry->external_courseid   = 12345;
-        $entry->external_sourceid   = 23456;
-        $entry->coursename          = 'External course for unit test';
-        $entry->coursename_edited   = 1;
-        $entry->structure           = 'Test';
-        $entry->structure_edited    = 0;
-        $entry->description         = 'Description';
-        $entry->description_edited  = 0;
-        $entry->objectives          = 'Objective';
-        $entry->objectives_edited   = 0;
-        $entry->organisation        = 'OER';
+        $entry = new \stdClass();
+        $entry->courseid = $courseid;
+        $entry->coursecode = 'ExternalCourse';
+        $entry->deleted = 0;
+        $entry->ignored = 0;
+        $entry->external_courseid = 12345;
+        $entry->external_sourceid = 23456;
+        $entry->coursename = 'External course for unit test';
+        $entry->coursename_edited = 1;
+        $entry->structure = 'Test';
+        $entry->structure_edited = 0;
+        $entry->description = 'Description';
+        $entry->description_edited = 0;
+        $entry->objectives = 'Objective';
+        $entry->objectives_edited = 0;
+        $entry->organisation = 'OER';
         $entry->organisation_edited = 1;
-        $entry->language            = 'en';
-        $entry->language_edited     = 0;
-        $entry->lecturer            = 'Christian Ortner';
-        $entry->lecturer_edited     = 0;
-        $entry->subplugin           = 'other';
-        $entry->usermodified        = 2;
-        $time                       = time();
-        $entry->timecreated         = $time;
-        $entry->timemodified        = $time;
+        $entry->language = 'en';
+        $entry->language_edited = 0;
+        $entry->lecturer = 'Christian Ortner';
+        $entry->lecturer_edited = 0;
+        $entry->subplugin = 'other';
+        $entry->usermodified = 2;
+        $time = time();
+        $entry->timecreated = $time;
+        $entry->timemodified = $time;
         $DB->insert_record('local_oer_courseinfo', $entry);
         return $entry;
     }
