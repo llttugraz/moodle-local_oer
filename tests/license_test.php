@@ -36,6 +36,9 @@ class license_test extends \advanced_testcase {
     /**
      * Test license cc check.
      *
+     * 2023-11-02 Moodle updated licenses from cc 3.0 to cc 4.0 so some tests have been updated.
+     * https://tracker.moodle.org/browse/MDL-43195'
+     *
      * @return void
      * @throws \coding_exception
      * @covers \local_oer\helper\license::test_license_correct_for_upload
@@ -44,7 +47,10 @@ class license_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->assertFalse(license::test_license_correct_for_upload('doesnotexist'));
         $this->assertFalse(license::test_license_correct_for_upload('allrightsreserved'));
-        $this->assertTrue(license::test_license_correct_for_upload('cc-nc-sa'));
+        $this->assertFalse(license::test_license_correct_for_upload('cc-nc-sa'),
+                'This test has been set to assert false on 2023-11-02 due to license change');
+        $this->assertTrue(license::test_license_correct_for_upload('cc-nc-sa-4.0'),
+                'Introduced on 2023-11-02 because of license change');
         $this->assertTrue(license::test_license_correct_for_upload('public'));
     }
 
@@ -57,7 +63,9 @@ class license_test extends \advanced_testcase {
      */
     public function test_get_license_fullname() {
         $this->resetAfterTest();
-        $this->assertEquals('Creative Commons - No Commercial NoDerivs', license::get_license_fullname('cc-nc-nd'));
+        $this->assertEquals('Creative Commons - NonCommercial-NoDerivatives 4.0 International',
+                license::get_license_fullname('cc-nc-nd-4.0'),
+                '2023-11-02 Updated because of license change');
         $this->assertEquals(get_string('licensenotfound', 'local_oer'), license::get_license_fullname('nope'));
     }
 
@@ -84,12 +92,12 @@ class license_test extends \advanced_testcase {
         $this->resetAfterTest();
         $list = license::get_licenses_select_data(false);
         $this->assertCount(9, $list, 'Test with the moodle default licenses');
-        $this->assertArrayHasKey('cc', $list);
+        $this->assertArrayHasKey('cc-4.0', $list, '2023-11-02 Updated because of license change');
         $this->assertArrayHasKey('public', $list);
         $this->assertArrayHasKey('unknown', $list);
         $list = license::get_licenses_select_data(true);
         $this->assertCount(10, $list, 'Test with the moodle default licenses');
         $this->assertArrayHasKey('nopref', $list);
-        $this->assertArrayHasKey('cc-nc', $list);
+        $this->assertArrayHasKey('cc-nc-4.0', $list, '2023-11-02 Updated because of license change');
     }
 }

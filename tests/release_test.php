@@ -25,7 +25,6 @@
 
 namespace local_oer;
 
-use local_oer\metadata\courseinfo_sync;
 use local_oer\metadata\coursetofile;
 
 defined('MOODLE_INTERNAL') || die();
@@ -142,8 +141,8 @@ class release_test extends \advanced_testcase {
 
         // Test license shortname replacement.
         $license = $metadata['license'];
-        $this->assertEquals('cc', $license['shortname']);
-        $replacement = "xx=>replacement\r\nabc=>otherreplacement\r\ncc=>replacedtextintest\r\nlast=>lastline";
+        $this->assertEquals('cc-4.0', $license['shortname'], 'Updated 2023-11-02 due to Moodle licence change.');
+        $replacement = "xx=>replacement\r\nabc=>otherreplacement\r\ncc-4.0=>replacedtextintest\r\nlast=>lastline";
         set_config('uselicensereplacement', 1, 'local_oer');
         set_config('licensereplacement', $replacement, 'local_oer');
         $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);

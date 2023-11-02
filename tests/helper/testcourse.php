@@ -103,7 +103,7 @@ class testcourse {
     public function set_file_to_release(int $courseid, \stored_file $file) {
         $metadata          = $this->generate_oer_non_release_metadata($courseid, $file);
         $metadata->context = 1;
-        $metadata->license = 'cc';
+        $metadata->license = 'cc-4.0'; // Updated 2023-11-02 due to Moodle licence change.
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}, ' .
                              '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}';
         $metadata->state   = 1;
