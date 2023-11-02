@@ -49,106 +49,106 @@ class coursecustomfield_test extends \advanced_testcase {
      */
     public function setUp(): void {
         $this->resetAfterTest();
-        $course                   = $this->getDataGenerator()->create_course();
-        $this->data['course1']    = $course;
-        $course2                  = $this->getDataGenerator()->create_course();
-        $this->data['course2']    = $course2;
-        $customcat1               = $this->getDataGenerator()->create_custom_field_category(['name' => 'First Category']);
-        $this->data['cat1']       = $customcat1;
-        $customcat2               = $this->getDataGenerator()->create_custom_field_category(['name' => 'Second Category']);
-        $this->data['cat2']       = $customcat2;
-        $customcat3               = $this->getDataGenerator()->create_custom_field_category(['name' => 'Third Category']);
-        $this->data['cat3']       = $customcat3;
-        $field1cat1               = $this->getDataGenerator()->create_custom_field(
+        $course = $this->getDataGenerator()->create_course();
+        $this->data['course1'] = $course;
+        $course2 = $this->getDataGenerator()->create_course();
+        $this->data['course2'] = $course2;
+        $customcat1 = $this->getDataGenerator()->create_custom_field_category(['name' => 'First Category']);
+        $this->data['cat1'] = $customcat1;
+        $customcat2 = $this->getDataGenerator()->create_custom_field_category(['name' => 'Second Category']);
+        $this->data['cat2'] = $customcat2;
+        $customcat3 = $this->getDataGenerator()->create_custom_field_category(['name' => 'Third Category']);
+        $this->data['cat3'] = $customcat3;
+        $field1cat1 = $this->getDataGenerator()->create_custom_field(
                 [
-                        'name'       => 'semester',
-                        'shortname'  => 'sem',
-                        'type'       => 'text',
-                        'categoryid' => $customcat1->get('id'),
-                        'configdata' => [
-                                'visibility'   => 0,
-                                'defaultvalue' => 'nosemester'
-                        ]
-                ]);
-        $this->data['field1cat1'] = $field1cat1;
-        $field2cat1               = $this->getDataGenerator()->create_custom_field(
-                [
-                        'name'       => 'additionaltextarea',
-                        'shortname'  => 'ata',
-                        'type'       => 'textarea',
-                        'categoryid' => $customcat1->get('id'),
-                        'configdata' => [
-                                'visibility'   => 1,
-                                'defaultvalue' => 'emptytext'
-                        ]
-                ]);
-        $this->data['field2cat1'] = $field2cat1;
-        $field3cat1               = $this->getDataGenerator()->create_custom_field(
-                [
-                        'name'       => 'checkboxfield',
-                        'shortname'  => 'cf',
-                        'type'       => 'checkbox',
-                        'categoryid' => $customcat1->get('id'),
-                        'configdata' => [
-                                'visibility'   => 2,
-                                'defaultvalue' => 0
-                        ]
-                ]);
-        $this->data['field3cat1'] = $field3cat1;
-        $field4cat1               = $this->getDataGenerator()->create_custom_field(
-                [
-                        'name'       => 'dateofsomething',
-                        'shortname'  => 'dos',
-                        'type'       => 'date',
+                        'name' => 'semester',
+                        'shortname' => 'sem',
+                        'type' => 'text',
                         'categoryid' => $customcat1->get('id'),
                         'configdata' => [
                                 'visibility' => 0,
-                                // Date does not have a default value.
-                        ]
+                                'defaultvalue' => 'nosemester',
+                        ],
                 ]);
-        $this->data['field4cat1'] = $field4cat1;
-        $field5cat1               = $this->getDataGenerator()->create_custom_field(
+        $this->data['field1cat1'] = $field1cat1;
+        $field2cat1 = $this->getDataGenerator()->create_custom_field(
                 [
-                        'name'       => 'selectfield',
-                        'shortname'  => 'sf',
-                        'type'       => 'select',
+                        'name' => 'additionaltextarea',
+                        'shortname' => 'ata',
+                        'type' => 'textarea',
                         'categoryid' => $customcat1->get('id'),
                         'configdata' => [
-                                'visibility'   => 1,
+                                'visibility' => 1,
+                                'defaultvalue' => 'emptytext',
+                        ],
+                ]);
+        $this->data['field2cat1'] = $field2cat1;
+        $field3cat1 = $this->getDataGenerator()->create_custom_field(
+                [
+                        'name' => 'checkboxfield',
+                        'shortname' => 'cf',
+                        'type' => 'checkbox',
+                        'categoryid' => $customcat1->get('id'),
+                        'configdata' => [
+                                'visibility' => 2,
+                                'defaultvalue' => 0,
+                        ],
+                ]);
+        $this->data['field3cat1'] = $field3cat1;
+        $field4cat1 = $this->getDataGenerator()->create_custom_field(
+                [
+                        'name' => 'dateofsomething',
+                        'shortname' => 'dos',
+                        'type' => 'date',
+                        'categoryid' => $customcat1->get('id'),
+                        'configdata' => [
+                                'visibility' => 0,
+                            // Date does not have a default value.
+                        ],
+                ]);
+        $this->data['field4cat1'] = $field4cat1;
+        $field5cat1 = $this->getDataGenerator()->create_custom_field(
+                [
+                        'name' => 'selectfield',
+                        'shortname' => 'sf',
+                        'type' => 'select',
+                        'categoryid' => $customcat1->get('id'),
+                        'configdata' => [
+                                'visibility' => 1,
                                 'defaultvalue' => 'def',
-                                'options'      => "abc\r\ndef\r\nghi",
-                        ]
+                                'options' => "abc\r\ndef\r\nghi",
+                        ],
                 ]);
         $this->data['field5cat1'] = $field5cat1;
-        $field1cat2               = $this->getDataGenerator()->create_custom_field(
+        $field1cat2 = $this->getDataGenerator()->create_custom_field(
                 [
-                        'name'       => 'dateofanotherthing',
-                        'shortname'  => 'doat',
-                        'type'       => 'date',
+                        'name' => 'dateofanotherthing',
+                        'shortname' => 'doat',
+                        'type' => 'date',
                         'categoryid' => $customcat2->get('id'),
                         'configdata' => [
                                 'visibility' => 2,
-                        ]
+                        ],
                 ]);
         $this->data['field1cat2'] = $field1cat2;
 
-        $handler                      = \core_course\customfield\course_handler::create();
-        $data                         = new \stdClass();
-        $data->id                     = $course->id;
-        $data->customfield_sem        = 'WS';
+        $handler = \core_course\customfield\course_handler::create();
+        $data = new \stdClass();
+        $data->id = $course->id;
+        $data->customfield_sem = 'WS';
         $data->customfield_ata_editor = [
-                'text'   => '<p dir="ltr" style="text-align:left;">' .
-                            'Textarea <a href="localhost">with</a> <img src="@@PLUGINFILE@@">a lots of text...</p>',
+                'text' => '<p dir="ltr" style="text-align:left;">' .
+                        'Textarea <a href="localhost">with</a> <img src="@@PLUGINFILE@@">a lots of text...</p>',
                 'format' => '1',
                 'itemid' => 0,
         ];
-        $data->customfield_cf         = 1;
-        $data->customfield_dos        = 1657152000;
-        $data->customfield_doat       = 1671840000;
-        $data->customfield_sf         = 3; // Should be ghi.
+        $data->customfield_cf = 1;
+        $data->customfield_dos = 1657152000;
+        $data->customfield_doat = 1671840000;
+        $data->customfield_sf = 3; // Should be ghi.
         $handler->instance_form_save($data);
-        $data                  = new \stdClass();
-        $data->id              = $course2->id;
+        $data = new \stdClass();
+        $data->id = $course2->id;
         $data->customfield_sem = 'SS';
         $handler->instance_form_save($data);
     }
@@ -190,15 +190,15 @@ class coursecustomfield_test extends \advanced_testcase {
      */
     public function test_get_course_customfields_with_applied_config() {
         $courseid = $this->data['course1']->id;
-        $data     = $this->data;
+        $data = $this->data;
 
         $everyone = \core_course\customfield\course_handler::VISIBLETOALL;
         $teachers = \core_course\customfield\course_handler::VISIBLETOTEACHERS;
-        $nobody   = \core_course\customfield\course_handler::NOTVISIBLE;
+        $nobody = \core_course\customfield\course_handler::NOTVISIBLE;
 
         $field2cat1 = $data['cat1']->get('id') . ':' . $data['field2cat1']->get('id');
         $field4cat1 = $data['cat1']->get('id') . ':' . $data['field4cat1']->get('id');
-        $ignore     = $field2cat1 . ',' . $field4cat1;
+        $ignore = $field2cat1 . ',' . $field4cat1;
 
         // Test 1.
         $this->set_settings_for_test($courseid, 0, $nobody, '');
@@ -287,10 +287,10 @@ class coursecustomfield_test extends \advanced_testcase {
     /**
      * Helper to prevent code duplication.
      *
-     * @param int    $courseid   Moodle courseid
-     * @param int    $enable     Checkbox value, 1 or 0
-     * @param int    $visibility Visibility as defined for customfields
-     * @param string $ignored    Setting of ignored customfields Format catid:fieldid, ...
+     * @param int $courseid Moodle courseid
+     * @param int $enable Checkbox value, 1 or 0
+     * @param int $visibility Visibility as defined for customfields
+     * @param string $ignored Setting of ignored customfields Format catid:fieldid, ...
      * @return void
      * @throws \dml_exception
      */

@@ -27,13 +27,13 @@
  * Hook for link in coursenode
  *
  * @param navigation_node $parentnode
- * @param stdClass        $course
- * @param context_course  $context
+ * @param stdClass $course
+ * @param context_course $context
  * @throws coding_exception
  * @throws moodle_exception
  */
 function local_oer_extend_navigation_course(navigation_node $parentnode, stdClass $course,
-                                            context_course  $context) {
+        context_course $context) {
     $capabilities = [
             'local/oer:viewitems',
     ];
@@ -41,7 +41,7 @@ function local_oer_extend_navigation_course(navigation_node $parentnode, stdClas
         // Ignore frontpage course.
         return;
     }
-    $url  = new moodle_url('/local/oer/views/main.php', ['id' => $course->id]);
+    $url = new moodle_url('/local/oer/views/main.php', ['id' => $course->id]);
     $node = navigation_node::create(
             get_string('oer_link', 'local_oer'),
             $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/upload', ''));
@@ -61,7 +61,7 @@ function local_oer_extend_navigation(global_navigation $navigation) {
     if (has_capability('local/oer:viewitems', $context)) {
         $coursenode = $navigation->find($PAGE->course->id, navigation_node::TYPE_COURSE);
         $beforenode = $coursenode->find('localboostnavigationcoursesections', global_navigation::TYPE_UNKNOWN);
-        $beforekey  = $beforenode ? $beforenode->key : null;
+        $beforekey = $beforenode ? $beforenode->key : null;
         $coursenode->add_node(
                 navigation_node::create(
                         get_string('oer_link', 'local_oer'),
@@ -90,13 +90,13 @@ function local_oer_extend_navigation(global_navigation $navigation) {
  */
 function local_oer_output_fragment_formdata(array $args): string {
     if (!isset($args['courseid'])
-        || !isset($args['formtype'])) {
+            || !isset($args['formtype'])) {
         return 'wrong arguments given';
     }
 
     $courseid = clean_param($args['courseid'], PARAM_INT);
     $formtype = clean_param($args['formtype'], PARAM_ALPHA);
-    $context  = context_course::instance($courseid);
+    $context = context_course::instance($courseid);
     require_capability('local/oer:edititems', $context);
     $fromform = [];
 
@@ -108,7 +108,7 @@ function local_oer_output_fragment_formdata(array $args): string {
             if (!isset($args['params'])) {
                 return 'form data missing.';
             }
-            $mform    = new \local_oer\forms\courseinfo_form(null, ['courseid' => $courseid]);
+            $mform = new \local_oer\forms\courseinfo_form(null, ['courseid' => $courseid]);
             $formdata = json_decode($args['params']);
             parse_str($formdata->settings, $fromform);
             $mform->set_data($fromform);
@@ -123,9 +123,9 @@ function local_oer_output_fragment_formdata(array $args): string {
             if (!isset($args['params'])) {
                 return 'additional parameters missing.';
             }
-            $params      = json_decode($args['params']);
+            $params = json_decode($args['params']);
             $contenthash = clean_param($params->contenthash, PARAM_ALPHANUM);
-            $form        = new \local_oer\forms\fileinfo_form(null, ['courseid' => $courseid, 'contenthash' => $contenthash]);
+            $form = new \local_oer\forms\fileinfo_form(null, ['courseid' => $courseid, 'contenthash' => $contenthash]);
             return $form->render();
         case 'FileinfoFormSave':
             if (!isset($args['params'])) {
@@ -134,7 +134,7 @@ function local_oer_output_fragment_formdata(array $args): string {
             $params = json_decode($args['params']);
             parse_str($params->settings, $fromform);
             $contenthash = clean_param($fromform['contenthash'], PARAM_ALPHANUM);
-            $mform       = new \local_oer\forms\fileinfo_form(null, ['courseid' => $courseid, 'contenthash' => $contenthash]);
+            $mform = new \local_oer\forms\fileinfo_form(null, ['courseid' => $courseid, 'contenthash' => $contenthash]);
             if (isset($params->preference) && $params->preference == 'reset') {
                 \local_oer\forms\fileinfo_form::reset_form_data_to_preference_values($fromform);
             }
@@ -154,7 +154,7 @@ function local_oer_output_fragment_formdata(array $args): string {
                 return 'form data missing.';
             }
             $params = json_decode($args['params']);
-            $mform  = new \local_oer\forms\preference_form(null, ['courseid' => $courseid]);
+            $mform = new \local_oer\forms\preference_form(null, ['courseid' => $courseid]);
             parse_str($params->settings, $fromform);
             $mform->set_data($fromform);
             $errors = $mform->validation($fromform, []);
@@ -165,17 +165,19 @@ function local_oer_output_fragment_formdata(array $args): string {
             $mform->update_metadata($fromform);
             return '{"saved":"true"}';
         case 'CourseToFileForm':
-            $params      = json_decode($args['params']);
+            $params = json_decode($args['params']);
             $contenthash = clean_param($params->contenthash, PARAM_ALPHANUM);
-            $form        = new \local_oer\forms\coursetofile_form(null, ['contenthash' => $contenthash, 'courseid' => $courseid]);
+            $form = new \local_oer\forms\coursetofile_form(null, ['contenthash' => $contenthash, 'courseid' => $courseid]);
             return $form->render();
         case 'CourseToFileFormSave':
             if (!isset($args['params'])) {
                 return 'form data missing.';
             }
             $params = json_decode($args['params']);
-            $mform  = new \local_oer\forms\coursetofile_form(null, ['contenthash' => $params->contenthash,
-                                                                    'courseid'    => $courseid]);
+            $mform = new \local_oer\forms\coursetofile_form(null, [
+                    'contenthash' => $params->contenthash,
+                    'courseid' => $courseid,
+            ]);
             parse_str($params->settings, $fromform);
             $mform->set_data($fromform);
             $errors = $mform->validation($fromform, []);
@@ -204,16 +206,16 @@ function local_oer_output_fragment_personform(array $args): string {
 /**
  * Serve public available oer files
  *
- * @param stdClass $course        the course object
- * @param stdClass $cm            the course module object
- * @param stdClass $context       the context
- * @param string   $filearea      the name of the file area
- * @param array    $args          extra arguments (itemid, path)
- * @param bool     $forcedownload whether or not force download
- * @param array    $options       additional options affecting the file serving
+ * @param stdClass $course the course object
+ * @param stdClass $cm the course module object
+ * @param stdClass $context the context
+ * @param string $filearea the name of the file area
+ * @param array $args extra arguments (itemid, path)
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
  * @return bool false if the file not found, just send the file otherwise and do not return anything
  */
-function local_oer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function local_oer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     if (get_config('local_oer', 'pullservice') != 1) {
         throw new \moodle_exception('Webservice to show public accessible OER Files is not activated on this system.');
     }
@@ -225,7 +227,7 @@ function local_oer_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
     global $DB;
     if ($DB->record_exists('local_oer_snapshot', ['id' => $fileid])) {
         $fileinfo = $DB->get_record('local_oer_snapshot', ['id' => $fileid]);
-        $file     = \local_oer\filelist::get_single_file($fileinfo->courseid, $fileinfo->contenthash);
+        $file = \local_oer\filelist::get_single_file($fileinfo->courseid, $fileinfo->contenthash);
         send_stored_file($file[0]['file']);
     }
     throw new \moodle_exception('File not found.');

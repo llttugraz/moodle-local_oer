@@ -47,22 +47,22 @@ class logger {
     /**
      * Add log entry
      *
-     * @param int    $courseid  Moodle courseid
-     * @param string $type      Type of message (error / success)
-     * @param string $message   The message to log
+     * @param int $courseid Moodle courseid
+     * @param string $type Type of message (error / success)
+     * @param string $message The message to log
      * @param string $component Which component called the logger, frankenstyle of plugin or subplugin
      * @return void
      * @throws \dml_exception
      */
-    public static function add(int    $courseid, string $type = self::LOGSUCCESS, string $message = '',
-                               string $component = 'local_oer') {
+    public static function add(int $courseid, string $type = self::LOGSUCCESS, string $message = '',
+            string $component = 'local_oer') {
         global $DB, $USER;
-        $msg               = new \stdClass();
-        $msg->courseid     = $courseid;
-        $msg->type         = $type;
-        $msg->message      = $message;
-        $msg->component    = $component;
-        $msg->timecreated  = time();
+        $msg = new \stdClass();
+        $msg->courseid = $courseid;
+        $msg->type = $type;
+        $msg->message = $message;
+        $msg->component = $component;
+        $msg->timecreated = time();
         $msg->timemodified = time();
         $msg->usermodified = $USER->id;
 

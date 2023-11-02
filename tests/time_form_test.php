@@ -50,7 +50,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '16.09;17.02;31.12;29.03;15.08'
+                time_settings::CONF_CUSTOMDATES => '16.09;17.02;31.12;29.03;15.08',
         ];
 
         $this->assertEmpty($mform->validation($fromform, []));
@@ -59,7 +59,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '32.01'
+                time_settings::CONF_CUSTOMDATES => '32.01',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -68,7 +68,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '15.00'
+                time_settings::CONF_CUSTOMDATES => '15.00',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -77,7 +77,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '00.01'
+                time_settings::CONF_CUSTOMDATES => '00.01',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -86,7 +86,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '16.08,17.09'
+                time_settings::CONF_CUSTOMDATES => '16.08,17.09',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -95,7 +95,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '16.08;17.09;'
+                time_settings::CONF_CUSTOMDATES => '16.08;17.09;',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -104,7 +104,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => ''
+                time_settings::CONF_CUSTOMDATES => '',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -113,7 +113,7 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => 'aa.bb;cc.dd'
+                time_settings::CONF_CUSTOMDATES => 'aa.bb;cc.dd',
         ];
 
         $result = $mform->validation($fromform, []);
@@ -122,14 +122,14 @@ class time_form_test extends \advanced_testcase {
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '28.02'
+                time_settings::CONF_CUSTOMDATES => '28.02',
         ];
 
         $this->assertEmpty($mform->validation($fromform, []));
 
         $fromform = [
                 time_settings::CONF_RELEASETIME => time_settings::CUSTOM,
-                time_settings::CONF_CUSTOMDATES => '29.02'
+                time_settings::CONF_CUSTOMDATES => '29.02',
         ];
 
         $result = $mform->validation($fromform, []);

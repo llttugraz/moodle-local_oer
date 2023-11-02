@@ -425,17 +425,21 @@ const showPersons = () => {
                 name: decodeURI(localizedrole + ': ' + person.firstname + ' ' + person.lastname)
             });
         });
-        Templates.render('local_oer/persons', persons)
-            .then(function(html, js) {
-                Templates.replaceNodeContents('#local_oer_storedperson_tagarea', html, js);
-                return; // For eslint.
-            }).fail(function(e) {
-                window.console.log(e);
-            }
-        );
+        renderPersonsTemplate(persons);
         return; // For eslint.
     }).fail(function(e) {
             window.console.debug(e);
+        }
+    );
+};
+
+const renderPersonsTemplate = (persons) => {
+    Templates.render('local_oer/persons', persons)
+        .then(function(html, js) {
+            Templates.replaceNodeContents('#local_oer_storedperson_tagarea', html, js);
+            return; // For eslint.
+        }).fail(function(e) {
+            window.console.log(e);
         }
     );
 };

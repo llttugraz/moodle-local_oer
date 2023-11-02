@@ -89,7 +89,7 @@ class filestate {
         // Step 2: Extract courseids from contexts.
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            list(, $course, $cm) = get_context_info_array($contextid);
+            [, $course, $cm] = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id' => $course->id,
                     'name' => format_string($course->fullname),
@@ -176,7 +176,7 @@ class filestate {
             $simplemetadata = [
                     [
                             'name' => get_string('title', 'local_oer'),
-                            'value' => $data->title
+                            'value' => $data->title,
                     ],
                     [
                             'name' => get_string('description', 'local_oer'),
@@ -187,19 +187,19 @@ class filestate {
                     ],
                     [
                             'name' => get_string('context', 'local_oer'),
-                            'value' => $context[$data->context]
+                            'value' => $context[$data->context],
                     ],
                     [
                             'name' => get_string('license', 'local_oer'),
-                            'value' => license::get_license_fullname($data->license)
+                            'value' => license::get_license_fullname($data->license),
                     ],
                     [
                             'name' => get_string('language', 'local_oer'),
-                            'value' => $data->language
+                            'value' => $data->language,
                     ],
                     [
                             'name' => get_string('resourcetype', 'local_oer'),
-                            'value' => $resources[$data->resourcetype]
+                            'value' => $resources[$data->resourcetype],
                     ],
             ];
             $tags = explode(',', $data->tags);
@@ -216,7 +216,7 @@ class filestate {
             $classlist = [];
             foreach ($classification as $type => $entries) {
                 $frankenstyle = 'oerclassification_' . $type;
-                list($url, $classdata) = fileinfo_form::load_classification_plugin_values($type);
+                [$url, $classdata] = fileinfo_form::load_classification_plugin_values($type);
                 $values = [];
                 foreach ($entries as $entry) {
                     $values[] = [

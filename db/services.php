@@ -26,20 +26,20 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'local_oer_get_files'              => [
-            'classname'     => 'local_oer\\services\\get_files',
-            'methodname'    => 'service',
-            'description'   => 'Get basic metadata of oer files of a course.',
-            'type'          => 'read',
-            'ajax'          => true,
-            'loginrequired' => true,
-    ],
-    'local_oer_get_file'              => [
-            'classname'     => 'local_oer\\services\\get_file',
-            'methodname'    => 'service',
-            'description'   => 'Get basic metadata of one oer file of a course.',
-            'type'          => 'read',
-            'ajax'          => true,
-            'loginrequired' => true,
-    ]
+        'local_oer_get_files' => [
+                'classname' => 'local_oer\\services\\get_files',
+                'methodname' => 'service',
+                'description' => 'Get basic metadata of oer files of a course.',
+                'type' => 'read',
+                'ajax' => true,
+                'loginrequired' => true,
+        ],
+        'local_oer_get_file' => [
+                'classname' => 'local_oer\\services\\get_file',
+                'methodname' => 'service',
+                'description' => 'Get basic metadata of one oer file of a course.',
+                'type' => 'read',
+                'ajax' => true,
+                'loginrequired' => true,
+        ],
 ];

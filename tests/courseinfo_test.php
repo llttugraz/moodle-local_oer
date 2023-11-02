@@ -47,7 +47,7 @@ class courseinfo_test extends \advanced_testcase {
      */
     public function setUp(): void {
         $this->resetAfterTest();
-        $course         = $this->getDataGenerator()->create_course();
+        $course = $this->getDataGenerator()->create_course();
         $this->courseid = $course->id;
     }
 
@@ -133,18 +133,18 @@ class courseinfo_test extends \advanced_testcase {
         $metadata = courseinfo::get_default_metadata_object($this->courseid);
         $DB->insert_record('local_oer_courseinfo', $metadata);
         $this->assertEquals(1, count($courseinfo->load_metadata_from_database($this->courseid)));
-        $metadata             = courseinfo::get_default_metadata_object($this->courseid);
+        $metadata = courseinfo::get_default_metadata_object($this->courseid);
         $metadata->coursecode = 'secondcourse';
         $DB->insert_record('local_oer_courseinfo', $metadata);
         $this->assertEquals(2, count($courseinfo->load_metadata_from_database($this->courseid)));
-        $json                   = [
+        $json = [
                 'a' => 'test',
-                'b' => 'aaaa'
+                'b' => 'aaaa',
         ];
         $metadata->customfields = json_encode($json);
-        $id                     = $DB->get_field('local_oer_courseinfo', 'id',
-                                                 ['courseid' => $this->courseid, 'coursecode' => $metadata->coursecode]);
-        $metadata->id           = $id;
+        $id = $DB->get_field('local_oer_courseinfo', 'id',
+                ['courseid' => $this->courseid, 'coursecode' => $metadata->coursecode]);
+        $metadata->id = $id;
         $DB->update_record('local_oer_courseinfo', $metadata);
         $courses = $courseinfo->load_metadata_from_database($this->courseid);
         $this->assertTrue(is_array(end($courses)->customfields));
@@ -160,22 +160,24 @@ class courseinfo_test extends \advanced_testcase {
      * @covers ::generate_metadata
      */
     public function test_generate_metadata() {
-        $customcat1            = $this->getDataGenerator()->create_custom_field_category(['name' => 'unittest category 1']);
-        $customcat2            = $this->getDataGenerator()->create_custom_field_category(['name' => 'category 2 for unittest']);
-        $field1                = $this->getDataGenerator()->create_custom_field(['name'       => 'semester', 'shortname' => 'sem',
-                                                                                 'type'       => 'text',
-                                                                                 'categoryid' => $customcat1->get('id')]);
-        $handler               = \core_course\customfield\course_handler::create();
-        $data                  = new \stdClass();
-        $data->id              = $this->courseid;
+        $customcat1 = $this->getDataGenerator()->create_custom_field_category(['name' => 'unittest category 1']);
+        $customcat2 = $this->getDataGenerator()->create_custom_field_category(['name' => 'category 2 for unittest']);
+        $field1 = $this->getDataGenerator()->create_custom_field([
+                'name' => 'semester', 'shortname' => 'sem',
+                'type' => 'text',
+                'categoryid' => $customcat1->get('id'),
+        ]);
+        $handler = \core_course\customfield\course_handler::create();
+        $data = new \stdClass();
+        $data->id = $this->courseid;
         $data->customfield_sem = 'WS';
         $handler->instance_form_save($data);
 
         set_config('coursecustomfields', 0, 'local_oer');
         $editingteacher1 = $this->getDataGenerator()->create_user();
         $editingteacher2 = $this->getDataGenerator()->create_user();
-        $teacher1        = $this->getDataGenerator()->create_user();
-        $student1        = $this->getDataGenerator()->create_user();
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($editingteacher1->id, $this->courseid, 'editingteacher');
         $this->getDataGenerator()->enrol_user($editingteacher2->id, $this->courseid, 'editingteacher');
         $this->getDataGenerator()->enrol_user($teacher1->id, $this->courseid, 'teacher');
@@ -183,9 +185,9 @@ class courseinfo_test extends \advanced_testcase {
 
         // Test 1: get basic metadata of course without customfields (setting is disabled).
         $courseinfo = new courseinfo();
-        $courses    = $courseinfo->generate_metadata($this->courseid);
+        $courses = $courseinfo->generate_metadata($this->courseid);
         $this->assertCount(1, $courses);
-        $course  = reset($courses);
+        $course = reset($courses);
         $mcourse = get_course($this->courseid);
         $this->assertEquals('moodlecourse-' . $this->courseid, $course->coursecode);
         $this->assertEquals($mcourse->fullname, $course->coursename);
@@ -198,28 +200,28 @@ class courseinfo_test extends \advanced_testcase {
         // Test 2: add customfields
         // Only a basic test, settings are tested in coursecustomfield tests.
         set_config('coursecustomfields', 1, 'local_oer');
-        $courses  = $courseinfo->generate_metadata($this->courseid);
-        $course   = reset($courses);
+        $courses = $courseinfo->generate_metadata($this->courseid);
+        $course = reset($courses);
         $expected = [
                 [
-                        'id'     => (int) $customcat1->get('id'),
-                        'name'   => $customcat1->get('name'),
+                        'id' => (int) $customcat1->get('id'),
+                        'name' => $customcat1->get('name'),
                         'fields' => [
                                 [
-                                        'id'         => (int) $field1->get('id'),
-                                        'shortname'  => $field1->get('shortname'),
-                                        'fullname'   => $field1->get('name'),
-                                        'type'       => $field1->get('type'),
+                                        'id' => (int) $field1->get('id'),
+                                        'shortname' => $field1->get('shortname'),
+                                        'fullname' => $field1->get('name'),
+                                        'type' => $field1->get('type'),
                                         'visibility' => $field1->get('configdata')['visibility'],
-                                        'data'       => "WS"
-                                ]
+                                        'data' => "WS",
+                                ],
                         ],
                 ],
                 [
-                        'id'     => (int) $customcat2->get('id'),
-                        'name'   => $customcat2->get('name'),
+                        'id' => (int) $customcat2->get('id'),
+                        'name' => $customcat2->get('name'),
                         'fields' => [],
-                ]
+                ],
         ];
         $this->assertEquals($expected, $course->customfields);
     }
@@ -232,36 +234,36 @@ class courseinfo_test extends \advanced_testcase {
      * @covers ::simple_html_to_text_reduction
      */
     public function test_simple_html_to_text_reduction() {
-        $anchor   = '<a href="https://irunaunittest.test">this text is lost</a>';
+        $anchor = '<a href="https://irunaunittest.test">this text is lost</a>';
         $expected = "https://irunaunittest.test";
-        $result   = courseinfo::simple_html_to_text_reduction($anchor);
+        $result = courseinfo::simple_html_to_text_reduction($anchor);
         $this->assertEquals($expected, $result);
-        $text     = "<h1>Hello there</h1>" .
-                    "<h3>Testtext</h3>" .
-                    "<p></p>" .
-                    "<p>" .
-                    "<ol>" .
-                    "<li>abc</li>" .
-                    "<li>def</li>" .
-                    "<li>ghi</li>" .
-                    "<li>uvw</li>" .
-                    "<li>xyz</li>" .
-                    "</ol>" .
-                    $anchor .
-                    $anchor .
-                    "</p>" . // Linebreak \r\n will be removed by trim.
-                    '<img src="abcdef" alt="abc">';
-        $result   = courseinfo::simple_html_to_text_reduction($text);
+        $text = "<h1>Hello there</h1>" .
+                "<h3>Testtext</h3>" .
+                "<p></p>" .
+                "<p>" .
+                "<ol>" .
+                "<li>abc</li>" .
+                "<li>def</li>" .
+                "<li>ghi</li>" .
+                "<li>uvw</li>" .
+                "<li>xyz</li>" .
+                "</ol>" .
+                $anchor .
+                $anchor .
+                "</p>" . // Linebreak \r\n will be removed by trim.
+                '<img src="abcdef" alt="abc">';
+        $result = courseinfo::simple_html_to_text_reduction($text);
         $expected = "Hello there\r\n" .
-                    "Testtext\r\n" .
-                    "\r\n" .
-                    "* abc\r\n" .
-                    "* def\r\n" .
-                    "* ghi\r\n" .
-                    "* uvw\r\n" .
-                    "* xyz\r\n" .
-                    "\r\n" .
-                    "https://irunaunittest.test https://irunaunittest.test";
+                "Testtext\r\n" .
+                "\r\n" .
+                "* abc\r\n" .
+                "* def\r\n" .
+                "* ghi\r\n" .
+                "* uvw\r\n" .
+                "* xyz\r\n" .
+                "\r\n" .
+                "https://irunaunittest.test https://irunaunittest.test";
         $this->assertEquals($expected, $result);
     }
 }

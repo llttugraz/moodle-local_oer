@@ -62,7 +62,7 @@ class requirement_test extends \advanced_testcase {
                 '',
                 0
         );
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertArrayHasKey('title', $reqarray);
         $this->assertArrayHasKey('license', $reqarray);
         $this->assertArrayHasKey('persons', $reqarray);
@@ -71,16 +71,16 @@ class requirement_test extends \advanced_testcase {
         $this->assertFalse($releasable);
         $this->assertFalse($release);
         $metadata->state = 1;
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}]}';
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context');
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertCount(5, $reqarray);
         $this->assertArrayHasKey('context', $reqarray);
         $this->assertArrayHasKey('description', $reqarray);
@@ -88,39 +88,39 @@ class requirement_test extends \advanced_testcase {
         $this->assertFalse($releasable);
         $this->assertFalse($release);
         $metadata->description = 'abc';
-        $metadata->context     = 1;
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        $metadata->context = 1;
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context,tags,language,resourcetype');
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertArrayHasKey('tags', $reqarray);
         $this->assertArrayHasKey('language', $reqarray);
         $this->assertCount(8, $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
 
-        $metadata->tags         = 'abc,cde';
-        $metadata->language     = 'de';
+        $metadata->tags = 'abc,cde';
+        $metadata->language = 'de';
         $metadata->resourcetype = 5;
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context,tags,language,resourcetype,oerclassification_oefos');
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertArrayHasKey('oerclassification_oefos', $reqarray);
         $this->assertCount(9, $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
         $metadata->classification = '{"oefos":["101001","101027"]}';
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         $metadata->license = 'unknown';
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
     }
@@ -142,36 +142,36 @@ class requirement_test extends \advanced_testcase {
      * @param string $description
      * @param string $license
      * @param string $persons
-     * @param int    $context
+     * @param int $context
      * @param string $tags
      * @param string $language
-     * @param int    $resourcetype
+     * @param int $resourcetype
      * @param string $oefos
-     * @param int    $state
+     * @param int $state
      * @return \stdClass
      */
     private static function get_metadata(string $title,
-                                         string $description,
-                                         string $license,
-                                         string $persons,
-                                         int    $context,
-                                         string $tags,
-                                         string $language,
-                                         int    $resourcetype,
-                                         string $oefos,
-                                         int    $state
+            string $description,
+            string $license,
+            string $persons,
+            int $context,
+            string $tags,
+            string $language,
+            int $resourcetype,
+            string $oefos,
+            int $state
     ) {
-        $metadata                 = new \stdClass();
-        $metadata->title          = $title;
-        $metadata->description    = $description;
-        $metadata->license        = $license;
-        $metadata->persons        = $persons;
-        $metadata->context        = $context;
-        $metadata->tags           = $tags;
-        $metadata->language       = $language;
-        $metadata->resourcetype   = $resourcetype;
+        $metadata = new \stdClass();
+        $metadata->title = $title;
+        $metadata->description = $description;
+        $metadata->license = $license;
+        $metadata->persons = $persons;
+        $metadata->context = $context;
+        $metadata->tags = $tags;
+        $metadata->language = $language;
+        $metadata->resourcetype = $resourcetype;
         $metadata->classification = $oefos;
-        $metadata->state          = $state;
+        $metadata->state = $state;
         return $metadata;
     }
 
@@ -218,25 +218,25 @@ class requirement_test extends \advanced_testcase {
         $this->setAdminUser();
         // To load settings.php some admin values have to be prepared.
         require_once($CFG->libdir . '/adminlib.php');
-        $ADMIN         = \admin_get_root();
+        $ADMIN = \admin_get_root();
         $hassiteconfig = false;
         require_once(__DIR__ . '/../settings.php');
         // The generated files does not have all fields set, so the reset function has to reset them.
         static::set_config('description,context,tags,language,resourcetype,oerclassification_oefos');
 
         $testcourse = new testcourse();
-        $course1    = $testcourse->generate_testcourse($this->getDataGenerator());
-        $course2    = $testcourse->generate_testcourse($this->getDataGenerator());
-        $teacher11  = $this->getDataGenerator()->create_user();
-        $teacher21  = $this->getDataGenerator()->create_user();
-        $teacher31  = $this->getDataGenerator()->create_user();
-        $teacher41  = $this->getDataGenerator()->create_user();
-        $teacher12  = $this->getDataGenerator()->create_user();
-        $teacher22  = $this->getDataGenerator()->create_user();
-        $teacher32  = $this->getDataGenerator()->create_user();
-        $teacher42  = $this->getDataGenerator()->create_user();
-        $student11  = $this->getDataGenerator()->create_user();
-        $student12  = $this->getDataGenerator()->create_user();
+        $course1 = $testcourse->generate_testcourse($this->getDataGenerator());
+        $course2 = $testcourse->generate_testcourse($this->getDataGenerator());
+        $teacher11 = $this->getDataGenerator()->create_user();
+        $teacher21 = $this->getDataGenerator()->create_user();
+        $teacher31 = $this->getDataGenerator()->create_user();
+        $teacher41 = $this->getDataGenerator()->create_user();
+        $teacher12 = $this->getDataGenerator()->create_user();
+        $teacher22 = $this->getDataGenerator()->create_user();
+        $teacher32 = $this->getDataGenerator()->create_user();
+        $teacher42 = $this->getDataGenerator()->create_user();
+        $student11 = $this->getDataGenerator()->create_user();
+        $student12 = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($teacher11->id, $course1->id, 'editingteacher');
         $this->getDataGenerator()->enrol_user($teacher21->id, $course1->id, 'editingteacher');
         $this->getDataGenerator()->enrol_user($teacher31->id, $course1->id, 'editingteacher');
@@ -247,11 +247,11 @@ class requirement_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($teacher42->id, $course2->id, 'teacher');
         $this->getDataGenerator()->enrol_user($student11->id, $course1->id, 'student');
         $this->getDataGenerator()->enrol_user($student12->id, $course2->id, 'student');
-        $allowed               = new \stdClass();
-        $allowed->userid       = $teacher11->id;
-        $allowed->type         = userlist::TYPE_A;
+        $allowed = new \stdClass();
+        $allowed->userid = $teacher11->id;
+        $allowed->type = userlist::TYPE_A;
         $allowed->usermodified = 2;
-        $allowed->timecreated  = time();
+        $allowed->timecreated = time();
         $allowed->timemodified = time();
         $DB->insert_record('local_oer_userlist', $allowed);
         $allowed->userid = $teacher22->id;

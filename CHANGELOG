@@ -1,0 +1,7 @@
+2023-11-02
+* add CHANGELOG
+* add CI support for Moodle 4.3 and PHP 8.2
+* remove CI support for Moodle 3.11
+
+2023-06-28
+* Release v2.2.0

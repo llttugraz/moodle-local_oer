@@ -26,10 +26,10 @@
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$type    = optional_param('type', '', PARAM_PLUGIN);
+$type = optional_param('type', '', PARAM_PLUGIN);
 $disable = optional_param('disable', '', PARAM_PLUGIN);
-$enable  = optional_param('enable', '', PARAM_PLUGIN);
-$return  = optional_param('return', 'overview', PARAM_ALPHA);
+$enable = optional_param('enable', '', PARAM_PLUGIN);
+$return = optional_param('return', 'overview', PARAM_ALPHA);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/oer/subplugins.php');
@@ -39,7 +39,7 @@ require_capability('moodle/site:config', context_system::instance());
 require_sesskey();
 
 if ($return === 'settings') {
-    $returnurl = new moodle_url('/admin/settings.php', array('section' => 'local_oer'));
+    $returnurl = new moodle_url('/admin/settings.php', ['section' => 'local_oer']);
 } else {
     $returnurl = new moodle_url('/admin/plugins.php');
 }
@@ -50,7 +50,7 @@ if (!$type) {
 
 $settingname = 'enabled' . $type . 'plugins';
 
-$enabled           = array();
+$enabled = [];
 $enabledsubplugins = get_config('local_oer', $settingname);
 if ($enabledsubplugins) {
     $enabledsubplugins = explode(',', $enabledsubplugins);

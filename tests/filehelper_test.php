@@ -82,7 +82,7 @@ class filehelper_test extends \advanced_testcase {
         $this->setAdminUser();
 
         $testcourse = new testcourse();
-        list(, $file) = $testcourse->generate_file('unittest');
+        [, $file] = $testcourse->generate_file('unittest');
         $url = filehelper::get_file_url($file);
         $this->assertIsObject($url);
         $this->assertEquals('moodle_url', get_class($url));

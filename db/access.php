@@ -27,27 +27,27 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
         'local/oer:viewitems' => [
-                'captype'      => 'read',
+                'captype' => 'read',
                 'contextlevel' => CONTEXT_COURSE,
-                'archetypes'   => [
-                        'manager'        => CAP_ALLOW,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
                 ],
         ],
         'local/oer:edititems' => [
-                'riskbitmask'  => RISK_CONFIG,
-                'captype'      => 'write',
+                'riskbitmask' => RISK_CONFIG,
+                'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
-                'archetypes'   => [
-                        'manager'        => CAP_ALLOW,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
                 ],
         ],
-        'local/oer:manage'    => [
-                'riskbitmask'  => RISK_CONFIG,
-                'captype'      => 'write',
+        'local/oer:manage' => [
+                'riskbitmask' => RISK_CONFIG,
+                'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
-                'archetypes'   => [
+                'archetypes' => [
                         'manager' => CAP_ALLOW,
                 ],
         ],

@@ -46,7 +46,7 @@ class oerclassification extends base {
      * @throws \dml_exception
      */
     public static function get_enabled_plugins() {
-        $enabledplugins = array();
+        $enabledplugins = [];
         $config = get_config('local_oer', 'enabledclassificationplugins');
         if ($config) {
             $config = explode(',', $config);
@@ -58,7 +58,7 @@ class oerclassification extends base {
             }
         }
 
-        $enabled = array();
+        $enabled = [];
         $installed = core_component::get_plugin_list('oerclassification');
         foreach ($installed as $plugin => $fulldir) {
             if (isset($enabledplugins[$plugin])) {
@@ -109,7 +109,7 @@ class oerclassification extends base {
      * @throws \moodle_exception
      */
     public static function get_manage_url() {
-        return new moodle_url('/admin/settings.php', array('section' => 'localpluginsoerclassification'));
+        return new moodle_url('/admin/settings.php', ['section' => 'localpluginsoerclassification']);
     }
 
     /**

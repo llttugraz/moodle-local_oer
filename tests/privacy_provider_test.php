@@ -27,11 +27,11 @@ namespace local_oer;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\transform;
-use \local_oer\privacy\provider;
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\writer;
-use \core_privacy\tests\provider_testcase;
-use \core_privacy\local\request\approved_userlist;
+use local_oer\privacy\provider;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\writer;
+use core_privacy\tests\provider_testcase;
+use core_privacy\local\request\approved_userlist;
 use local_oer\userlist\userlist;
 
 /**

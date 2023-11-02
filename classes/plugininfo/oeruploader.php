@@ -44,8 +44,8 @@ class oeruploader extends base {
      * @return array|null of enabled plugins $pluginname=>$pluginname, null means unknown
      */
     public static function get_enabled_plugins() {
-        $enabledplugins = array();
-        $config         = get_config('local_oer', 'enableduploaderplugins');
+        $enabledplugins = [];
+        $config = get_config('local_oer', 'enableduploaderplugins');
         if ($config) {
             $config = explode(',', $config);
             foreach ($config as $sp) {
@@ -56,7 +56,7 @@ class oeruploader extends base {
             }
         }
 
-        $enabled   = array();
+        $enabled = [];
         $installed = core_component::get_plugin_list('oeruploader');
         foreach ($installed as $plugin => $fulldir) {
             if (isset($enabledplugins[$plugin])) {
@@ -104,7 +104,7 @@ class oeruploader extends base {
      * @return moodle_url
      */
     public static function get_manage_url() {
-        return new moodle_url('/admin/settings.php', array('section' => 'localpluginsoeruploader'));
+        return new moodle_url('/admin/settings.php', ['section' => 'localpluginsoeruploader']);
     }
 
     /**
@@ -120,12 +120,12 @@ class oeruploader extends base {
      * Load the settings for a specific submodule.
      *
      * @param part_of_admin_tree $adminroot
-     * @param string             $parentnodename
-     * @param bool               $hassiteconfig
+     * @param string $parentnodename
+     * @param bool $hassiteconfig
      */
     public function load_settings(part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig) {
         global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
-        $ADMIN      = $adminroot; // May be used in settings.php.
+        $ADMIN = $adminroot; // May be used in settings.php.
         $plugininfo = $this; // Also can be used inside settings.php.
 
         if (!$this->is_installed_and_upgraded()) {
@@ -136,7 +136,7 @@ class oeruploader extends base {
             return;
         }
 
-        $section  = $this->get_settings_section_name();
+        $section = $this->get_settings_section_name();
         $settings = new admin_settingpage($section, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
         include($this->full_path('settings.php')); // This may also set $settings to null.
 

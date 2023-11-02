@@ -61,15 +61,15 @@ class get_files extends \external_api {
         return new \external_single_structure(
                 [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
-                        'context'  => new \external_value(PARAM_INT, 'Moodle course context id'),
+                        'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
                         'sections' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'sectionnum'  => new \external_value(PARAM_INT, 'Number of section in course'),
+                                                'sectionnum' => new \external_value(PARAM_INT, 'Number of section in course'),
                                                 'sectionname' => new \external_value(PARAM_TEXT, 'Name of section in course'),
                                         ])
                         ),
-                        'files'    => new \external_multiple_structure(get_file::external_file_return_value())
+                        'files' => new \external_multiple_structure(get_file::external_file_return_value()),
                 ]);
     }
 
@@ -84,13 +84,13 @@ class get_files extends \external_api {
      * @throws \moodle_exception
      */
     public static function service(int $courseid) {
-        list($files, $sections) = filelist::get_simple_filelist($courseid);
+        [$files, $sections] = filelist::get_simple_filelist($courseid);
         $context = \context_course::instance($courseid);
         return [
                 'courseid' => $courseid,
-                'context'  => $context->id,
+                'context' => $context->id,
                 'sections' => $sections,
-                'files'    => $files,
+                'files' => $files,
         ];
     }
 }

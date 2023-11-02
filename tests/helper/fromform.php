@@ -34,42 +34,42 @@ class fromform {
     /**
      * The format of the returned array is similar to the form submit from frontend.
      *
-     * @param int    $courseid
+     * @param int $courseid
      * @param string $contenthash
      * @param string $title
      * @param string $description
-     * @param int    $context
+     * @param int $context
      * @param string $license
      * @param string $language
-     * @param int    $resourcetype
-     * @param array  $persons every array entry is a JSON string with format:
+     * @param int $resourcetype
+     * @param array $persons every array entry is a JSON string with format:
      *                        {"role":"Author","firstname":"Christian","lastname":"Ortner"}
-     * @param int    $upload
-     * @param int    $ignore
-     * @param array  $tags    Tags in array format ['tag a','tag b'].
+     * @param int $upload
+     * @param int $ignore
+     * @param array $tags Tags in array format ['tag a','tag b'].
      * @return array
      * @throws \Exception
      */
     public static function fileinfoform_submit(int $courseid, string $contenthash, string $title, string $description,
-                                               int $context, string $license, string $language, int $resourcetype, array $persons,
-                                               int $upload, int $ignore, array $tags = []) {
+            int $context, string $license, string $language, int $resourcetype, array $persons,
+            int $upload, int $ignore, array $tags = []) {
         if ($upload == 1 && $ignore == 1) {
             throw new \Exception('Upload and ignore cannot be set at the same time.');
         }
-        $retval                                      = [];
-        $retval['courseid']                          = "$courseid";
-        $retval['contenthash']                       = $contenthash;
-        $retval['storedperson']                      = '{"persons":[' . implode(',', $persons) . ']}';
-        $retval['storedtags']                        = implode(',', $tags);
-        $retval['sesskey']                           = "sess" . rand(100, 100000);
+        $retval = [];
+        $retval['courseid'] = "$courseid";
+        $retval['contenthash'] = $contenthash;
+        $retval['storedperson'] = '{"persons":[' . implode(',', $persons) . ']}';
+        $retval['storedtags'] = implode(',', $tags);
+        $retval['sesskey'] = "sess" . rand(100, 100000);
         $retval['_qf_local_oer_forms_fileinfo_form'] = "1";
-        $retval['title']                             = $title;
-        $retval['description']                       = $description;
-        $retval['context']                           = "$context";
-        $retval['license']                           = $license;
-        $retval['tags']                              = '';
-        $retval['language']                          = $language;
-        $retval['resourcetype']                      = "$resourcetype";
+        $retval['title'] = $title;
+        $retval['description'] = $description;
+        $retval['context'] = "$context";
+        $retval['license'] = $license;
+        $retval['tags'] = '';
+        $retval['language'] = $language;
+        $retval['resourcetype'] = "$resourcetype";
         if ($upload == 1) {
             $retval['upload'] = "$upload";
         }

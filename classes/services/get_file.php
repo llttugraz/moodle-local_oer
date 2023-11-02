@@ -47,7 +47,7 @@ class get_file extends \external_api {
     public static function service_parameters() {
         return new \external_function_parameters(
                 [
-                        'courseid'    => new \external_value(PARAM_INT, 'Moodle course id', VALUE_REQUIRED),
+                        'courseid' => new \external_value(PARAM_INT, 'Moodle course id', VALUE_REQUIRED),
                         'contenthash' => new \external_value(PARAM_ALPHANUM, 'Moodle course id', VALUE_REQUIRED),
                 ]
         );
@@ -62,8 +62,8 @@ class get_file extends \external_api {
         return new \external_single_structure(
                 [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
-                        'context'  => new \external_value(PARAM_INT, 'Moodle course context id'),
-                        'file'     => self::external_file_return_value()
+                        'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
+                        'file' => self::external_file_return_value(),
                 ]);
     }
 
@@ -71,7 +71,7 @@ class get_file extends \external_api {
      * Ajax function to call.
      * Returns information the frontend needs to display one file.
      *
-     * @param int    $courseid
+     * @param int $courseid
      * @param string $contenthash
      * @return array
      * @throws \coding_exception
@@ -82,12 +82,12 @@ class get_file extends \external_api {
         if (empty($contenthash)) {
             throw new \moodle_exception('Contenthash cannot be empty for single file aquirement.');
         }
-        $file    = filelist::get_simple_file($courseid, $contenthash);
+        $file = filelist::get_simple_file($courseid, $contenthash);
         $context = \context_course::instance($courseid);
         return [
                 'courseid' => $courseid,
-                'context'  => $context->id,
-                'file'     => $file,
+                'context' => $context->id,
+                'file' => $file,
         ];
     }
 
@@ -101,57 +101,57 @@ class get_file extends \external_api {
     public static function external_file_return_value() {
         return new \external_single_structure(
                 [
-                        'id'              => new \external_value(PARAM_INT, 'DB id of oer file entry'),
-                        'contenthash'     => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
-                        'title'           => new \external_value(PARAM_TEXT, 'Title or filename'),
-                        'mimetype'        => new \external_value(PARAM_TEXT, 'Mimetype'),
-                        'icon'            => new \external_value(PARAM_RAW, 'File icon'),
-                        'icontype'        => new \external_value(PARAM_ALPHA, 'File icon type'),
-                        'iconisimage'     => new \external_value(PARAM_BOOL, 'Bool if icon is image'),
-                        'timemodified'    => new \external_value(PARAM_TEXT, 'Readable time'),
-                        'timeuploaded'    => new \external_value(PARAM_TEXT, 'Uploaded time'),
-                        'timeuploadedts'  => new \external_value(PARAM_INT, 'Uploaded timestamp'),
-                        'upload'          => new \external_value(PARAM_BOOL, 'File ready for upload'),
-                        'ignore'          => new \external_value(PARAM_BOOL, 'File ignored'),
-                        'deleted'         => new \external_value(PARAM_BOOL,
-                                                                 'File deleted, orphaned metadata'),
-                        'modules'         => new \external_multiple_structure(
+                        'id' => new \external_value(PARAM_INT, 'DB id of oer file entry'),
+                        'contenthash' => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
+                        'title' => new \external_value(PARAM_TEXT, 'Title or filename'),
+                        'mimetype' => new \external_value(PARAM_TEXT, 'Mimetype'),
+                        'icon' => new \external_value(PARAM_RAW, 'File icon'),
+                        'icontype' => new \external_value(PARAM_ALPHA, 'File icon type'),
+                        'iconisimage' => new \external_value(PARAM_BOOL, 'Bool if icon is image'),
+                        'timemodified' => new \external_value(PARAM_TEXT, 'Readable time'),
+                        'timeuploaded' => new \external_value(PARAM_TEXT, 'Uploaded time'),
+                        'timeuploadedts' => new \external_value(PARAM_INT, 'Uploaded timestamp'),
+                        'upload' => new \external_value(PARAM_BOOL, 'File ready for upload'),
+                        'ignore' => new \external_value(PARAM_BOOL, 'File ignored'),
+                        'deleted' => new \external_value(PARAM_BOOL,
+                                'File deleted, orphaned metadata'),
+                        'modules' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'moduleurl'  => new \external_value(PARAM_URL,
-                                                                                    'Url to moodle activity'),
+                                                'moduleurl' => new \external_value(PARAM_URL,
+                                                        'Url to moodle activity'),
                                                 'modulename' => new \external_value(PARAM_TEXT,
-                                                                                    'Name of course module'),
+                                                        'Name of course module'),
                                         ]
                                 )),
-                        'sections'        => new \external_multiple_structure(
+                        'sections' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'sectionnum'  => new \external_value(PARAM_INT,
-                                                                                     'Number of section in course'),
+                                                'sectionnum' => new \external_value(PARAM_INT,
+                                                        'Number of section in course'),
                                                 'sectionname' => new \external_value(PARAM_TEXT,
-                                                                                     'Name of section in course'),
+                                                        'Name of section in course'),
                                         ]
                                 )),
                         'requirementsmet' => new \external_value(PARAM_BOOL,
-                                                                 'Boolean if all requirements for release are fulfilled'),
-                        'state'           => new \external_value(PARAM_INT, 'State of file as defined in filestate class.'),
-                        'multiple'        => new \external_value(PARAM_BOOL, 'File is used in multiple courses'),
-                        'editor'          => new \external_value(PARAM_INT, 'Courseid where file is edited.'),
-                        'courses'         => new \external_multiple_structure(
+                                'Boolean if all requirements for release are fulfilled'),
+                        'state' => new \external_value(PARAM_INT, 'State of file as defined in filestate class.'),
+                        'multiple' => new \external_value(PARAM_BOOL, 'File is used in multiple courses'),
+                        'editor' => new \external_value(PARAM_INT, 'Courseid where file is edited.'),
+                        'courses' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'id'     => new \external_value(PARAM_INT, 'Id of course where file is used'),
-                                                'name'   => new \external_value(PARAM_TEXT,
-                                                                                'Name of course where file is used'),
+                                                'id' => new \external_value(PARAM_INT, 'Id of course where file is used'),
+                                                'name' => new \external_value(PARAM_TEXT,
+                                                        'Name of course where file is used'),
                                                 'editor' => new \external_value(PARAM_BOOL,
-                                                                                'True if the file is edited in this course'),
+                                                        'True if the file is edited in this course'),
                                         ]
                                 )
                         ),
-                        'writable'        => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
-                        'coursetofile'    => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
-                        'wwwroot'         => new \external_value(PARAM_URL, 'wwwroot of moodle'),
+                        'writable' => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
+                        'coursetofile' => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
+                        'wwwroot' => new \external_value(PARAM_URL, 'wwwroot of moodle'),
                 ]);
     }
 }

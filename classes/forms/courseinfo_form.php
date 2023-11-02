@@ -55,17 +55,17 @@ class courseinfo_form extends \moodleform {
         $moodleonly = get_config('local_oer', 'metadataaggregator') == 'no_value';
 
         $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                'text' => get_string('courseinfoformhelp', 'local_oer')
+                'text' => get_string('courseinfoformhelp', 'local_oer'),
         ]);
         $mform->addElement('html', $text);
         if (!$moodleonly) {
             $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                    'text' => get_string('courseinfoformexternhelp', 'local_oer')
+                    'text' => get_string('courseinfoformexternhelp', 'local_oer'),
             ]);
             $mform->addElement('html', $text);
         }
         $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                'text' => get_string('courseinfoformadditionalhelp', 'local_oer')
+                'text' => get_string('courseinfoformadditionalhelp', 'local_oer'),
         ]);
         $mform->addElement('html', $text);
 
@@ -236,7 +236,7 @@ class courseinfo_form extends \moodleform {
         $ignorebox = $identifier . '_ignore_' . $course->coursecode;
         $group = $name . 'group';
         $helpstring = $helpstring == '' ? $identifier : $helpstring;
-        $availablefromgroup = array();
+        $availablefromgroup = [];
         $availablefromgroup[] =& $mform->createElement($type, $name, $shownname, $additionaldata);
         $availablefromgroup[] =& $mform->createElement('checkbox', $checkbox, '', get_string('overwrite', 'local_oer'));
         $mform->addGroup($availablefromgroup, $name . 'group', $shownname, ' ', false);

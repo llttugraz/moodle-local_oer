@@ -37,20 +37,20 @@ class oer_config_link extends \admin_setting_heading {
     /**
      * Constructor
      *
-     * @param string      $name
-     * @param string      $visiblename
+     * @param string $name
+     * @param string $visiblename
      * @param \moodle_url $link
      */
     public function __construct($name, $visiblename, \moodle_url $link) {
         $this->nosave = true;
-        $this->link   = $link;
+        $this->link = $link;
         parent::__construct($name, $visiblename, '');
     }
 
     /**
      * Returns an HTML string
      *
-     * @param mixed  $data
+     * @param mixed $data
      * @param string $query
      * @return string
      */
@@ -58,9 +58,9 @@ class oer_config_link extends \admin_setting_heading {
         global $PAGE;
         $context = \context_system::instance();
         $PAGE->set_context($context);
-        $renderer   = new \plugin_renderer_base($PAGE, 'admin');
-        $data       = [
-                'url'      => $this->link,
+        $renderer = new \plugin_renderer_base($PAGE, 'admin');
+        $data = [
+                'url' => $this->link,
                 'name' => $this->visiblename,
         ];
         return $renderer->render_from_template('local_oer/configlink', $data);

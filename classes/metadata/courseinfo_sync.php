@@ -58,7 +58,7 @@ class courseinfo_sync {
             foreach ($oldcourses as $key => $oldcourse) {
                 if ($newcourse->coursecode == $oldcourse->coursecode) {
                     $found = true;
-                    list($updatecourse, $update) = $this->compare_course($oldcourse, $newcourse);
+                    [$updatecourse, $update] = $this->compare_course($oldcourse, $newcourse);
                     if ($update) {
                         $sync['update'][] = $updatecourse;
                     }
@@ -151,7 +151,7 @@ class courseinfo_sync {
         $updatecourse->timemodified = $newcourse->timemodified;
         // This check has to be made against newcourse, oldcourse may not exist yet.
         if ($newcourse->subplugin == courseinfo::BASETYPE) {
-            list($updatecourse->customfields, $updateneeded) = $this->compare_customfields($oldcourse->customfields,
+            [$updatecourse->customfields, $updateneeded] = $this->compare_customfields($oldcourse->customfields,
                     $newcourse->customfields);
         }
 

@@ -46,11 +46,11 @@ $data = [];
 
 foreach ($logs as $log) {
     $data['logs'][] = [
-            'courseid'    => $log->courseid,
-            'url'         => new moodle_url('/course/view.php', ['id' => $log->courseid]),
-            'type'        => $log->type,
-            'message'     => $log->message,
-            'component'   => $log->component,
+            'courseid' => $log->courseid,
+            'url' => new moodle_url('/course/view.php', ['id' => $log->courseid]),
+            'type' => $log->type,
+            'message' => $log->message,
+            'component' => $log->component,
             'timecreated' => $log->timecreated,
     ];
 }

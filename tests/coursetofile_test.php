@@ -52,7 +52,7 @@ class coursetofile_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
-        list($draftid, $unusedfile) = $helper->generate_file('unused', null, 'This file is not used anywhere');
+        [$draftid, $unusedfile] = $helper->generate_file('unused', null, 'This file is not used anywhere');
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (' . $unusedfile->get_contenthash() .
@@ -75,7 +75,7 @@ class coursetofile_test extends \advanced_testcase {
         $this->setAdminUser();
 
         $helper = new testcourse();
-        list($draftid, $sharedfile) = $helper->generate_file('shared', null, 'Shared file in multiple courses');
+        [$draftid, $sharedfile] = $helper->generate_file('shared', null, 'Shared file in multiple courses');
 
         // Create a course and add the file to it (with a resource module).
         $course1 = $this->getDataGenerator()->create_course();

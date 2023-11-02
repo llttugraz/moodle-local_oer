@@ -66,7 +66,7 @@ class user_selector_test extends \advanced_testcase {
         foreach ($users as $user) {
             for ($i = 1; $i <= 100; $i++) {
                 $list[] = [
-                        $user[0] . $i, $user[1] . $i, $i . $user[2], $user[3], $user[4]
+                        $user[0] . $i, $user[1] . $i, $i . $user[2], $user[3], $user[4],
                 ];
             }
         }
@@ -77,7 +77,7 @@ class user_selector_test extends \advanced_testcase {
                     [
                             'firstname' => $user[0],
                             'lastname' => $user[1],
-                            'email' => $user[2]
+                            'email' => $user[2],
                     ]
             );
             $entry->userid = $created->id;
@@ -96,7 +96,7 @@ class user_selector_test extends \advanced_testcase {
         set_config('allowedlist', 1, 'local_oer');
         $settings = [
                 'displayallowedusers' => true, // This will search users already on the allowed list.
-                'type' => userlist::TYPE_A
+                'type' => userlist::TYPE_A,
         ];
         $selector = new user_selector('unit test user selector', $settings);
         // First call the function with an empty search string.
@@ -105,7 +105,8 @@ class user_selector_test extends \advanced_testcase {
         $this->assertEquals(
                 [
                         get_string('toomanyuserstoshow', '', 200) => [],
-                        get_string('pleaseusesearch') => []],
+                        get_string('pleaseusesearch') => [],
+                ],
                 $result, 'The result 200 are the 200 users on the allowed list.');
 
         // Searchstring 'Claude', expected 100 results.
@@ -113,7 +114,8 @@ class user_selector_test extends \advanced_testcase {
         $this->assertEquals(
                 [
                         get_string('toomanyusersmatchsearch', '', ['count' => 100, 'search' => 'Claude']) => [],
-                        get_string('pleasesearchmore') => []],
+                        get_string('pleasesearchmore') => [],
+                ],
                 $result);
         $result = $selector->find_users('Fay1');
         $this->assertCount(12, $result['Authorised users']);
@@ -129,7 +131,7 @@ class user_selector_test extends \advanced_testcase {
         // Search for users to add to the allow list, here also 'Simon' can be found.
         set_config('maxusersperpage', 100);
         $settings = [
-                'type' => userlist::TYPE_A
+                'type' => userlist::TYPE_A,
         ];
         $selector = new user_selector('unit test user selector', $settings);
         $result = $selector->find_users('Simon');
@@ -142,7 +144,7 @@ class user_selector_test extends \advanced_testcase {
         set_config('allowedlist', 0, 'local_oer');
         $settings = [
                 'displayallowedusers' => true, // This will search users already on the (dis)allowed list.
-                'type' => userlist::TYPE_D
+                'type' => userlist::TYPE_D,
         ];
         $selector = new user_selector('unit test user selector', $settings);
         $result = $selector->find_users('Simon');
@@ -150,7 +152,7 @@ class user_selector_test extends \advanced_testcase {
         $result = $selector->find_users('Fay');
         $this->assertEmpty($result);
         $settings = [
-                'type' => userlist::TYPE_D
+                'type' => userlist::TYPE_D,
         ];
         $selector = new user_selector('unit test user selector', $settings);
         $result = $selector->find_users('Simon');

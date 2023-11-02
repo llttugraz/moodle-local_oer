@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = [
     // Notify user with oer edit capability that a file does not met new requirements.
-    'requirementschanged' => [
-            'capability' => 'local/oer:edititems'
-    ],
+        'requirementschanged' => [
+                'capability' => 'local/oer:edititems',
+        ],
 ];

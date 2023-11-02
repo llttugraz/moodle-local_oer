@@ -45,21 +45,21 @@ if (optional_param('create_snapshots', false, PARAM_BOOL)) {
 }
 
 $activecourses = \local_oer\helper\activecourse::get_list_of_courses(true);
-$data          = [];
+$data = [];
 foreach ($activecourses as $course) {
-    $coursename        = $DB->get_field('course', 'fullname', ['id' => $course->courseid]);
-    $snapshot          = new \local_oer\snapshot($course->courseid);
-    $files             = $snapshot->get_latest_course_snapshot();
+    $coursename = $DB->get_field('course', 'fullname', ['id' => $course->courseid]);
+    $snapshot = new \local_oer\snapshot($course->courseid);
+    $files = $snapshot->get_latest_course_snapshot();
     $data['courses'][] = [
-            'url'    => new moodle_url('/local/oer/views/main.php', ['id' => $course->courseid]),
+            'url' => new moodle_url('/local/oer/views/main.php', ['id' => $course->courseid]),
             'course' => $course->courseid . ': ' . $coursename,
-            'files'  => count($files),
-            // TODO - detailed infos about files - history etc..
+            'files' => count($files),
+        // TODO - detailed infos about files - history etc..
     ];
 }
 
 $data['releaseurl'] = $url;
-$data['isadmin']    = is_siteadmin();
+$data['isadmin'] = is_siteadmin();
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oer/releasehistory', $data);

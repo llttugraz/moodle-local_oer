@@ -144,7 +144,7 @@ class fileinfo_form extends \moodleform {
                         'enabled' => $preference !== false,
                         'saved' => $fromdb !== false,
                         'contenthash' => $course['contenthash'],
-                        'courseid' => $course['courseid']
+                        'courseid' => $course['courseid'],
                 ]);
         $mform->addElement('html', $prefhtml);
 
@@ -452,7 +452,7 @@ class fileinfo_form extends \moodleform {
             // This code is not reachable without subplugins installed.
             $frankenstyle = 'oerclassification_' . $key;
             // Load classification data and add them to form 0..n classification plugins possible.
-            list($url, $selectdata) = self::load_classification_plugin_values($key);
+            [$url, $selectdata] = self::load_classification_plugin_values($key);
             $options = [
                     'multiple' => true,
             ];

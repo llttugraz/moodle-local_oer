@@ -53,7 +53,7 @@ function xmldb_local_oer_upgrade($oldversion) {
         $table->add_field('coursesize', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
         // Adding keys to table local_oer_queue.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
         // Conditionally launch create table for local_oer_queue.
         if (!$dbman->table_exists($table)) {
@@ -77,7 +77,7 @@ function xmldb_local_oer_upgrade($oldversion) {
         $table->add_field('timeadded', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table local_oer_log.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
         // Conditionally launch create table for local_oer_log.
         if (!$dbman->table_exists($table)) {
@@ -288,12 +288,12 @@ function xmldb_local_oer_upgrade($oldversion) {
 
         foreach ($records as $record) {
             unset($record->id);
-            $record->courseid     = $record->course;
+            $record->courseid = $record->course;
             $record->timemodified = $record->timeadded;
-            $record->timecreated  = $record->timeadded;
+            $record->timecreated = $record->timeadded;
             unset($record->timeadded);
             $record->usermodified = $USER->id;
-            $record->component    = 'local_oer';
+            $record->component = 'local_oer';
             $DB->insert_record('local_oer_log', $record);
         }
 
@@ -303,7 +303,7 @@ function xmldb_local_oer_upgrade($oldversion) {
 
     if ($oldversion < 2022020200) {
         global $DB, $USER;
-        $items         = $DB->get_records('local_oer_items');
+        $items = $DB->get_records('local_oer_items');
         $resourcetypes = \local_oer\forms\fileinfo_form::lom_resource_types(false);
         foreach ($items as $record) {
             unset($record->id);
@@ -311,20 +311,20 @@ function xmldb_local_oer_upgrade($oldversion) {
             // This approach could get the wrong filename, if the same file is used more than once in system.
             $files = $DB->get_records('files', ['contenthash' => $record->contenthash]);
             if ($files) {
-                $record->title   = reset($files)->filename;
+                $record->title = reset($files)->filename;
                 $record->persons = reset($files)->author;
             } else {
-                $record->title   = 'File not found';
+                $record->title = 'File not found';
                 $record->persons = '';
             }
             // Only Higher Education used in previous version.
-            $record->context     = 1;
+            $record->context = 1;
             $record->description = '';
-            $record->role        = ucfirst($record->role);
-            $found               = false;
+            $record->role = ucfirst($record->role);
+            $found = false;
             foreach ($resourcetypes as $key => $value) {
                 if ($value == $record->resourcetype) {
-                    $found                = true;
+                    $found = true;
                     $record->resourcetype = $key;
                 }
             }
@@ -332,8 +332,8 @@ function xmldb_local_oer_upgrade($oldversion) {
                 $record->resourcetype = 0;
             }
             if (!empty($record->oefos)) {
-                $oefos                  = explode(',', $record->oefos);
-                $classification         = [
+                $oefos = explode(',', $record->oefos);
+                $classification = [
                         'oefos' => $oefos,
                 ];
                 $record->classification = json_encode($classification);
@@ -358,14 +358,14 @@ function xmldb_local_oer_upgrade($oldversion) {
         $prefs = $DB->get_records('local_oer_user_pref');
         foreach ($prefs as $record) {
             unset($record->id);
-            $record->context  = 1;
-            $record->role     = $record->role == 'nopref' ? null : ucfirst($record->role);
+            $record->context = 1;
+            $record->role = $record->role == 'nopref' ? null : ucfirst($record->role);
             $record->language = $record->language == 'nopref' ? null : $record->language;
-            $record->persons  = $record->author;
+            $record->persons = $record->author;
             unset($record->author);
             foreach ($resourcetypes as $key => $value) {
                 if ($value == $record->resourcetype) {
-                    $found                = true;
+                    $found = true;
                     $record->resourcetype = $key;
                 }
             }
@@ -373,20 +373,20 @@ function xmldb_local_oer_upgrade($oldversion) {
                 $record->resourcetype = null;
             }
             if (!empty($record->oefos)) {
-                $oefos                  = explode(',', $record->oefos);
-                $classification         = [
+                $oefos = explode(',', $record->oefos);
+                $classification = [
                         'oefos' => $oefos,
                 ];
                 $record->classification = json_encode($classification);
             } else {
                 $record->classification = null;
             }
-            $state         = $record->radio == 'ignore' ? 2 : 0;
-            $state         = $record->radio == 'upload' ? 1 : $state;
-            $state         = $record->radio == 'nopref' ? null : $state;
+            $state = $record->radio == 'ignore' ? 2 : 0;
+            $state = $record->radio == 'upload' ? 1 : $state;
+            $state = $record->radio == 'nopref' ? null : $state;
             $record->state = $state;
             unset($record->radio);
-            $record->timecreated  = $record->modified_at;
+            $record->timecreated = $record->modified_at;
             $record->timemodified = $record->modified_at;
             unset($record->modified_at);
             $record->usermodified = $record->modified_by;
@@ -469,10 +469,10 @@ function xmldb_local_oer_upgrade($oldversion) {
         // Add courses that already have file metadata to active courses.
         $files = $DB->get_records('local_oer_files');
         foreach ($files as $file) {
-            $active               = new stdClass();
-            $active->courseid     = $file->courseid;
+            $active = new stdClass();
+            $active->courseid = $file->courseid;
             $active->usermodified = 2;
-            $active->timecreated  = time();
+            $active->timecreated = time();
             $active->timemodified = time();
             if (!$DB->record_exists('local_oer_activecourses', ['courseid' => $active->courseid])) {
                 $DB->insert_record('local_oer_activecourses', $active);
@@ -522,7 +522,7 @@ function xmldb_local_oer_upgrade($oldversion) {
     if ($oldversion < 2022030701) {
 
         // Define field coursemetadata, additionaldata and releasehash to be added to local_oer_snapshot.
-        $table  = new xmldb_table('local_oer_snapshot');
+        $table = new xmldb_table('local_oer_snapshot');
         $field1 = new xmldb_field('coursemetadata', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'classification');
         $field2 = new xmldb_field('additionaldata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'coursemetadata');
         $field3 = new xmldb_field('releasehash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null, 'additionaldata');
@@ -723,14 +723,14 @@ function xmldb_local_oer_upgrade($oldversion) {
  * @return string
  */
 function xmldb_local_oer_prepare_persons(?string $role, string $persons): string {
-    $role            = $role ?? 'Author';
-    $result          = new stdClass();
+    $role = $role ?? 'Author';
+    $result = new stdClass();
     $result->persons = [];
-    $names           = explode(',', $persons);
+    $names = explode(',', $persons);
     foreach ($names as $name) {
-        $person           = new stdClass();
-        $person->role     = $role;
-        $nameparts        = explode(' ', $name);
+        $person = new stdClass();
+        $person->role = $role;
+        $nameparts = explode(' ', $name);
         $person->lastname = end($nameparts);
         unset($nameparts[count($nameparts) - 1]);
         $person->firstname = implode(' ', $nameparts);
