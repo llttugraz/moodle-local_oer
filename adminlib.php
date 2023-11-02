@@ -82,9 +82,9 @@ class oersubplugins_settings extends admin_setting {
         }
 
         $plugins = [
-                'courseinfo'     => core_component::get_plugin_list('oercourseinfo'),
+                'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
                 'classification' => core_component::get_plugin_list('oerclassification'),
-                'uploader'       => core_component::get_plugin_list('oeruploader'),
+                'uploader' => core_component::get_plugin_list('oeruploader'),
         ];
         foreach ($plugins as $key => $subplugins) {
             foreach ($subplugins as $name => $dir) {
@@ -112,32 +112,32 @@ class oersubplugins_settings extends admin_setting {
         global $OUTPUT, $PAGE;
         $pluginmanager = core_plugin_manager::instance();
 
-        $strdisable   = get_string('disable');
-        $strenable    = get_string('enable');
-        $strname      = get_string('name');
-        $strsettings  = get_string('settings');
+        $strdisable = get_string('disable');
+        $strenable = get_string('enable');
+        $strname = get_string('name');
+        $strsettings = get_string('settings');
         $struninstall = get_string('uninstallplugin', 'core_admin');
-        $strversion   = get_string('version');
-        $strplugin    = get_string('plugin');
+        $strversion = get_string('version');
+        $strplugin = get_string('plugin');
 
         $plugins = [
-                'courseinfo'     => core_component::get_plugin_list('oercourseinfo'),
+                'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
                 'classification' => core_component::get_plugin_list('oerclassification'),
-                'uploader'       => core_component::get_plugin_list('oeruploader'),
+                'uploader' => core_component::get_plugin_list('oeruploader'),
         ];
 
         $return = $OUTPUT->heading(get_string('subpluginsheading', 'local_oer'), 3, 'main', true);
         $return .= $OUTPUT->box_start('generalbox oerinstalledsubplugins');
 
-        $table                      = new html_table();
-        $table->head                = array($strplugin, $strname, $strversion, $strenable, $strsettings, $struninstall);
-        $table->align               = array('left', 'left', 'center', 'center', 'center', 'center');
-        $table->data                = array();
+        $table = new html_table();
+        $table->head = [$strplugin, $strname, $strversion, $strenable, $strsettings, $struninstall];
+        $table->align = ['left', 'left', 'center', 'center', 'center', 'center'];
+        $table->data = [];
         $table->attributes['class'] = 'admintable generaltable';
 
         foreach ($plugins as $key => $subplugins) {
             foreach ($subplugins as $name => $dir) {
-                $type    = 'oer' . $key . '_';
+                $type = 'oer' . $key . '_';
                 $namestr = get_string('pluginname', $type . $name);
                 $version = get_config($type . $name, 'version');
                 if ($version === false) {
@@ -149,31 +149,35 @@ class oersubplugins_settings extends admin_setting {
                 // Add hide/show link.
                 $class = '';
                 if (!$version) {
-                    $hideshow    = '';
-                    $displayname = html_writer::tag('span', $name, array('class' => 'error'));
+                    $hideshow = '';
+                    $displayname = html_writer::tag('span', $name, ['class' => 'error']);
                 } else if ($plugininfo->is_enabled()) {
-                    $url         = new moodle_url('/local/oer/subplugins.php',
-                                                  array('sesskey' => sesskey(), 'return' => 'settings',
-                                                        'disable' => $name,
-                                                        'type'    => $key));
-                    $hideshow    = $OUTPUT->pix_icon('t/hide', $strdisable);
-                    $hideshow    = html_writer::link($url, $hideshow);
+                    $url = new moodle_url('/local/oer/subplugins.php',
+                            [
+                                    'sesskey' => sesskey(), 'return' => 'settings',
+                                    'disable' => $name,
+                                    'type' => $key,
+                            ]);
+                    $hideshow = $OUTPUT->pix_icon('t/hide', $strdisable);
+                    $hideshow = html_writer::link($url, $hideshow);
                     $displayname = $namestr;
                 } else {
-                    $url         = new moodle_url('/local/oer/subplugins.php',
-                                                  array('sesskey' => sesskey(), 'return' => 'settings',
-                                                        'enable'  => $name,
-                                                        'type'    => $key));
-                    $hideshow    = $OUTPUT->pix_icon('t/show', $strenable);
-                    $hideshow    = html_writer::link($url, $hideshow);
+                    $url = new moodle_url('/local/oer/subplugins.php',
+                            [
+                                    'sesskey' => sesskey(), 'return' => 'settings',
+                                    'enable' => $name,
+                                    'type' => $key,
+                            ]);
+                    $hideshow = $OUTPUT->pix_icon('t/show', $strenable);
+                    $hideshow = html_writer::link($url, $hideshow);
                     $displayname = $namestr;
-                    $class       = 'dimmed_text';
+                    $class = 'dimmed_text';
                 }
 
                 if ($PAGE->theme->resolve_image_location('icon', $type . $name, false)) {
-                    $icon = $OUTPUT->pix_icon('icon', '', $type . $name, array('class' => 'icon pluginicon'));
+                    $icon = $OUTPUT->pix_icon('icon', '', $type . $name, ['class' => 'icon pluginicon']);
                 } else {
-                    $icon = $OUTPUT->pix_icon('spacer', '', 'moodle', array('class' => 'icon pluginicon noicon'));
+                    $icon = $OUTPUT->pix_icon('spacer', '', 'moodle', ['class' => 'icon pluginicon noicon']);
                 }
                 $displayname = $icon . ' ' . $displayname;
 
@@ -193,7 +197,7 @@ class oersubplugins_settings extends admin_setting {
                 }
 
                 // Add a row to the table.
-                $row = new html_table_row(array(ucwords($key), $displayname, $version, $hideshow, $settings, $uninstall));
+                $row = new html_table_row([ucwords($key), $displayname, $version, $hideshow, $settings, $uninstall]);
                 if ($class) {
                     $row->attributes['class'] = $class;
                 }

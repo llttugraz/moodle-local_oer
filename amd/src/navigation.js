@@ -34,7 +34,7 @@ export const initLayoutListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", function (action) {
         action.preventDefault();
         UserPreference.setLayout(action.target.dataset.value);
         Output.showFiles();
@@ -50,7 +50,7 @@ export const initSortListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", function (action) {
         action.preventDefault();
         UserPreference.setSort(action.target.dataset.value);
         Output.showFiles();
@@ -66,7 +66,7 @@ export const initGroupingListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", function (action) {
         action.preventDefault();
         if (typeof action.target.dataset.value === 'undefined') {
             return;
@@ -86,10 +86,10 @@ export const initCourseinfoListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", function (action) {
         action.preventDefault();
         let title = Str.get_string('courseinfobutton', 'local_oer');
-        title.done(function(localizedTitle) {
+        title.done(function (localizedTitle) {
             Output.showForm('CourseinfoForm', localizedTitle, {});
         });
     });
@@ -104,10 +104,10 @@ export const initPreferenceListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", function (action) {
         action.preventDefault();
         let title = Str.get_string('preferencebutton', 'local_oer');
-        title.done(function(localizedTitle) {
+        title.done(function (localizedTitle) {
             Output.showForm('PreferenceForm', localizedTitle, {});
         });
     });
@@ -121,12 +121,12 @@ export const initSearchListener = () => {
     if (searchInput === null) {
         return;
     }
-    let searchFiles = debounce(function() {
+    let searchFiles = debounce(function () {
         Output.showFiles();
     }, 500, false);
 
     searchInput.addEventListener("keyup", searchFiles);
-    searchInput.addEventListener("search", function() {
+    searchInput.addEventListener("search", function () {
         Output.showFiles();
     });
 };
@@ -145,10 +145,10 @@ export const initSearchListener = () => {
  */
 const debounce = (func, wait, immediate) => {
     let timeout;
-    return function() {
+    return function () {
         let context = this;
         let args = arguments;
-        let later = function() {
+        let later = function () {
             timeout = null;
             if (!immediate) {
                 func.apply(context, args);

@@ -29,7 +29,7 @@ use local_oer\time\time_form;
 use local_oer\time\time_settings;
 
 $context = context_system::instance();
-$url     = new moodle_url('/local/oer/views/time_config.php');
+$url = new moodle_url('/local/oer/views/time_config.php');
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('pluginname', 'local_oer'));

@@ -254,7 +254,7 @@ class fileinfo_form_test extends \advanced_testcase {
 
         $tags = [
                 'unit',
-                'test'
+                'test',
         ];
 
         $fromform = fromform::fileinfoform_submit($course->id, $contenthash, 'changed title',

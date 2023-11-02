@@ -34,8 +34,8 @@ interface external_metadata {
     /**
      * Loads the course metadata defined by a sub plugin.
      *
-     * @param int   $courseid Moodle courseid
-     * @param array $infos    Array defined in metadata/courseinfo.php
+     * @param int $courseid Moodle courseid
+     * @param array $infos Array defined in metadata/courseinfo.php
      * @return void
      */
     public function load_data(int $courseid, array &$infos): void;

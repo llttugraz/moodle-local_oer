@@ -84,69 +84,71 @@ class courseinfo_form_test extends \advanced_testcase {
                 'categoryid' => $customcat->get('id'),
                 'name' => 'field1',
                 'shortname' => 'field1',
-                'type' => 'text'
+                'type' => 'text',
         ]);
         $field2 = $this->getDataGenerator()->create_custom_field([
                 'categoryid' => $customcat->get('id'),
                 'name' => 'field2',
                 'shortname' => 'field2',
-                'type' => 'date'
+                'type' => 'date',
         ]);
         $field3 = $this->getDataGenerator()->create_custom_field([
                 'categoryid' => $customcat->get('id'),
                 'name' => 'field3',
                 'shortname' => 'field3',
-                'type' => 'select'
+                'type' => 'select',
         ]);
         $field4 = $this->getDataGenerator()->create_custom_field([
                 'categoryid' => $customcat->get('id'),
                 'name' => 'field4',
                 'shortname' => 'field4',
-                'type' => 'checkbox'
+                'type' => 'checkbox',
         ]);
-        $customfields = [[
-                'id' => $customcat->get('id'),
-                'name' => 'OER unit test',
-                'fields' => [
-                        [
-                                'id' => $field1->get('id'),
-                                'shortname' => 'field1',
-                                'fullname' => 'field1',
-                                'type' => 'text',
-                                'visibility' => '2',
-                                'data' => 'a'
+        $customfields = [
+                [
+                        'id' => $customcat->get('id'),
+                        'name' => 'OER unit test',
+                        'fields' => [
+                                [
+                                        'id' => $field1->get('id'),
+                                        'shortname' => 'field1',
+                                        'fullname' => 'field1',
+                                        'type' => 'text',
+                                        'visibility' => '2',
+                                        'data' => 'a',
+                                ],
+                                [
+                                        'id' => $field2->get('id'),
+                                        'shortname' => 'field2',
+                                        'fullname' => 'field2',
+                                        'type' => 'date',
+                                        'visibility' => '2',
+                                        'data' => time(),
+                                ],
+                                [
+                                        'id' => $field3->get('id'),
+                                        'shortname' => 'field3',
+                                        'fullname' => 'field3',
+                                        'type' => 'select',
+                                        'visibility' => '2',
+                                        'data' => 'b',
+                                ],
+                                [
+                                        'id' => $field4->get('id'),
+                                        'shortname' => 'field4',
+                                        'fullname' => 'field4',
+                                        'type' => 'checkbox',
+                                        'visibility' => '2',
+                                        'data' => '1',
+                                ],
                         ],
-                        [
-                                'id' => $field2->get('id'),
-                                'shortname' => 'field2',
-                                'fullname' => 'field2',
-                                'type' => 'date',
-                                'visibility' => '2',
-                                'data' => time(),
-                        ],
-                        [
-                                'id' => $field3->get('id'),
-                                'shortname' => 'field3',
-                                'fullname' => 'field3',
-                                'type' => 'select',
-                                'visibility' => '2',
-                                'data' => 'b'
-                        ],
-                        [
-                                'id' => $field4->get('id'),
-                                'shortname' => 'field4',
-                                'fullname' => 'field4',
-                                'type' => 'checkbox',
-                                'visibility' => '2',
-                                'data' => '1'
-                        ]
-                ]
-        ]];
+                ],
+        ];
         $DB->set_field('local_oer_courseinfo', 'customfields', json_encode($customfields),
                 ['coursecode' => 'moodlecourse-' . $course->id]);
 
         $customdata = [
-                'courseid' => $course->id
+                'courseid' => $course->id,
         ];
         $mform = new courseinfo_form(null, $customdata);
 
@@ -244,7 +246,7 @@ class courseinfo_form_test extends \advanced_testcase {
 
         // Set the value back to its original state.
         $fromform = [
-                'courseid' => $course->id
+                'courseid' => $course->id,
         ];
         $mform->update_metadata($fromform);
 

@@ -40,16 +40,16 @@ if (get_config('local_oer', 'pullservice') != 1) {
 
 $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
 // Increase application profile when metadata changes.
-$result  = [
-        'applicationprofile' => 'v1.0.0'
+$result = [
+        'applicationprofile' => 'v1.0.0',
 ];
-$i       = 0;
+$i = 0;
 $context = context_system::instance();
 global $PAGE;
 $PAGE->set_context($context);
 foreach ($courses as $course) {
     $release = new \local_oer\release($course->courseid);
-    $data    = $release->get_released_files();
+    $data = $release->get_released_files();
     if (!empty($data)) {
         $metadata = [];
         foreach ($data as $entry) {

@@ -30,7 +30,7 @@ global $PAGE, $USER, $OUTPUT, $DB;
 $courseid = required_param('id', PARAM_INT);
 
 $context = context_course::instance($courseid);
-$id      = $context->id;
+$id = $context->id;
 $PAGE->set_context($context);
 
 $course = get_course($courseid);
@@ -60,15 +60,15 @@ if (optional_param('download_zip', false, PARAM_BOOL)) {
 }
 
 $data = [
-        'courseid'                  => $courseid,
-        'context'                   => $context->id,
+        'courseid' => $courseid,
+        'context' => $context->id,
         'cantooglecourseactivation' => $allowed && has_capability('local/oer:manage', $context),
-        'canmanage'                 => has_capability('local/oer:manage', $context),
-        'downloadurl'               => new moodle_url('/local/oer/views/main.php', ['id' => $courseid]),
-        'allowed'                   => $allowed,
-        'notallowed'                => get_config('local_oer', 'notallowedtext'),
-        'releaseinfo'              => \local_oer\time\time_settings::get_timeslot_output(1),
-        'isadmin'                   => is_siteadmin(), // Used for ZIP Download button, eventually add a new capability.
+        'canmanage' => has_capability('local/oer:manage', $context),
+        'downloadurl' => new moodle_url('/local/oer/views/main.php', ['id' => $courseid]),
+        'allowed' => $allowed,
+        'notallowed' => get_config('local_oer', 'notallowedtext'),
+        'releaseinfo' => \local_oer\time\time_settings::get_timeslot_output(1),
+        'isadmin' => is_siteadmin(), // Used for ZIP Download button, eventually add a new capability.
 ];
 
 echo $OUTPUT->header();

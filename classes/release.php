@@ -145,7 +145,7 @@ class release {
                 'filecreationtime' => $file->get_timecreated(),
                 'timereleased' => $fileinfo->timecreated,
                 'classification' => $classification,
-                'courses' => json_decode($fileinfo->coursemetadata)
+                'courses' => json_decode($fileinfo->coursemetadata),
         ];
 
         if ($fileinfo->additionaldata) {
@@ -191,7 +191,7 @@ class release {
                     $result[$key] = [
                             'type' => $key,
                             'url' => $url,
-                            'values' => []
+                            'values' => [],
                     ];
                 }
                 foreach ($info->$key as $identifier) {

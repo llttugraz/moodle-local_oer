@@ -89,7 +89,7 @@ class courseinfo_sync_test extends \advanced_testcase {
                 [
                         'fullname' => 'Sync test course 1',
                         'shortname' => 'synccourse',
-                        'summary' => 'A course created for a php unit test'
+                        'summary' => 'A course created for a php unit test',
                 ]
         );
 
@@ -161,24 +161,24 @@ class courseinfo_sync_test extends \advanced_testcase {
     public function test_compare_customfields() {
         $this->resetAfterTest();
         $sync = new courseinfo_sync();
-        list($fields, $update) = $sync->compare_customfields(null, null);
+        [$fields, $update] = $sync->compare_customfields(null, null);
         $this->assertNull($fields);
         $this->assertFalse($update);
-        list($fields, $update) = $sync->compare_customfields(['notempty' => 'someentry'], null);
+        [$fields, $update] = $sync->compare_customfields(['notempty' => 'someentry'], null);
         $this->assertNull($fields);
         $this->assertTrue($update);
         $old = [
                 'entry' => 'notempty',
         ];
-        list($fields, $update) = $sync->compare_customfields($old, $old);
+        [$fields, $update] = $sync->compare_customfields($old, $old);
         $this->assertIsString($fields);
         $this->assertEquals(json_encode($old), $fields);
         $this->assertFalse($update);
         $new = [
                 'entry' => 'othervalue',
-                'secondentry' => 'also exists'
+                'secondentry' => 'also exists',
         ];
-        list($fields, $update) = $sync->compare_customfields($old, $new);
+        [$fields, $update] = $sync->compare_customfields($old, $new);
         $this->assertIsString($fields);
         $this->assertEquals(json_encode($new), $fields);
         $this->assertTrue($update);

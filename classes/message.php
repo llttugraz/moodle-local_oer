@@ -33,42 +33,45 @@ class message {
      * Notify the user that the requirements have changed and the file does not fullfill all of it.
      * This can only happen when the settings for required fields is changed by an administrator.
      *
-     * @param \stdClass $user     Moodle user object
-     * @param array     $files    file records from local_oer_files table
-     * @param int       $courseid Moodle courseid
+     * @param \stdClass $user Moodle user object
+     * @param array $files file records from local_oer_files table
+     * @param int $courseid Moodle courseid
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
     public static function send_requirementschanged(\stdClass $user, array $files, int $courseid) {
-        $course                     = get_course($courseid);
-        $message                    = new \core\message\message();
-        $message->component         = 'local_oer';
-        $message->name              = 'requirementschanged';
-        $message->userfrom          = \core_user::get_noreply_user();
-        $message->userto            = $user;
-        $message->subject           = get_string('requirementschanged_subject', 'local_oer');
-        $courseurl                  = new \moodle_url('/course/view.php', ['id' => $course->id]);
+        $course = get_course($courseid);
+        $message = new \core\message\message();
+        $message->component = 'local_oer';
+        $message->name = 'requirementschanged';
+        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $user;
+        $message->subject = get_string('requirementschanged_subject', 'local_oer');
+        $courseurl = new \moodle_url('/course/view.php', ['id' => $course->id]);
         $message->fullmessageformat = FORMAT_HTML;
-        $fullmessage                = '<p>' . get_string('requirementschanged_body', 'local_oer',
-                                                         ['url' => $courseurl->out(), 'course' => $course->fullname]);
-        $filelisthtml               = '';
+        $fullmessage = '<p>' . get_string('requirementschanged_body', 'local_oer',
+                        ['url' => $courseurl->out(), 'course' => $course->fullname]);
+        $filelisthtml = '';
         foreach ($files as $file) {
             $filelisthtml .= '* ' . $file->title . '<br>';
         }
-        $fullmessage              .= $filelisthtml . '</p>';
-        $message->fullmessage     = $fullmessage;
+        $fullmessage .= $filelisthtml . '</p>';
+        $message->fullmessage = $fullmessage;
         $message->fullmessagehtml = $fullmessage;
-        $message->smallmessage    = get_string('requirementschanged_small', 'local_oer');
-        $message->notification    = 1;
-        $message->contexturl      = (new \moodle_url('/local/oer/views/main.php',
-                                                     ['id' => $courseid]))->out(false);
-        $message->contexturlname  = 'OER course files';
-        $support                  = \core_user::get_support_user();
-        $content                  = array('*' => array('header' => 'OER Requirements changed ',
-                                                       'footer' => 'If you have any questions, please contact ' .
-                                                                   $support->email));
+        $message->smallmessage = get_string('requirementschanged_small', 'local_oer');
+        $message->notification = 1;
+        $message->contexturl = (new \moodle_url('/local/oer/views/main.php',
+                ['id' => $courseid]))->out(false);
+        $message->contexturlname = 'OER course files';
+        $support = \core_user::get_support_user();
+        $content = [
+                '*' => [
+                        'header' => 'OER Requirements changed ',
+                        'footer' => 'If you have any questions, please contact ' . $support->email,
+                ],
+        ];
         $message->set_additional_content('email', $content);
         message_send($message);
     }

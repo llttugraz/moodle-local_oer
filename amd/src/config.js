@@ -41,7 +41,7 @@ export const getOutputValues = (init) => {
     let filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_section', 'f_released'];
 
     output.founddeleted = false;
-    output.files.forEach(function(file) {
+    output.files.forEach(function (file) {
         if (file.deleted === 1) {
             output.founddeleted = true;
         }
@@ -50,7 +50,7 @@ export const getOutputValues = (init) => {
     let chosenfilterobject = UserPreference.getFilter();
     let chosenfilter = chosenfilterobject.filter;
     let additionalvalue = chosenfilterobject.value;
-    filters.forEach(function(filter) {
+    filters.forEach(function (filter) {
         output[filter] = false;
         if (filter === chosenfilter) {
             output[filter] = true;
@@ -60,7 +60,7 @@ export const getOutputValues = (init) => {
     let filteredFiles = [];
     if (chosenfilter !== 'f_all') {
         output.init = false;
-        output.files.forEach(function(file) {
+        output.files.forEach(function (file) {
             switch (chosenfilter) {
                 case 'f_upload':
                     if (file.upload === true) {
@@ -93,7 +93,7 @@ export const getOutputValues = (init) => {
                     }
                     break;
                 case 'f_section':
-                    file.sections.forEach(function(section) {
+                    file.sections.forEach(function (section) {
                         if (section.sectionname === additionalvalue) {
                             filteredFiles.push(file);
                         }
@@ -109,7 +109,7 @@ export const getOutputValues = (init) => {
         let searchValue = search.value;
         let searchOutput = [];
         if (searchValue !== '') {
-            output.files.forEach(function(file) {
+            output.files.forEach(function (file) {
                 if (file.title.toLowerCase().includes(searchValue.toLowerCase())) {
                     searchOutput.push(file);
                 }
@@ -120,7 +120,7 @@ export const getOutputValues = (init) => {
 
     let sortOptions = ['s_default', 's_title_asc', 's_title_desc', 's_mimetype', 's_released'];
     let chosensort = UserPreference.getSort();
-    sortOptions.forEach(function(option) {
+    sortOptions.forEach(function (option) {
         output[option] = false;
         if (option === chosensort) {
             output[option] = true;
@@ -167,7 +167,7 @@ export const getOutputValues = (init) => {
         let amount = parseInt(selected, 10);
         let firstelement = (page - 1) * amount;
         let lastelement = (page * amount) - 1;
-        output.files.forEach(function(file, index) {
+        output.files.forEach(function (file, index) {
             if (index >= firstelement && index <= lastelement) {
                 shownFiles.push(file);
             }

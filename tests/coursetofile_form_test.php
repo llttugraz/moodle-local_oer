@@ -67,7 +67,7 @@ class coursetofile_form_test extends \advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
 
-        list($draftid, $file) = $helper->generate_file('multipleused');
+        [$draftid, $file] = $helper->generate_file('multipleused');
 
         $customdata = [
                 'courseid' => $course1->id,

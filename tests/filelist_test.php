@@ -114,18 +114,18 @@ class filelist_test extends \advanced_testcase {
      * @covers ::select_file_icon_or_thumbnail
      */
     public function test_get_simple_filelist() {
-        list($files, $sections) = filelist::get_simple_filelist($this->data['course1']->id);
+        [$files, $sections] = filelist::get_simple_filelist($this->data['course1']->id);
         $this->assertIsArray($files);
         $this->assertIsArray($sections);
         $this->assertCount(5, $files);
         $this->assertCount(1, $sections);
-        list($files, $sections) = filelist::get_simple_filelist($this->data['course2']->id);
+        [$files, $sections] = filelist::get_simple_filelist($this->data['course2']->id);
         $this->assertIsArray($files);
         $this->assertIsArray($sections);
         $this->assertCount(5, $files);
         $this->assertCount(1, $sections);
         $course = $this->getDataGenerator()->create_course();
-        list($files, $sections) = filelist::get_simple_filelist($course->id);
+        [$files, $sections] = filelist::get_simple_filelist($course->id);
         $this->assertIsArray($files);
         $this->assertIsArray($sections);
         $this->assertCount(0, $files);

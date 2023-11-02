@@ -48,7 +48,7 @@ class userlist {
      */
     public static function user_is_allowed($userid) {
         global $DB;
-        $type  = get_config('local_oer', 'allowedlist') == '1' ? self::TYPE_A : self::TYPE_D;
+        $type = get_config('local_oer', 'allowedlist') == '1' ? self::TYPE_A : self::TYPE_D;
         $exist = $DB->record_exists('local_oer_userlist', ['userid' => $userid, 'type' => $type]);
         return $type == self::TYPE_A ? $exist : !$exist;
     }

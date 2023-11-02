@@ -70,7 +70,7 @@ class filestate_test extends \advanced_testcase {
         $course2 = $this->getDataGenerator()->create_course();
         $filename = 'samefile';
         $content = 'some content that will result in the same contenthash';
-        list($draftid, $file) = $testcourse->generate_file($filename, null, $content);
+        [$draftid, $file] = $testcourse->generate_file($filename, null, $content);
         $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
         $testcourse->generate_resource($course2, $this->getDataGenerator(), $filename, null, $content);
 
@@ -165,7 +165,7 @@ class filestate_test extends \advanced_testcase {
      */
     private function assert_file_state($contenthash, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
             $expectedwritable) {
-        list($state, $editorid, $courses, $writable) = filestate::calculate_file_state($contenthash, $courseid);
+        [$state, $editorid, $courses, $writable] = filestate::calculate_file_state($contenthash, $courseid);
         $this->assertEquals($expectedstate, $state);
         $this->assertEquals($expectededitor, $editorid);
         $this->assertCount($expectedcoursecount, $courses);
@@ -225,7 +225,7 @@ class filestate_test extends \advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course();
         $filename = 'samefile';
         $content = 'some content that will result in the same contenthash';
-        list($draftid, $file) = $testcourse->generate_file($filename, null, $content);
+        [$draftid, $file] = $testcourse->generate_file($filename, null, $content);
         $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
 
         $testcourse->set_file_to_non_release($course1->id, $file);

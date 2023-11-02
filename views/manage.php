@@ -43,21 +43,25 @@ $type = get_config('local_oer', 'allowedlist') == '1'
         : \local_oer\userlist\userlist::TYPE_D;
 
 $potentialuserselector = new \local_oer\userlist\user_selector('addselect',
-                                                                     ['displayallowedusers' => 0,
-                                                                      'type'                => $type]);
-$alloweduserselector   = new \local_oer\userlist\user_selector('removeselect',
-                                                                     ['displayallowedusers' => 1,
-                                                                      'type'                => $type]);
+        [
+                'displayallowedusers' => 0,
+                'type' => $type,
+        ]);
+$alloweduserselector = new \local_oer\userlist\user_selector('removeselect',
+        [
+                'displayallowedusers' => 1,
+                'type' => $type,
+        ]);
 
 global $DB;
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoassign = $potentialuserselector->get_selected_users();
     if (!empty($userstoassign)) {
         foreach ($userstoassign as $adduser) {
-            $user              = new stdClass();
-            $user->userid      = $adduser->id;
+            $user = new stdClass();
+            $user->userid = $adduser->id;
             $user->timecreated = time();
-            $user->type        = $type;
+            $user->type = $type;
             $DB->insert_record('local_oer_userlist', $user);
         }
         $potentialuserselector->invalidate_selected_users();
@@ -69,9 +73,9 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoremove = $alloweduserselector->get_selected_users();
     if (!empty($userstoremove)) {
         foreach ($userstoremove as $removeuser) {
-            $user           = [];
+            $user = [];
             $user['userid'] = $removeuser->id;
-            $user['type']   = $type;
+            $user['type'] = $type;
             $DB->delete_records('local_oer_userlist', $user);
         }
         $potentialuserselector->invalidate_selected_users();
@@ -83,8 +87,8 @@ $renderer = $PAGE->get_renderer('local_oer');
 
 echo $OUTPUT->header();
 
-$selectoroptions                        = new stdClass();
-$selectoroptions->alloweduserselector   = $alloweduserselector;
+$selectoroptions = new stdClass();
+$selectoroptions->alloweduserselector = $alloweduserselector;
 $selectoroptions->potentialuserselector = $potentialuserselector;
 echo $renderer->oer_user_selector($selectoroptions);
 

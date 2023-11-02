@@ -45,15 +45,15 @@
 </div>
 
 {{^element.frozen}}
-{{#js}}
-require(['local_oer/navigation'], function(action) {
-action.initLayoutListener();
-action.initSortListener();
-action.initGroupingListener();
-action.initCourseinfoListener();
-action.initPreferenceListener();
-action.initSearchListener();
-});
-{{/js}}
+    {{#js}}
+        require(['local_oer/navigation'], function(action) {
+        action.initLayoutListener();
+        action.initSortListener();
+        action.initGroupingListener();
+        action.initCourseinfoListener();
+        action.initPreferenceListener();
+        action.initSearchListener();
+        });
+    {{/js}}
 {{/element.frozen}}
 

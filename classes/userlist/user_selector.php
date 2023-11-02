@@ -58,7 +58,7 @@ class user_selector extends \user_selector_base {
         parent::__construct($name, $options);
 
         $this->displayallowedusers = !empty($options['displayallowedusers']);
-        $this->type                = $options['type'];
+        $this->type = $options['type'];
     }
 
     /**
@@ -73,9 +73,9 @@ class user_selector extends \user_selector_base {
         global $DB;
         // By default wherecondition retrieves all users except the deleted, not ...
         // ... confirmed and guest.
-        list($wherecondition, $params) = $this->search_sql($search, 'u');
+        [$wherecondition, $params] = $this->search_sql($search, 'u');
 
-        $fields      = 'SELECT ' . $this->required_fields_sql('u');
+        $fields = 'SELECT ' . $this->required_fields_sql('u');
         $countfields = 'SELECT COUNT(1)';
 
         if ($this->displayallowedusers) {
@@ -90,7 +90,7 @@ class user_selector extends \user_selector_base {
                                                   WHERE oul.userid = u.id AND oul.type = '$this->type')"; // TODO list type.
         }
 
-        list($sort, $sortparams) = users_order_by_sql('u', $search, $this->accesscontext);
+        [$sort, $sortparams] = users_order_by_sql('u', $search, $this->accesscontext);
         $order = ' ORDER BY ' . $sort;
 
         if (!$this->is_validating()) {

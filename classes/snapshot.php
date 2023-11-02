@@ -62,7 +62,7 @@ class snapshot {
      */
     public function get_latest_course_snapshot() {
         global $DB;
-        $files  = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id ASC');
+        $files = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id ASC');
         $result = [];
         foreach ($files as $file) {
             if (isset($result[$file->contenthash])) {
@@ -86,7 +86,7 @@ class snapshot {
     public function get_file_history($contenthash) {
         global $DB;
         $files = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid, 'contenthash' => $contenthash],
-                                  'timecreated DESC');
+                'timecreated DESC');
         // TODO.
     }
 
@@ -100,7 +100,7 @@ class snapshot {
      */
     public function create_snapshot_of_course_files() {
         $files = filelist::get_course_files($this->courseid);
-        list($courses, $courseinfo) = $this->get_active_courseinfo_metadata();
+        [$courses, $courseinfo] = $this->get_active_courseinfo_metadata();
         if (!$courseinfo) {
             logger::add($this->courseid, logger::LOGERROR, 'Course does not has courseinfo, maybe all entries are ignored');
             return;
@@ -119,56 +119,56 @@ class snapshot {
      * the metadata to older versions. When the hash is already stored, nothing has changed, and it does not
      * need to be stored.
      *
-     * @param \stored_file $file       Moodle stored file object
-     * @param array        $courseinfo List of all courses (internal and external) linked to this file
-     * @param array        $courses    Courses from local_oer_courseinfo table for this course
+     * @param \stored_file $file Moodle stored file object
+     * @param array $courseinfo List of all courses (internal and external) linked to this file
+     * @param array $courses Courses from local_oer_courseinfo table for this course
      * @return void
      * @throws \dml_exception
      */
     private function create_file_snapshot(\stored_file $file, array $courseinfo, array $courses) {
         global $DB, $USER;
         $fileinfo = $DB->get_record('local_oer_files', [
-                'courseid'    => $this->courseid,
-                'contenthash' => $file->get_contenthash()
+                'courseid' => $this->courseid,
+                'contenthash' => $file->get_contenthash(),
         ]);
         if (!$fileinfo) {
             // File metadata has not been stored yet, so this file can be skipped.
             return;
         }
-        list($reqarray, $releasable, $release) = requirements::metadata_fulfills_all_requirements($fileinfo);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($fileinfo);
         if (!$release) {
             // At least one criterion is not fulfilled, file cannot be released.
             if ($fileinfo->state == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
                 logger::add($this->courseid, logger::LOGERROR, 'File with hash ' . $fileinfo->contenthash .
-                                                               ' is set to release, but does not fulfill all requirements.');
+                        ' is set to release, but does not fulfill all requirements.');
             }
             return;
         }
 
-        $snapshot                 = new \stdClass();
-        $snapshot->courseid       = $this->courseid;
-        $snapshot->contenthash    = $fileinfo->contenthash;
-        $snapshot->title          = $fileinfo->title;
-        $snapshot->description    = $fileinfo->description;
-        $snapshot->context        = $fileinfo->context;
-        $snapshot->license        = $fileinfo->license;
-        $snapshot->persons        = $fileinfo->persons;
-        $snapshot->tags           = $fileinfo->tags;
-        $snapshot->language       = $fileinfo->language;
-        $snapshot->resourcetype   = $fileinfo->resourcetype;
+        $snapshot = new \stdClass();
+        $snapshot->courseid = $this->courseid;
+        $snapshot->contenthash = $fileinfo->contenthash;
+        $snapshot->title = $fileinfo->title;
+        $snapshot->description = $fileinfo->description;
+        $snapshot->context = $fileinfo->context;
+        $snapshot->license = $fileinfo->license;
+        $snapshot->persons = $fileinfo->persons;
+        $snapshot->tags = $fileinfo->tags;
+        $snapshot->language = $fileinfo->language;
+        $snapshot->resourcetype = $fileinfo->resourcetype;
         $snapshot->classification = $fileinfo->classification;
         $snapshot->coursemetadata = json_encode($this->get_overwritten_courseinfo_metadata($courseinfo, $fileinfo->contenthash,
-                                                                                           $courses));
+                $courses));
         $snapshot->additionaldata = $this->add_external_metadata();
-        $hash                     = hash('sha256', json_encode($snapshot));
-        $snapshot->releasehash    = $hash;
-        $snapshot->usermodified   = $USER->id;
-        $snapshot->timemodified   = time();
-        $snapshot->timecreated    = time();
-        $latestrelease            = $DB->get_records('local_oer_snapshot',
-                                                     ['courseid' => $this->courseid, 'contenthash' => $fileinfo->contenthash],
-                                                     'timecreated DESC', '*', 0, 1);
+        $hash = hash('sha256', json_encode($snapshot));
+        $snapshot->releasehash = $hash;
+        $snapshot->usermodified = $USER->id;
+        $snapshot->timemodified = time();
+        $snapshot->timecreated = time();
+        $latestrelease = $DB->get_records('local_oer_snapshot',
+                ['courseid' => $this->courseid, 'contenthash' => $fileinfo->contenthash],
+                'timecreated DESC', '*', 0, 1);
         if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);
         }
@@ -182,13 +182,13 @@ class snapshot {
      */
     private function add_external_metadata(): ?string {
         $activeaggregator = get_config('local_oer', 'metadataaggregator');
-        $plugins          = oercourseinfo::get_enabled_plugins();
+        $plugins = oercourseinfo::get_enabled_plugins();
         // @codeCoverageIgnoreStart
         // This code is not reachable without subplugins installed.
         foreach ($plugins as $key => $name) {
             if ($key == $activeaggregator) {
                 $frankenstyle = 'oercourseinfo_' . $key;
-                $plugin       = '\\' . $frankenstyle . '\info';
+                $plugin = '\\' . $frankenstyle . '\info';
                 return json_encode($plugin::add_metadata_fields($this->courseid));
             }
         }
@@ -206,7 +206,7 @@ class snapshot {
      */
     private function get_active_courseinfo_metadata() {
         global $DB;
-        $courses    = $DB->get_records('local_oer_courseinfo', ['courseid' => $this->courseid, 'ignored' => 0, 'deleted' => 0]);
+        $courses = $DB->get_records('local_oer_courseinfo', ['courseid' => $this->courseid, 'ignored' => 0, 'deleted' => 0]);
         $courseinfo = [];
         foreach ($courses as $course) {
             $courseinfo[] = $this->extract_courseinfo_metadata($course);
@@ -222,9 +222,9 @@ class snapshot {
     /**
      * When the overwritten state for course metadata is active load the changes and update the courseinfo array.
      *
-     * @param array  $courseinfo  Courseinfo array as created for the whole course
+     * @param array $courseinfo Courseinfo array as created for the whole course
      * @param string $contenthash Moodle file contenthash
-     * @param array  $courses     Courses from local_oer_courseinfo table for this course
+     * @param array $courses Courses from local_oer_courseinfo table for this course
      * @return array
      * @throws \dml_exception
      */
@@ -236,18 +236,20 @@ class snapshot {
         global $DB;
         $courseinfo = [];
 
-        $remove     = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash,
-                                                                  'state'       => coursetofile::COURSETOFILE_DISABLED]);
-        $sql        = "SELECT * FROM {local_oer_courseinfo} ci " .
-                      "JOIN {local_oer_coursetofile} ctf ON ci.courseid = ctf.courseid AND ci.coursecode = ctf.coursecode " .
-                      "WHERE ctf.contenthash = :contenthash AND ctf.state = :state";
+        $remove = $DB->get_records('local_oer_coursetofile', [
+                'contenthash' => $contenthash,
+                'state' => coursetofile::COURSETOFILE_DISABLED,
+        ]);
+        $sql = "SELECT * FROM {local_oer_courseinfo} ci " .
+                "JOIN {local_oer_coursetofile} ctf ON ci.courseid = ctf.courseid AND ci.coursecode = ctf.coursecode " .
+                "WHERE ctf.contenthash = :contenthash AND ctf.state = :state";
         $addcourses = $DB->get_records_sql($sql, ['contenthash' => $contenthash, 'state' => coursetofile::COURSETOFILE_ENABLED]);
 
         foreach ($courses as $key => $course) {
             foreach ($remove as $rm) {
                 if ($course->courseid == $rm->courseid &&
-                    $course->coursecode == $rm->coursecode &&
-                    $rm->state == coursetofile::COURSETOFILE_DISABLED
+                        $course->coursecode == $rm->coursecode &&
+                        $rm->state == coursetofile::COURSETOFILE_DISABLED
                 ) {
                     unset($courses[$key]);
                 }
@@ -271,16 +273,16 @@ class snapshot {
      */
     private function extract_courseinfo_metadata(\stdClass $course) {
         $info = [
-                'identifier'     => $course->coursecode,
-                'courseid'       => $course->external_courseid,
-                'sourceid'       => $course->external_sourceid,
-                'coursename'     => $course->coursename,
-                'structure'      => $course->structure ?? '',
-                'description'    => $course->description ?? '',
-                'objective'      => $course->objectives ?? '',
-                'organisation'   => $course->organisation ?? '',
+                'identifier' => $course->coursecode,
+                'courseid' => $course->external_courseid,
+                'sourceid' => $course->external_sourceid,
+                'coursename' => $course->coursename,
+                'structure' => $course->structure ?? '',
+                'description' => $course->description ?? '',
+                'objective' => $course->objectives ?? '',
+                'organisation' => $course->organisation ?? '',
                 'courselanguage' => $course->language ?? '',
-                'lecturer'       => $course->lecturer ?? '',
+                'lecturer' => $course->lecturer ?? '',
         ];
 
         return $this->add_customfields_to_snapshot($course, $info);
@@ -290,14 +292,14 @@ class snapshot {
      * Add customfields to snapshot if enabled and moodlecourse.
      *
      * @param \stdClass $course Course object
-     * @param array     $info   Metadata array to extend
+     * @param array $info Metadata array to extend
      * @return array
      * @throws \dml_exception
      */
     private function add_customfields_to_snapshot(\stdClass $course, array $info) {
         if ($course->subplugin == courseinfo::BASETYPE
-            && strpos($course->coursecode, 'moodlecourse') !== false
-            && get_config('local_oer', 'coursecustomfields') == 1) {
+                && strpos($course->coursecode, 'moodlecourse') !== false
+                && get_config('local_oer', 'coursecustomfields') == 1) {
             $customfields = coursecustomfield::get_customfields_for_snapshot($course->courseid);
             if (!empty($customfields)) {
                 $info['customfields'] = $customfields;

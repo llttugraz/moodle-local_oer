@@ -66,28 +66,28 @@ class testcourse {
     /**
      * Contains all fields from oer files table with a non-release default value.
      *
-     * @param int          $courseid
+     * @param int $courseid
      * @param \stored_file $file
      * @return \stdClass
      */
     public function generate_oer_non_release_metadata(int $courseid, \stored_file $file) {
-        $metadata                 = new \stdClass();
-        $metadata->courseid       = $courseid;
-        $metadata->contenthash    = $file->get_contenthash();
-        $metadata->title          = $file->get_filename();
-        $metadata->description    = '';
-        $metadata->context        = 0;
-        $metadata->license        = 'allrightsreserved';
-        $metadata->persons        = '';
-        $metadata->tags           = null;
-        $metadata->language       = 'en';
-        $metadata->resourcetype   = 0;
+        $metadata = new \stdClass();
+        $metadata->courseid = $courseid;
+        $metadata->contenthash = $file->get_contenthash();
+        $metadata->title = $file->get_filename();
+        $metadata->description = '';
+        $metadata->context = 0;
+        $metadata->license = 'allrightsreserved';
+        $metadata->persons = '';
+        $metadata->tags = null;
+        $metadata->language = 'en';
+        $metadata->resourcetype = 0;
         $metadata->classification = null;
-        $metadata->state          = 0;
-        $metadata->preference     = 0;
-        $metadata->usermodified   = 2;
-        $metadata->timemodified   = time();
-        $metadata->timecreated    = time();
+        $metadata->state = 0;
+        $metadata->preference = 0;
+        $metadata->usermodified = 2;
+        $metadata->timemodified = time();
+        $metadata->timecreated = time();
         return $metadata;
     }
 
@@ -95,18 +95,18 @@ class testcourse {
      * Overwrite the fields that are required with a certain value for release.
      * Returns filesize for comparison.
      *
-     * @param int          $courseid
+     * @param int $courseid
      * @param \stored_file $file
      * @return int
      * @throws \dml_exception
      */
     public function set_file_to_release(int $courseid, \stored_file $file) {
-        $metadata          = $this->generate_oer_non_release_metadata($courseid, $file);
+        $metadata = $this->generate_oer_non_release_metadata($courseid, $file);
         $metadata->context = 1;
         $metadata->license = 'cc-4.0'; // Updated 2023-11-02 due to Moodle licence change.
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}, ' .
-                             '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}';
-        $metadata->state   = 1;
+                '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}';
+        $metadata->state = 1;
         $this->update_db($metadata);
         return $file->get_filesize();
     }
@@ -115,8 +115,8 @@ class testcourse {
      * Set files to release or non-release.
      * The files will be modified in that order they come from filelist::get_course_files.
      *
-     * @param int  $courseid
-     * @param int  $amount  How many files of this course should be changed
+     * @param int $courseid
+     * @param int $amount How many files of this course should be changed
      * @param bool $release Set the file to release or non-release
      * @return int
      * @throws \coding_exception
@@ -124,8 +124,8 @@ class testcourse {
      */
     public function set_files_to(int $courseid, int $amount, bool $release = false) {
         $coursefiles = filelist::get_course_files($courseid);
-        $i           = 0;
-        $size        = 0;
+        $i = 0;
+        $size = 0;
         foreach ($coursefiles as $coursefile) {
             if ($i == $amount) {
                 break;
@@ -151,7 +151,7 @@ class testcourse {
         global $DB;
         if ($DB->record_exists('local_oer_files', ['courseid' => $metadata->courseid, 'contenthash' => $metadata->contenthash])) {
             $metadata->id = $DB->get_field('local_oer_files', 'id',
-                                           ['courseid' => $metadata->courseid, 'contenthash' => $metadata->contenthash]);
+                    ['courseid' => $metadata->courseid, 'contenthash' => $metadata->contenthash]);
             $DB->update_record('local_oer_files', $metadata);
         } else {
             $DB->insert_record('local_oer_files', $metadata);
@@ -161,7 +161,7 @@ class testcourse {
     /**
      * Similar to the set_release function - but set a file to non-release.
      *
-     * @param int          $courseid
+     * @param int $courseid
      * @param \stored_file $file
      * @return void
      * @throws \dml_exception
@@ -174,20 +174,20 @@ class testcourse {
     /**
      * Generate a resource in given course.
      *
-     * @param \stdClass               $course
+     * @param \stdClass $course
      * @param \testing_data_generator $generator
-     * @param string                  $filename If empty, random filename is generated
-     * @param int|null                $draftid  If null, moodle is asked for unused draft id
-     * @param string                  $content  If empty, random bytes are written
+     * @param string $filename If empty, random filename is generated
+     * @param int|null $draftid If null, moodle is asked for unused draft id
+     * @param string $content If empty, random bytes are written
      * @return \stdClass
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
     public function generate_resource(\stdClass $course, \testing_data_generator $generator, string $filename = '',
-                                      ?int      $draftid = null, string $content = '') {
-        $record         = new \stdClass();
+            ?int $draftid = null, string $content = '') {
+        $record = new \stdClass();
         $record->course = $course;
-        list($draftid, $file) = $this->generate_file($filename, $draftid, $content);
+        [$draftid, $file] = $this->generate_file($filename, $draftid, $content);
         $record->files = $draftid;
         return $generator->create_module('resource', $record);
     }
@@ -196,9 +196,9 @@ class testcourse {
      * Generate a file with moodle file_storage.
      * Only the draft id is required for the module generators.
      *
-     * @param string   $filename If empty, random filename is generated
-     * @param int|null $draftid  If null, moodle is asked for unused draft id
-     * @param string   $content  If empty, random bytes are written
+     * @param string $filename If empty, random filename is generated
+     * @param int|null $draftid If null, moodle is asked for unused draft id
+     * @param string $content If empty, random bytes are written
      * @return array
      * @throws \file_exception
      * @throws \stored_file_creation_exception
@@ -209,21 +209,21 @@ class testcourse {
             $filename = 'Testfile' . rand(1000000, 1000000000);
         }
 
-        $fs          = get_file_storage();
+        $fs = get_file_storage();
         $usercontext = \context_user::instance($USER->id);
-        $draftid     = !is_null($draftid) ? $draftid : file_get_unused_draft_itemid();
-        $content     = $content == '' ? random_bytes(rand(1, 1000)) : $content;
+        $draftid = !is_null($draftid) ? $draftid : file_get_unused_draft_itemid();
+        $content = $content == '' ? random_bytes(rand(1, 1000)) : $content;
 
-        $filerecord = array(
+        $filerecord = [
                 'contextid' => $usercontext->id,
                 'component' => 'user',
-                'filearea'  => 'draft',
-                'itemid'    => $draftid,
-                'filepath'  => '/',
-                'filename'  => $filename,
+                'filearea' => 'draft',
+                'itemid' => $draftid,
+                'filepath' => '/',
+                'filename' => $filename,
                 'sortorder' => 1,
-        );
-        $file       = $fs->create_file_from_string($filerecord, $content);
+        ];
+        $file = $fs->create_file_from_string($filerecord, $content);
         return [$draftid, $file];
     }
 
@@ -236,12 +236,12 @@ class testcourse {
      */
     public function get_contenthash_of_first_found_file($course) {
         global $DB;
-        $module   = $DB->get_record('modules', ['name' => 'resource']);
-        $cms      = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id], 'id ASC');
+        $module = $DB->get_record('modules', ['name' => 'resource']);
+        $cms = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id], 'id ASC');
         $resource = reset($cms);
-        $context  = \context_module::instance($resource->id);
+        $context = \context_module::instance($resource->id);
         // There is also a dot entry. So there are at least two records.
-        $files       = $DB->get_records('files', ['contextid' => $context->id], 'id ASC');
+        $files = $DB->get_records('files', ['contextid' => $context->id], 'id ASC');
         $contenthash = null;
         foreach ($files as $file) {
             if ($file->filename != '.') {

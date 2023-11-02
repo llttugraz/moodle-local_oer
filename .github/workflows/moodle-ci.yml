@@ -1,6 +1,6 @@
 name: Moodle Plugin CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   test:
@@ -30,16 +30,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4', '8.0', '8.1', '8.2']
-        moodle-branch: ['MOODLE_401_STABLE', 'MOODLE_402_STABLE', 'MOODLE_403_STABLE']
-        database: [pgsql, mariadb]
+        php: [ '7.4', '8.0', '8.1', '8.2' ]
+        moodle-branch: [ 'MOODLE_401_STABLE', 'MOODLE_402_STABLE', 'MOODLE_403_STABLE' ]
+        database: [ pgsql, mariadb ]
         exclude:
-        - php: '7.4'
-          moodle-branch: 'MOODLE_402_STABLE'
-        - php: '7.4'
-          moodle-branch: 'MOODLE_403_STABLE'
-        - php: '8.2'
-          moodle-branch: 'MOODLE_401_STABLE'
+          - php: '7.4'
+            moodle-branch: 'MOODLE_402_STABLE'
+          - php: '7.4'
+            moodle-branch: 'MOODLE_403_STABLE'
+          - php: '8.2'
+            moodle-branch: 'MOODLE_401_STABLE'
 
     steps:
       - name: Check out repository code

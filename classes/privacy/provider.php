@@ -64,8 +64,8 @@ class provider implements
         $collection->add_database_table(
                 'local_oer_userlist',
                 [
-                        'userid'      => 'privacy:metadata:local_oer_userlist:userid',
-                        'type'        => 'privacy:metadata:local_oer_userlist:type',
+                        'userid' => 'privacy:metadata:local_oer_userlist:userid',
+                        'type' => 'privacy:metadata:local_oer_userlist:type',
                         'timecreated' => 'privacy:metadata:local_oer_userlist:timecreated',
                 ],
                 'privacy:metadata:local_oer_userlist'
@@ -140,13 +140,13 @@ class provider implements
         $sql = "SELECT * FROM {local_oer_userlist} ou WHERE ou.userid = :userid";
         if ($userrecord = $DB->get_record_sql($sql, ['userid' => $contextlist->get_user()->id])) {
             $data = (object) [
-                    'userid'      => $userrecord->userid,
-                    'type'        => $userrecord->type,
+                    'userid' => $userrecord->userid,
+                    'type' => $userrecord->type,
                     'timecreated' => transform::datetime($userrecord->timecreated),
             ];
             writer::with_context(\context_system::instance())->export_data(
                     [
-                            get_string('pluginname', 'local_oer')
+                            get_string('pluginname', 'local_oer'),
                     ], $data);
         }
     }

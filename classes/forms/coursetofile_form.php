@@ -108,8 +108,8 @@ class coursetofile_form extends \moodleform {
                 $collapse = $OUTPUT->render_from_template('local_oer/courseinfo_collapse', $infodata);
                 $mform->addElement('advcheckbox', $identifier,
                         $courseinfo['metadata']['coursename'], $collapse,
-                        array('group' => $courseinfo['parent']),
-                        array(0, 1));
+                        ['group' => $courseinfo['parent']],
+                        [0, 1]);
             }
             $mform->addElement('html', '<hr>');
         }
@@ -168,11 +168,13 @@ class coursetofile_form extends \moodleform {
                 $params = [
                         'contenthash' => $file['contenthash'],
                         'courseid' => $course[0],
-                        'coursecode' => $course[1]
+                        'coursecode' => $course[1],
                 ];
                 $ignore = $DB->get_field('local_oer_courseinfo', 'ignored',
-                        ['courseid' => $course[0],
-                                'coursecode' => $course[1]]);
+                        [
+                                'courseid' => $course[0],
+                                'coursecode' => $course[1],
+                        ]);
                 if (($file['courseid'] == $course[0] && $ignore != $state) ||
                         ($file['courseid'] != $course[0] && $state == coursetofile::COURSETOFILE_DISABLED)) {
                     // For editor course only store different values, and for others.

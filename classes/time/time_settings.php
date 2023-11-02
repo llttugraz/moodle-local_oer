@@ -81,9 +81,9 @@ class time_settings {
      * @throws \dml_exception
      */
     public static function set_next_upload_window() {
-        $plugin  = 'local_oer';
+        $plugin = 'local_oer';
         $setting = get_config($plugin, self::CONF_RELEASETIME);
-        $clock   = get_config($plugin, self::CONF_RELEASEHOUR);
+        $clock = get_config($plugin, self::CONF_RELEASEHOUR);
         switch ($setting) {
             case self::DAY:
                 $next = new \DateTime("tomorrow $clock");
@@ -95,26 +95,26 @@ class time_settings {
                 $next = new \DateTime("first day of next month $clock");
                 break;
             case self::CUSTOM:
-                $dates        = explode(';', get_config($plugin, self::CONF_CUSTOMDATES));
-                $now          = new \DateTime();
-                $smallest     = -1;
+                $dates = explode(';', get_config($plugin, self::CONF_CUSTOMDATES));
+                $now = new \DateTime();
+                $smallest = -1;
                 $smallestdate = -1;
                 foreach ($dates as $date) {
-                    $a     = explode('.', $date);
+                    $a = explode('.', $date);
                     $month = $now->format('m');
-                    $day   = $now->format('d');
+                    $day = $now->format('d');
                     if ($a[1] < $month || ($a[1] == $month && $a[0] <= $day)) {
                         $year = (int) $now->format('Y') + 1;
                     } else {
                         $year = $now->format('Y');
                     }
                     $timestring = "$year-$a[1]-$a[0] $clock";
-                    $time       = new \DateTime($timestring);
-                    $diff       = $time->getTimestamp() - $now->getTimestamp();
+                    $time = new \DateTime($timestring);
+                    $diff = $time->getTimestamp() - $now->getTimestamp();
                     if ($diff <= 0) {
                         continue;
                     } else if ($smallest == -1 || ($smallest != -1 && $diff < $smallest)) {
-                        $smallest     = $diff;
+                        $smallest = $diff;
                         $smallestdate = $time;
                     }
                 }
@@ -133,9 +133,9 @@ class time_settings {
      * @throws \coding_exception
      */
     public static function format_difference($diff) {
-        $a            = [];
-        $a['days']    = floor($diff / (3600 * 24));
-        $a['hours']   = floor(($diff % (3600 * 24)) / 3600);
+        $a = [];
+        $a['days'] = floor($diff / (3600 * 24));
+        $a['hours'] = floor(($diff % (3600 * 24)) / 3600);
         $a['minutes'] = floor(($diff % 3600) / 60);
 
         return get_string('timediff', 'local_oer', $a);
@@ -155,13 +155,13 @@ class time_settings {
         global $PAGE;
         $context = \context_course::instance($courseid);
         $PAGE->set_context($context);
-        $renderer    = new \plugin_renderer_base($PAGE, 'course');
-        $compare     = time();
+        $renderer = new \plugin_renderer_base($PAGE, 'course');
+        $compare = time();
         $nextrelease = get_config('local_oer', self::RELEASETIME);
-        $diff        = $nextrelease - $compare;
-        $data        = [
+        $diff = $nextrelease - $compare;
+        $data = [
                 'nextrelease' => $nextrelease < time() ? '-' : userdate($nextrelease),
-                'nextdiff'    => $diff < 0 ? '-' : self::format_difference($diff),
+                'nextdiff' => $diff < 0 ? '-' : self::format_difference($diff),
         ];
         return $renderer->render_from_template('local_oer/timeslot', $data);
     }
