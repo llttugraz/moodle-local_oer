@@ -206,14 +206,17 @@ class filelist {
                                 'contenthash' => $file[0]['file']->get_contenthash(),
                         ]);
                 [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($record);
-                $timestamps = $DB->get_records('local_oer_snapshot', ['courseid' => $courseid, 'contenthash' => $contenthash],
+                $timestamps = $DB->get_records('local_oer_snapshot', [
+                        'courseid' => $courseid, 'contenthash' => $file[0]['file']->get_contenthash(),
+                ],
                         'timecreated DESC', 'id,timecreated', 0, 1);
                 $snapshot = new \stdClass();
                 $snapshot->release = empty($timestamps) ? 0 : reset($timestamps)->timecreated;
                 $entry['id'] = $record->id;
                 $entry['title'] = $record->title;
                 $entry['timemodified'] = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
-                $entry['timeuploaded'] = !is_null($snapshot->release) ? userdate($snapshot->release) : '-';
+                $entry['timeuploaded'] = (!is_null($snapshot->release) && $snapshot->release > 0)
+                        ? userdate($snapshot->release) : '-';
                 $entry['timeuploadedts'] = $snapshot->release;
                 $entry['upload'] = $record->state == 1 ? 1 : 0;
                 $entry['ignore'] = $record->state == 2 ? 1 : 0;

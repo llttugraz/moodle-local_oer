@@ -1,6 +1,6 @@
 2023-11-03
 * Bugfix for HTML special characters https://github.com/llttugraz/moodle-local_oer/issues/23
-
+* Bugfix for wrong shown release timestamps https://github.com/llttugraz/moodle-local_oer/tree/24-bug-wrongmissing-timestamp-on-filecard-for-release-date
 
 2023-11-02
 * add CHANGELOG
