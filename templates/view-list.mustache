@@ -57,7 +57,7 @@
                     </div>
                     <div class="pl-1 col-2">
                         <p class="card-title d-block m-0">
-                            <span title="{{title}}">{{title}}</span>
+                            <span title="{{title}}">{{{title}}}</span>
                             {{#ignore}}
                                 <small><i class="icon fa fa-info-circle fa-fw" title="{{#str}} isignored, local_oer{{/str}}" aria-hidden="true"></i></small>
                             {{/ignore}}
@@ -99,14 +99,14 @@
                             <li class="list-group-item border-0 p-0">
                                 <small><small>{{#str}} section {{/str}}:
                                     {{#sections}}
-                                        {{sectionname}},
+                                        {{{sectionname}}},
                                     {{/sections}}
                                 </small> </small>
                             </li>
                             <li class="list-group-item border-0 p-0">
                                 <small><small>{{#str}} activity {{/str}}:
                                     {{#modules}}
-                                        <a href="{{moduleurl}}">{{modulename}}</a>,
+                                        <a href="{{moduleurl}}">{{{modulename}}}</a>,
                                     {{/modules}}
                                 </small> </small>
                             </li>

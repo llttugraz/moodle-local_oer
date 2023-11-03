@@ -1,3 +1,7 @@
+2023-11-03
+* Bugfix for HTML special characters https://github.com/llttugraz/moodle-local_oer/issues/23
+
+
 2023-11-02
 * add CHANGELOG
 * add CI support for Moodle 4.3 and PHP 8.2
