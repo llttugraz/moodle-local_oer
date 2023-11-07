@@ -42,6 +42,20 @@ class oersubplugins_settings extends admin_setting {
     }
 
     /**
+     * Returns an array of all subplugins.
+     *
+     * @return array
+     */
+    private function get_plugin_list() {
+        return [
+                'oermodules' => core_component::get_plugin_list('oermodules'),
+                'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
+                'classification' => core_component::get_plugin_list('oerclassification'),
+                'uploader' => core_component::get_plugin_list('oeruploader'),
+        ];
+    }
+
+    /**
      * Always returns true, does nothing.
      *
      * @return true
@@ -75,17 +89,14 @@ class oersubplugins_settings extends admin_setting {
      *
      * @param string $query The string to search for
      * @return bool Returns true if found, false if not
+     * @throws coding_exception
      */
     public function is_related($query) {
         if (parent::is_related($query)) {
             return true;
         }
 
-        $plugins = [
-                'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
-                'classification' => core_component::get_plugin_list('oerclassification'),
-                'uploader' => core_component::get_plugin_list('oeruploader'),
-        ];
+        $plugins = $this->get_plugin_list();
         foreach ($plugins as $key => $subplugins) {
             foreach ($subplugins as $name => $dir) {
                 if (stripos($name, $query) !== false) {
@@ -105,8 +116,11 @@ class oersubplugins_settings extends admin_setting {
      * Builds the XHTML to display the control.
      *
      * @param string $data Unused
-     * @param string $query
+     * @param $query
      * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function output_html($data, $query = '') {
         global $OUTPUT, $PAGE;
@@ -120,11 +134,7 @@ class oersubplugins_settings extends admin_setting {
         $strversion = get_string('version');
         $strplugin = get_string('plugin');
 
-        $plugins = [
-                'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
-                'classification' => core_component::get_plugin_list('oerclassification'),
-                'uploader' => core_component::get_plugin_list('oeruploader'),
-        ];
+        $plugins = $this->get_plugin_list();
 
         $return = $OUTPUT->heading(get_string('subpluginsheading', 'local_oer'), 3, 'main', true);
         $return .= $OUTPUT->box_start('generalbox oerinstalledsubplugins');

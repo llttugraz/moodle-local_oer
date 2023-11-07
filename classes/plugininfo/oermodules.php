@@ -19,7 +19,7 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2021-2023 Educational Technologies, Graz, University of Technology
+ * @copyright  2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,16 +30,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/oer/classes/plugininfo/plugininfo.php');
 
 /**
- * Class oercourseinfo
+ * Class oermodules
  */
-class oercourseinfo extends plugininfo {
+class oermodules extends plugininfo {
     /**
      * @var string
      */
-    protected static $subplugin = 'oercourseinfo';
+    protected static $subplugin = 'oermodules';
 
     /**
      * @var string
      */
-    protected static $enabledplugins = 'enabledcourseinfoplugins';
+    protected static $enabledplugins = 'enabledmodulesplugins';
 }
