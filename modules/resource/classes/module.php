@@ -26,12 +26,37 @@
 namespace oermod_resource;
 
 use local_oer\modules\elements;
+use local_oer\modules\element;
 
 class module implements \local_oer\modules\module {
-
-    public function load_elements(): \local_oer\modules\elements {
+    /**
+     * Load all files from a given course.
+     *
+     * @param int $courseid Moodle courseid
+     * @return elements
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    public function load_elements(int $courseid): \local_oer\modules\elements {
         $elements = new elements();
-        // TODO: Implement load_elements() method.
+        $fs = get_file_storage();
+        $cms = get_fast_modinfo($courseid);
+
+        foreach ($cms->cms as $cm) {
+            $files = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'id ASC', false);
+            foreach ($files as $file) {
+                $element = new element();
+                $element->set_type(element::OERTYPE_MOODLEFILE);
+                $element->set_title($file->get_filename());
+                $element->set_identifier($file->get_contenthash());
+                $element->set_iddescription('Moodle file contenthash');
+                $element->set_idtype('contenthash:SHA1');
+                $element->set_license($file->get_license());
+
+                $elements->add_element($element);
+            }
+        }
+
         return $elements;
     }
 

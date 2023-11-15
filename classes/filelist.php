@@ -27,6 +27,8 @@ namespace local_oer;
 
 use local_oer\helper\filestate;
 use local_oer\helper\requirements;
+use local_oer\modules\elements;
+use local_oer\plugininfo\oermod;
 
 /**
  * Class filelist
@@ -73,6 +75,11 @@ class filelist {
      * @throws \moodle_exception
      */
     public static function get_course_files(int $courseid): array {
+        $plugins = oermod::get_enabled_plugins();
+        $elements = new elements();
+        foreach (array_keys($plugins) as $pluginname) {
+            $elements->merge_elements(oermod::load_elements($pluginname, $courseid));
+        }
         $mod = get_fast_modinfo($courseid);
         $coursefiles = [];
 

@@ -48,7 +48,7 @@ class oersubplugins_settings extends admin_setting {
      */
     private function get_plugin_list() {
         return [
-                'oermodules' => core_component::get_plugin_list('oermodules'),
+                'mod' => core_component::get_plugin_list('oermod'),
                 'courseinfo' => core_component::get_plugin_list('oercourseinfo'),
                 'classification' => core_component::get_plugin_list('oerclassification'),
                 'uploader' => core_component::get_plugin_list('oeruploader'),
@@ -116,7 +116,7 @@ class oersubplugins_settings extends admin_setting {
      * Builds the XHTML to display the control.
      *
      * @param string $data Unused
-     * @param $query
+     * @param string $query
      * @return string
      * @throws coding_exception
      * @throws dml_exception

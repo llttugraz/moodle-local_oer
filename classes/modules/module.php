@@ -34,9 +34,10 @@ interface module {
     /**
      * Returns all elements a sub-plugin can deliver.
      *
+     * @param int $courseid Moodle courseid
      * @return elements
      */
-    public function load_elements(): \local_oer\modules\elements;
+    public function load_elements(int $courseid): \local_oer\modules\elements;
 
     /**
      * Returns an array of writable fields with language string notation.

@@ -48,7 +48,7 @@ class element {
      *
      * @var int
      */
-    private $type = 0;
+    private int $type = 0;
 
     /**
      * Title of the element.
@@ -56,7 +56,39 @@ class element {
      *
      * @var string
      */
-    private $title = '';
+    private string $title = '';
+
+    /**
+     * Unique identifier for this element.
+     *
+     * @var string
+     */
+    private string $identifier = '';
+
+    /**
+     * Description for the identifier.
+     *
+     * As the elements also can be defined in external systems, different identifiers may be provided.
+     *
+     * @var string
+     */
+    private string $iddescription = '';
+
+    /**
+     * If the identifier can be reproduced directly from the element itself, add the used algorithm here.
+     *
+     * Example: Moodle file contenthashes are generated with SHA1, so write contenthash:SHA1 to this field.
+     *
+     * @var string
+     */
+    private string $idtype = '';
+
+    /**
+     * Shortname of the used license.
+     *
+     * @var string
+     */
+    private string $license = '';
 
     /**
      * Set the type for the element.
@@ -89,7 +121,7 @@ class element {
     }
 
     /**
-     * Set the title of a element. Cannot be empty.
+     * Set the title of element. Cannot be empty.
      *
      * @param string $title
      * @return void
@@ -104,7 +136,7 @@ class element {
     }
 
     /**
-     * Get title of a element.
+     * Get title of element.
      *
      * @return string
      * @throws \coding_exception
@@ -114,5 +146,96 @@ class element {
             throw new \coding_exception('Title has not been set.');
         }
         return $this->title;
+    }
+
+    /**
+     * Set the identifier of this element.
+     *
+     * @param string $identifier
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_identifier(string $identifier): void {
+        if (empty($identifier)) {
+            throw new \coding_exception('Identifier cannot be empty.');
+        }
+        $this->identifier = $identifier;
+    }
+
+    /**
+     * Get the unique identifier of this element.
+     *
+     * @return string
+     * @throws \coding_exception
+     */
+    public function get_identifier(): string {
+        if (empty($this->identifier)) {
+            throw new \coding_exception('Identifier has not been set.');
+        }
+        return $this->identifier;
+    }
+
+    /**
+     * Set the identifier description for this element.
+     *
+     * @param string $description
+     * @return void
+     */
+    public function set_iddescription(string $description): void {
+        $this->iddescription = $description;
+    }
+
+    /**
+     * Get the identifier description of this element.
+     *
+     * @return string
+     */
+    public function get_iddescription(): string {
+        return $this->iddescription;
+    }
+
+    /**
+     * Set the identifier type for this element.
+     *
+     * @param string $type
+     * @return void
+     */
+    public function set_idtype(string $type): void {
+        $this->idtype = $type;
+    }
+
+    /**
+     * Get the identifier type of this element.
+     *
+     * @return string
+     */
+    public function get_idtype(): string {
+        return $this->idtype;
+    }
+
+    /**
+     * Set the license shortname, needs to be mapped to moodle shortnames.
+     *
+     * @param string $license
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_license(string $license): void {
+        global $CFG;
+        require_once ($CFG->libdir . '/licenselib.php');
+        if (!\license_manager::get_license_by_shortname($license)) {
+            throw new \coding_exception('Licenses needs to be mapped to Moodle license shortnames. ' .
+                    'If the license is not available in Moodle set the license to unknown.');
+        }
+        $this->license = $license;
+    }
+
+    /**
+     * Get the license of the element.
+     *
+     * @return void
+     */
+    public function get_license(): string {
+        return $this->license;
     }
 }

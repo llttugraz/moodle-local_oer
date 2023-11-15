@@ -26,10 +26,153 @@
 namespace local_oer\modules;
 
 /**
- * Class resource
+ * Class elements
  *
- * Data-structure for a list of \module\resource of any type. Every module sub-plugin has to return this class.
+ * Data-structure for a list of \module\element of any type. Every module sub-plugin has to return this class.
  */
-class elements {
+class elements implements \Iterator, \Countable {
+    /**
+     * List of elements.
+     *
+     * @var element[]
+     */
+    private array $elements = [];
 
+    /**
+     * Current position of the iterator.
+     *
+     * @var int
+     */
+    private int $pos = 0;
+
+    /**
+     * Add an element to the list.
+     *
+     * @param element $element
+     * @return void
+     * @throws \coding_exception
+     */
+    public function add_element(element $element) {
+        if (empty($element->get_type() || empty($element->get_title())
+                || empty($element->get_identifier()) || empty($element->get_license()))) {
+            throw new \coding_exception('Fields type, title, identifier and license cannot be empty');
+        }
+        $this->elements[] = $element;
+    }
+
+    /**
+     * Remove an element from the list with the iterator key.
+     *
+     * The iterator key will then point automatically to the next item.
+     * If it was the last item the key will be invalid.
+     *
+     * @param int $pos
+     * @return void
+     */
+    public function remove_element(int $pos) {
+        unset($this->elements[$pos]);
+    }
+
+    /**
+     * Merge a list of elements into this one.
+     *
+     * @param elements $elements
+     * @return void
+     */
+    public function merge_elements(elements $elements) {
+        $this->rewind();
+        foreach ($elements as $element) {
+            $this->elements[] = $element;
+        }
+    }
+
+    /**
+     * Find an element in the list.
+     *
+     * If a non-unique value is given, it only returns the first found element.
+     *
+     * @param string $fieldname
+     * @param string $fieldvalue
+     * @return element|null
+     * @throws \coding_exception
+     */
+    public function find_element(string $fieldname, string $fieldvalue): ?element {
+        if (!property_exists('local_oer\modules\element', $fieldname)) {
+            throw new \coding_exception("Unknown property $fieldname");
+        }
+
+        foreach ($this->elements as $element) {
+            $property = "get_$fieldname";
+            if ($element->{$property} == $fieldvalue) {
+                return $element;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return current element.
+     *
+     * PHP iterator interface.
+     *
+     * @return element
+     */
+    public function current() {
+        return $this->elements[$this->pos];
+    }
+
+    /**
+     * Increase position to next element.
+     *
+     * PHP iterator interface.
+     *
+     * @return void
+     */
+    public function next() {
+        ++$this->pos;
+    }
+
+    /**
+     * Return current position.
+     *
+     * PHP iterator interface.
+     *
+     * @return int
+     */
+    public function key() {
+        return $this->pos;
+    }
+
+    /**
+     * Test if current position results in a valid object.
+     *
+     * PHP iterator interface.
+     *
+     * @return bool
+     */
+    public function valid() {
+        return isset($this->elements[$this->pos]);
+    }
+
+    /**
+     * Set the array key back to start.
+     *
+     * PHP iterator interface.
+     *
+     * @return void
+     */
+    public function rewind() {
+        $this->pos = 0;
+    }
+
+    /**
+     * Count all elements stored in this class.
+     *
+     * PHP countable interface.
+     *
+     * @return int|null
+     */
+    public function count() {
+        return count($this->elements);
+    }
 }

@@ -36,10 +36,32 @@ class oermod extends plugininfo {
     /**
      * @var string
      */
-    protected static $subplugin = 'oermodules';
+    protected static $subplugin = 'oermod';
 
     /**
      * @var string
      */
-    protected static $enabledplugins = 'enabledmodulesplugins';
+    protected static $enabledplugins = 'enabledmodplugins';
+
+    /**
+     * @param string $plugin shortname of plugin
+     * @param int $courseid Moodle courseid
+     * @return \local_oer\modules\elements;
+     * @throws \coding_exception
+     */
+    public static function load_elements(string $plugin, int $courseid): \local_oer\modules\elements {
+        global $CFG;
+        $modulepath = $CFG->dirroot . '/local/oer/modules/' . $plugin . '/classes/module.php';
+        if (!file_exists($modulepath)) {
+            throw new \coding_exception('Convention: Subplugin has to implement module class.');
+        }
+        require_once($modulepath);
+        $classname = "oermod_$plugin\module";
+        $module = new $classname();
+        if (!in_array('local_oer\modules\module', class_implements($module))) {
+            throw new \coding_exception('Convention: Subplugin class module has to implement local_oer\modules\module interface.');
+        }
+        $elements = $module->load_elements($courseid);
+        return $elements;
+    }
 }

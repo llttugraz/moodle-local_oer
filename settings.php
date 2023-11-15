@@ -173,7 +173,7 @@ if ($hassiteconfig) {
     unset($settings);
     $ADMIN->add('localplugins',
             new admin_category('localoersubpluginssettings', new lang_string('pluginname', 'local_oer'), true));
-    foreach (core_plugin_manager::instance()->get_plugins_of_type('oermodules') as $plugin) {
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('oermod') as $plugin) {
         $plugin->load_settings($ADMIN, 'localoersubpluginssettings', $hassiteconfig);
     }
     foreach (core_plugin_manager::instance()->get_plugins_of_type('oercourseinfo') as $plugin) {
