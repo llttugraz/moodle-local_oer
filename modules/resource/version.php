@@ -23,23 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_oer\plugininfo;
-
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/local/oer/classes/plugininfo/plugininfo.php');
-
-/**
- * Class oermodules
- */
-class oermodules extends plugininfo {
-    /**
-     * @var string
-     */
-    protected static $subplugin = 'oermodules';
-
-    /**
-     * @var string
-     */
-    protected static $enabledplugins = 'enabledmodulesplugins';
-}
+$plugin->version = 2023111500;
+$plugin->requires = 2022112806;
+$plugin->component = 'oermod_resource';

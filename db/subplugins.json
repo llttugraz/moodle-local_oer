@@ -3,6 +3,6 @@
     "oercourseinfo": "local/oer/metadata",
     "oeruploader": "local/oer/uploader",
     "oerclassification": "local/oer/classification",
-    "oermodules": "local/oer/modules"
+    "oermod": "local/oer/modules"
   }
 }

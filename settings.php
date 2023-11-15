@@ -69,6 +69,7 @@ if ($hassiteconfig) {
         }
     }
 
+    // TODO: this setting somehow blocks upgradesettings.php on version changes.
     $settings->add(new admin_setting_configmultiselect('local_oer/coursecustomfieldsignored',
             get_string('coursecustomfieldsignored', 'local_oer'),
             get_string('coursecustomfieldsignored_description', 'local_oer'),
