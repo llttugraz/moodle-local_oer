@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Open Educational Resources Plugin
+ * OER subplugin for loading mod_resource files
  *
- * @package    local_oer
+ * @package    oermod_resource
  * @author     Christian Ortner <christian.ortner@tugraz.at>
  * @copyright  2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

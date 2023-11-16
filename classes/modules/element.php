@@ -59,29 +59,11 @@ class element {
     private string $title = '';
 
     /**
-     * Unique identifier for this element.
+     * Unique identifier for this element. Use the class /local/oer/identifier to create identifiers.
      *
      * @var string
      */
     private string $identifier = '';
-
-    /**
-     * Description for the identifier.
-     *
-     * As the elements also can be defined in external systems, different identifiers may be provided.
-     *
-     * @var string
-     */
-    private string $iddescription = '';
-
-    /**
-     * If the identifier can be reproduced directly from the element itself, add the used algorithm here.
-     *
-     * Example: Moodle file contenthashes are generated with SHA1, so write contenthash:SHA1 to this field.
-     *
-     * @var string
-     */
-    private string $idtype = '';
 
     /**
      * Shortname of the used license.
@@ -173,7 +155,7 @@ class element {
      * @throws \coding_exception
      */
     public function set_identifier(string $identifier): void {
-        $this->not_empty('identifier', $identifier);
+        \local_oer\identifier::strict_validate($identifier);
         $this->identifier = $identifier;
     }
 
@@ -186,44 +168,6 @@ class element {
     public function get_identifier(): string {
         $this->not_empty('identifier', $this->identifier);
         return $this->identifier;
-    }
-
-    /**
-     * Set the identifier description for this element.
-     *
-     * @param string $description
-     * @return void
-     */
-    public function set_iddescription(string $description): void {
-        $this->iddescription = $description;
-    }
-
-    /**
-     * Get the identifier description of this element.
-     *
-     * @return string
-     */
-    public function get_iddescription(): string {
-        return $this->iddescription;
-    }
-
-    /**
-     * Set the identifier type for this element.
-     *
-     * @param string $type
-     * @return void
-     */
-    public function set_idtype(string $type): void {
-        $this->idtype = $type;
-    }
-
-    /**
-     * Get the identifier type of this element.
-     *
-     * @return string
-     */
-    public function get_idtype(): string {
-        return $this->idtype;
     }
 
     /**
@@ -270,22 +214,21 @@ class element {
      * @return string
      * @throws \coding_exception
      */
-    public function get_origin(): string {
-        $this->not_empty('origin', $this->origin);
-        return $this->origin;
+    public function get_source(): string {
+        $this->not_empty('source', $this->source);
+        return $this->source;
     }
 
     /**
-     * Set the source of this element.
+     * Set the origin of this element.
      *
      * @param string $value
      * @return void
      * @throws \coding_exception
-     * @throws \invalid_parameter_exception
      */
     public function set_source(string $value): void {
         $this->not_empty('source', $value);
-        validate_param($value, PARAM_URL, NULL_NOT_ALLOWED, 'Source has to be a valid url');
+        $value = clean_param($value, PARAM_URL);
         $this->source = $value;
     }
 
@@ -295,9 +238,9 @@ class element {
      * @return string
      * @throws \coding_exception
      */
-    public function get_source(): string {
-        $this->not_empty('source', $this->source);
-        return $this->source;
+    public function get_origin(): string {
+        $this->not_empty('origin', $this->origin);
+        return $this->origin;
     }
 
     /**

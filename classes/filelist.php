@@ -75,10 +75,19 @@ class filelist {
      * @throws \moodle_exception
      */
     public static function get_course_files(int $courseid): array {
+        // Step 1: gather all elements from subplugins.
         $plugins = oermod::get_enabled_plugins();
         $elements = new elements();
         foreach (array_keys($plugins) as $pluginname) {
             $elements->merge_elements(oermod::load_elements($pluginname, $courseid));
+        }
+
+        // Step 2: enrich elements for oer workflow.
+        foreach ($elements as $element) {
+            // Step 2.1: check if element already is stored in table.
+
+
+            // Step 2.2: if element has type OERTYPE_MOODLE FILE, check for filestate.
         }
         $mod = get_fast_modinfo($courseid);
         $coursefiles = [];

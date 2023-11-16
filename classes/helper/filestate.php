@@ -63,6 +63,11 @@ class filestate {
     const STATE_FILE_ERROR = 0;
 
     /**
+     * This element is cannot be checked for duplicates so it is ignored.
+     */
+    const STATE_FILE_IGNORE = -1;
+
+    /**
      * Calculate the current file state for a file that has been found in a mod_resource or mod_folder activity.
      *
      * @param string $contenthash Moodle file contenthash

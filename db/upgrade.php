@@ -712,6 +712,72 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022111700, 'local', 'oer');
     }
 
+    if ($oldversion < 2023111600) {
+
+        // Define table local_oer_elements to be created.
+        $table = new xmldb_table('local_oer_elements');
+
+        // Adding fields to table local_oer_elements.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('identifier', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('context', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('license', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'unknown');
+        $table->add_field('persons', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('tags', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('language', XMLDB_TYPE_CHAR, '2', null, XMLDB_NOTNULL, null, 'en');
+        $table->add_field('resourcetype', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('classification', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('releasestate', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_oer_elements.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('license', XMLDB_KEY_FOREIGN, ['license'], 'license', ['shortname']);
+
+        // Adding indexes to table local_oer_elements.
+        $table->add_index('uniqueindex', XMLDB_INDEX_UNIQUE, ['courseid', 'identifier']);
+
+        // Conditionally launch create table for local_oer_elements.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $records = $DB->get_records('local_oer_files');
+        foreach ($records as $record) {
+            unset($record->id);
+            $identifier = \local_oer\identifier::compose(
+                    'moodle', $CFG->wwwroot,
+                    'file', 'contenthash', $record->contenthash
+            );
+
+            $record->identifier = $identifier;
+            unset($record->contenthash);
+            $record->type = \local_oer\modules\element::OERTYPE_MOODLEFILE;
+            $record->releasestate = $record->state;
+            unset($record->state);
+            $DB->insert_record('local_oer_elements', $record);
+        }
+
+        // Define table local_oer_files to be dropped.
+        $table = new xmldb_table('local_oer_files');
+
+        // Conditionally launch drop table for local_oer_files.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111600, 'local', 'oer');
+    }
+
     return true;
 }
 

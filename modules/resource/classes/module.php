@@ -44,6 +44,7 @@ class module implements \local_oer\modules\module {
      * @throws \moodle_exception
      */
     public function load_elements(int $courseid): \local_oer\modules\elements {
+        global $CFG;
         $elements = new elements();
         $fs = get_file_storage();
         $cms = get_fast_modinfo($courseid);
@@ -55,9 +56,11 @@ class module implements \local_oer\modules\module {
                 $element->set_type(element::OERTYPE_MOODLEFILE);
                 $element->set_origin('mod_resource');
                 $element->set_title($file->get_filename());
-                $element->set_identifier($file->get_contenthash());
-                $element->set_iddescription('Moodle file contenthash');
-                $element->set_idtype('contenthash:SHA1');
+                $identifier = \local_oer\identifier::compose(
+                        'moodle', $CFG->wwwroot, 'file',
+                        'contenthash', $file->get_contenthash()
+                );
+                $element->set_identifier($identifier);
                 $element->set_license($file->get_license());
                 $element->set_source(filehelper::get_file_url($file, true));
                 $element->set_filesize($file->get_filesize());
