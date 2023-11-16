@@ -44,6 +44,8 @@ class oermod extends plugininfo {
     protected static $enabledplugins = 'enabledmodplugins';
 
     /**
+     * Load all elements from a given subplugin.
+     *
      * @param string $plugin shortname of plugin
      * @param int $courseid Moodle courseid
      * @return \local_oer\modules\elements;

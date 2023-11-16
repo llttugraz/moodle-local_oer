@@ -91,6 +91,33 @@ class element {
     private string $license = '';
 
     /**
+     * Where does the element come from?
+     *
+     * For Moodle plugins just type in the frankenstyle plugin name (e.g. mod_resource). For external sources take the name of the
+     * source (e.g. opencast).
+     *
+     * @var string
+     */
+    private string $origin = '';
+
+    /**
+     * Source url to the element. Direct link to file or external source.
+     *
+     * @var string
+     */
+    private string $source = '';
+
+    /**
+     * Filesize in bytes.
+     *
+     * Only necessary if type OERTYPE_MOODLEFILE is used. Optional for other types.
+     * Readable formats will be created later.
+     *
+     * @var int
+     */
+    private int $filesize = 0;
+
+    /**
      * Set the type for the element.
      *
      * Only defined types can be used.
@@ -100,10 +127,7 @@ class element {
      * @throws \coding_exception
      */
     public function set_type(int $type): void {
-        if (!in_array($type, [self::OERTYPE_MOODLEFILE, self::OERTYPE_EXTERNAL])) {
-            throw new \coding_exception('Wrong type defined for element, use either OERTYPE_MOODLEFILE or OERTYPE_EXTERNAL.');
-        }
-
+        $this->wrong_type($type);
         $this->type = $type;
     }
 
@@ -114,9 +138,7 @@ class element {
      * @throws \coding_exception
      */
     public function get_type(): int {
-        if ($this->type == 0) {
-            throw new \coding_exception('Type has not been set.');
-        }
+        $this->wrong_type($this->type);
         return $this->type;
     }
 
@@ -128,10 +150,7 @@ class element {
      * @throws \coding_exception
      */
     public function set_title(string $title): void {
-        if (empty($title)) {
-            throw new \coding_exception('Title cannot be empty.');
-        }
-
+        $this->not_empty('title', $title);
         $this->title = $title;
     }
 
@@ -142,9 +161,7 @@ class element {
      * @throws \coding_exception
      */
     public function get_title(): string {
-        if (empty($this->title)) {
-            throw new \coding_exception('Title has not been set.');
-        }
+        $this->not_empty('title', $this->title);
         return $this->title;
     }
 
@@ -156,9 +173,7 @@ class element {
      * @throws \coding_exception
      */
     public function set_identifier(string $identifier): void {
-        if (empty($identifier)) {
-            throw new \coding_exception('Identifier cannot be empty.');
-        }
+        $this->not_empty('identifier', $identifier);
         $this->identifier = $identifier;
     }
 
@@ -169,9 +184,7 @@ class element {
      * @throws \coding_exception
      */
     public function get_identifier(): string {
-        if (empty($this->identifier)) {
-            throw new \coding_exception('Identifier has not been set.');
-        }
+        $this->not_empty('identifier', $this->identifier);
         return $this->identifier;
     }
 
@@ -222,7 +235,7 @@ class element {
      */
     public function set_license(string $license): void {
         global $CFG;
-        require_once ($CFG->libdir . '/licenselib.php');
+        require_once($CFG->libdir . '/licenselib.php');
         if (!\license_manager::get_license_by_shortname($license)) {
             throw new \coding_exception('Licenses needs to be mapped to Moodle license shortnames. ' .
                     'If the license is not available in Moodle set the license to unknown.');
@@ -237,5 +250,103 @@ class element {
      */
     public function get_license(): string {
         return $this->license;
+    }
+
+    /**
+     * Set the origin of this element.
+     *
+     * @param string $value
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_origin(string $value): void {
+        $this->not_empty('origin', $value);
+        $this->origin = $value;
+    }
+
+    /**
+     * Get the identifier type of this element.
+     *
+     * @return string
+     * @throws \coding_exception
+     */
+    public function get_origin(): string {
+        $this->not_empty('origin', $this->origin);
+        return $this->origin;
+    }
+
+    /**
+     * Set the source of this element.
+     *
+     * @param string $value
+     * @return void
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     */
+    public function set_source(string $value): void {
+        $this->not_empty('source', $value);
+        validate_param($value, PARAM_URL, NULL_NOT_ALLOWED, 'Source has to be a valid url');
+        $this->source = $value;
+    }
+
+    /**
+     * Get the identifier type of this element.
+     *
+     * @return string
+     * @throws \coding_exception
+     */
+    public function get_source(): string {
+        $this->not_empty('source', $this->source);
+        return $this->source;
+    }
+
+    /**
+     * Set filesize.
+     *
+     * @param int $filesize
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_filesize(int $filesize): void {
+        if ($this->type == self::OERTYPE_MOODLEFILE) {
+            $this->not_empty('filesize', $filesize);
+        }
+        $this->filesize = $filesize;
+    }
+
+    /**
+     * Get filesize.
+     *
+     * @return int
+     */
+    public function get_filesize(): int {
+        return $this->filesize;
+    }
+
+    /**
+     * Validate if element is not empty.
+     *
+     * @param string $name
+     * @param string $value
+     * @return void
+     * @throws \coding_exception
+     */
+    private function not_empty(string $name, string $value) {
+        if (empty($value)) {
+            throw new \coding_exception("$name has not been set.");
+        }
+    }
+
+    /**
+     * Validate if only defined types are used.
+     *
+     * @param int $type
+     * @return void
+     * @throws \coding_exception
+     */
+    private function wrong_type(int $type) {
+        if (!in_array($type, [self::OERTYPE_MOODLEFILE, self::OERTYPE_EXTERNAL])) {
+            throw new \coding_exception('Wrong type defined for element, use either OERTYPE_MOODLEFILE or OERTYPE_EXTERNAL.');
+        }
     }
 }

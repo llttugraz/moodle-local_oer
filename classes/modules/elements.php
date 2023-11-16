@@ -53,10 +53,7 @@ class elements implements \Iterator, \Countable {
      * @throws \coding_exception
      */
     public function add_element(element $element) {
-        if (empty($element->get_type() || empty($element->get_title())
-                || empty($element->get_identifier()) || empty($element->get_license()))) {
-            throw new \coding_exception('Fields type, title, identifier and license cannot be empty');
-        }
+        $this->validate_required_fields($element);
         $this->elements[] = $element;
     }
 
@@ -174,5 +171,32 @@ class elements implements \Iterator, \Countable {
      */
     public function count() {
         return count($this->elements);
+    }
+
+    /**
+     * When a new element is added there are some minimum required fields.
+     *
+     * Without these fields the local_oer plugin cannot process the elements correctly.
+     * It is only tested if the fields are empty, as the element itself tests for the content of the fields.
+     *
+     * @param element $element
+     * @return void
+     * @throws \coding_exception
+     */
+    private function validate_required_fields(element $element) {
+        $required = ['type', 'title', 'identifier', 'license', 'origin', 'source'];
+        if ($element->get_type() == element::OERTYPE_MOODLEFILE) {
+            $required[] = 'filesize';
+        }
+        $missing = [];
+        foreach ($required as $param) {
+            $field = "get_$param";
+            if (empty($element->$field())) {
+                $missing[] = $param;
+            }
+        }
+        if (!empty($missing)) {
+            throw new \coding_exception('Field(s) -' . implode(',', $missing) . '- is/are required and cannot be empty');
+        }
     }
 }
