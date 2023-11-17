@@ -100,6 +100,31 @@ class element {
     private int $filesize = 0;
 
     /**
+     * Mimetype.
+     *
+     *  Only necessary if type OERTYPE_MOODLEFILE is used. Optional for other types.
+     *  Readable formats will be created later.
+     *
+     * @var string
+     */
+    private string $mimetype = '';
+
+    /**
+     * Elementstate will be filled by the oer plugin and keeps track of different states an element can have
+     * in the system.
+     *
+     * @var \stdClass
+     */
+    private \stdClass $elementstate;
+
+    /**
+     * Data added by the user in GUI or added by local_oer plugin will be stored here.
+     *
+     * @var \stdClass
+     */
+    private \stdClass $storedmetadata;
+
+    /**
      * Set the type for the element.
      *
      * Only defined types can be used.
@@ -181,8 +206,7 @@ class element {
         global $CFG;
         require_once($CFG->libdir . '/licenselib.php');
         if (!\license_manager::get_license_by_shortname($license)) {
-            throw new \coding_exception('Licenses needs to be mapped to Moodle license shortnames. ' .
-                    'If the license is not available in Moodle set the license to unknown.');
+            $license = 'unknown';
         }
         $this->license = $license;
     }
@@ -264,6 +288,77 @@ class element {
      */
     public function get_filesize(): int {
         return $this->filesize;
+    }
+
+    /**
+     * Set mimetype.
+     *
+     * @param string $mimetype
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_mimetype(string $mimetype): void {
+        if ($this->type == self::OERTYPE_MOODLEFILE) {
+            $this->not_empty('mimetype', $mimetype);
+        }
+        $this->mimetype = $mimetype;
+    }
+
+    /**
+     * Get mimetype.
+     *
+     * @return string
+     */
+    public function get_mimetype(): string {
+        return $this->mimetype;
+    }
+
+    /**
+     * Set the element state for the element.
+     *
+     * The val
+     *
+     * @param \stdClass $elementstate
+     * @return void
+     */
+    public function set_elementstate(\stdClass $elementstate): void {
+        $this->elementstate = $elementstate;
+    }
+
+    /**
+     * Get elementstate.
+     *
+     * @return \stdClass
+     */
+    public function get_elementstate(): \stdClass {
+        return $this->elementstate;
+    }
+
+    /**
+     * A record from the local_oer_elements table is added to the element.
+     *
+     * Fields that are already stored will be overwritten.
+     *
+     * @param \stdClass $metadata Metadata from local_oer_elements table.
+     * @return void
+     * @throws \coding_exception
+     */
+    public function set_stored_metadata(\stdClass $metadata) {
+        unset($metadata->identifier);
+        $this->set_title($metadata->title);
+        $this->set_license($metadata->license);
+        unset($metadata->title);
+        unset($metadata->license);
+        $this->storedmetadata = $metadata;
+    }
+
+    /**
+     * Get the stored metadata if already stored in local_oer_elements. Empty array else.
+     *
+     * @return \stdClass
+     */
+    public function get_stored_metadata(): \stdClass {
+        return $this->storedmetadata;
     }
 
     /**

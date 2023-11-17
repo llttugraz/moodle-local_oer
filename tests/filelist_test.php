@@ -41,6 +41,8 @@ class filelist_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
         require_once(__DIR__ . '/helper/testcourse.php');
         $helper = new testcourse();
         $course1 = $helper->generate_testcourse($this->getDataGenerator());
@@ -52,20 +54,6 @@ class filelist_test extends \advanced_testcase {
                 'course1' => $course1,
                 'course2' => $course2,
         ];
-    }
-
-    /**
-     * Test get_files.
-     *
-     * @return void
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @covers ::__construct
-     * @covers ::get_files
-     */
-    public function test_get_files() {
-        $filelist = new filelist($this->data['course2']->id);
-        $this->assertCount(5, $filelist->get_files());
     }
 
     /**

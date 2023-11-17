@@ -28,6 +28,7 @@ namespace local_oer;
 use local_oer\helper\filestate;
 use local_oer\metadata\courseinfo;
 use local_oer\metadata\courseinfo_sync;
+use local_oer\modules\element;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -58,7 +59,7 @@ class filestate_test extends \advanced_testcase {
      * @throws \file_exception
      * @throws \moodle_exception
      * @throws \stored_file_creation_exception
-     * @covers ::calculate_file_state
+     * @covers ::calculate_state
      */
     public function test_calculate_file_state() {
         $this->resetAfterTest(true);
@@ -71,74 +72,70 @@ class filestate_test extends \advanced_testcase {
         $filename = 'samefile';
         $content = 'some content that will result in the same contenthash';
         [$draftid, $file] = $testcourse->generate_file($filename, null, $content);
+        $element = $testcourse->get_element_for_file($file);
         $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
         $testcourse->generate_resource($course2, $this->getDataGenerator(), $filename, null, $content);
 
-        // Tests for state 0.
-        $testcourse->set_file_to_non_release($course1->id, $file);
-        $testcourse->set_file_to_non_release($course2->id, $file);
-        $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
-        $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
-        $this->assert_file_state($file->get_contenthash(), $course1->id,
-                filestate::STATE_FILE_ERROR, 0,
-                0, false);
-        $log = $DB->get_record('local_oer_log', ['courseid' => $course1->id]);
-        $this->assertEquals(logger::LOGERROR, $log->type);
-        $msg = 'Ambiguous metadata for file ' . $file->get_contenthash() .
-                ' found. File has been edited in ' . 2 . ' courses';
-        $this->assertEquals($msg, $log->message);
+        // Tests for state 0 (STATE_FILE_ERROR) Removed.
+        // 2023-11-17: The state STATE_FILE_ERROR and its according code has been removed.
+        // The table local_oer_files has been removed and a new table local_oer_elements added.
+        // The elements table has a unique identifier and cannot be used in more than one course.
 
-        // Tests for state 1.
-        $DB->delete_records('local_oer_files', ['courseid' => $course1->id]);
-        $DB->delete_records('local_oer_files', ['courseid' => $course2->id]);
-        $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
-        $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
-        $this->assert_file_state($file->get_contenthash(), $course1->id,
+        // Tests for state 1 (STATE_FILE_NOT_EDITED).
+        // The element has not been edited yet, so either of the courses can start editing the file.
+        $DB->delete_records('local_oer_elements', ['courseid' => $course1->id]);
+        $DB->delete_records('local_oer_elements', ['courseid' => $course2->id]);
+        $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
+        $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
+        $this->assert_file_state($element, $course1->id,
                 filestate::STATE_FILE_NOT_EDITED, 0,
                 2, true);
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_NOT_EDITED, 0,
                 2, true);
 
-        // Tests for state 2.
+        // Tests for state 2 (STATE_FILE_EDITED).
+        // The element has already been edited in course1, therefore course2 does not get write capability for the file.
         $testcourse->set_file_to_non_release($course1->id, $file);
-        $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
-        $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
-        $this->assert_file_state($file->get_contenthash(), $course1->id,
+        $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
+        $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
+        $this->assert_file_state($element, $course1->id,
                 filestate::STATE_FILE_EDITED, $course1->id,
                 2, true);
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_EDITED, $course1->id,
                 2, false);
 
-        // Tests for state 3.
+        // TODO: fix snapshot class, does not support element datastructure yet.
+        // Tests for state 3 (STATE_FILE_RELEASED).
+        // The element has been released. So it can not be edited by any of the courses.
         $testcourse->set_file_to_release($course1->id, $file);
         $sync = new courseinfo_sync();
         $sync->sync_course($course1->id);
         $snapshot = new snapshot($course1->id);
         $snapshot->create_snapshot_of_course_files();
-        $this->assertTrue($DB->record_exists('local_oer_files', ['courseid' => $course1->id]));
-        $this->assertFalse($DB->record_exists('local_oer_files', ['courseid' => $course2->id]));
-        $this->assertTrue($DB->record_exists('local_oer_snapshot', ['contenthash' => $file->get_contenthash()]));
-        $this->assert_file_state($file->get_contenthash(), $course1->id,
+        $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
+        $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
+        $this->assertTrue($DB->record_exists('local_oer_snapshot', ['identifier' => $element->get_identifier()]));
+        $this->assert_file_state($element, $course1->id,
                 filestate::STATE_FILE_RELEASED, $course1->id,
                 2, false);
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_RELEASED, $course1->id,
                 2, false);
 
         // Test inheritance.
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_RELEASED, $course1->id,
                 2, false);
         delete_course($course1->id, false);
         // After the deletion of course 1 the file metadata will be inherited to course 2.
         // So course 2 has to be the editorid from now on.
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_RELEASED, $course2->id,
                 1, false);
         $DB->delete_records('local_oer_snapshot', ['contenthash' => $file->get_contenthash()]);
-        $this->assert_file_state($file->get_contenthash(), $course2->id,
+        $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_EDITED, $course2->id,
                 1, true);
 
@@ -147,7 +144,10 @@ class filestate_test extends \advanced_testcase {
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (123' .
                 ') has been searched that is not used anywhere');
-        filestate::calculate_file_state('123', $course1->id);
+        $identifier = identifier::compose('moodle', 'unit-test',
+                'file', 'contenthash', '123');
+        $element->set_identifier($identifier);
+        filestate::calculate_state($element, $course1->id);
     }
 
     /**
@@ -163,13 +163,13 @@ class filestate_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function assert_file_state($contenthash, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
+    private function assert_file_state(element $element, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
             $expectedwritable) {
-        [$state, $editorid, $courses, $writable] = filestate::calculate_file_state($contenthash, $courseid);
-        $this->assertEquals($expectedstate, $state);
-        $this->assertEquals($expectededitor, $editorid);
-        $this->assertCount($expectedcoursecount, $courses);
-        $this->assertEquals($expectedwritable, $writable);
+        filestate::calculate_state($element, $courseid);
+        $this->assertEquals($expectedstate, $element->get_elementstate()->state);
+        $this->assertEquals($expectededitor, $element->get_elementstate()->editorid);
+        $this->assertCount($expectedcoursecount, $element->get_elementstate()->courses);
+        $this->assertEquals($expectedwritable, $element->get_elementstate()->writable);
     }
 
     /**

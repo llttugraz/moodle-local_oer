@@ -187,6 +187,7 @@ class elements implements \Iterator, \Countable {
         $required = ['type', 'title', 'identifier', 'license', 'origin', 'source'];
         if ($element->get_type() == element::OERTYPE_MOODLEFILE) {
             $required[] = 'filesize';
+            $required[] = 'mimetype';
         }
         $missing = [];
         foreach ($required as $param) {

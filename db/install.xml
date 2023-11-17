@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/oer/db" VERSION="20231116" COMMENT="XMLDB file for Moodle local/oer"
+<XMLDB PATH="local/oer/db" VERSION="20231117" COMMENT="XMLDB file for Moodle local/oer"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -98,7 +98,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="File contenthash"/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Identifier for an element"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="context" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
@@ -119,6 +119,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="identifier" UNIQUE="false" FIELDS="identifier"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="local_oer_coursetofile" COMMENT="Mapping which course metadata objects are added to which file. This is an optional behaviour and only written if a file makes something different from the course default behaviour.">
       <FIELDS>
@@ -165,7 +169,7 @@
         <KEY NAME="license" TYPE="foreign" FIELDS="license" REFTABLE="license" REFFIELDS="shortname"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="uniqueindex" UNIQUE="true" FIELDS="courseid, identifier"/>
+        <INDEX NAME="identifier" UNIQUE="true" FIELDS="identifier"/>
       </INDEXES>
     </TABLE>
   </TABLES>

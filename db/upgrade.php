@@ -712,7 +712,7 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022111700, 'local', 'oer');
     }
 
-    if ($oldversion < 2023111600) {
+    if ($oldversion < 2023111700) {
 
         // Define table local_oer_elements to be created.
         $table = new xmldb_table('local_oer_elements');
@@ -743,7 +743,7 @@ function xmldb_local_oer_upgrade($oldversion) {
         $table->add_key('license', XMLDB_KEY_FOREIGN, ['license'], 'license', ['shortname']);
 
         // Adding indexes to table local_oer_elements.
-        $table->add_index('uniqueindex', XMLDB_INDEX_UNIQUE, ['courseid', 'identifier']);
+        $table->add_index('identifier', XMLDB_INDEX_UNIQUE, ['identifier']);
 
         // Conditionally launch create table for local_oer_elements.
         if (!$dbman->table_exists($table)) {
@@ -775,7 +775,58 @@ function xmldb_local_oer_upgrade($oldversion) {
         }
 
         // Oer savepoint reached.
-        upgrade_plugin_savepoint(true, 2023111600, 'local', 'oer');
+        upgrade_plugin_savepoint(true, 2023111700, 'local', 'oer');
+    }
+
+    if ($oldversion < 2023111701) {
+
+        $records = $DB->get_records('local_oer_snapshots');
+
+        // Rename field contenthash on table local_oer_snapshot to identifier.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, 'courseid');
+
+        // Launch rename field contenthash.
+        $dbman->rename_field($table, $field, 'identifier');
+
+        // Changing precision of field identifier on table local_oer_snapshot to (255).
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('identifier', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'courseid');
+
+        // Launch change of precision for field identifier.
+        $dbman->change_field_precision($table, $field);
+
+        foreach ($records as $record) {
+            $identifier = \local_oer\identifier::compose(
+                    'moodle', $CFG->wwwroot,
+                    'file', 'contenthash', $record->contenthash
+            );
+
+            $record->identifier = $identifier;
+            unset($record->contenthash);
+            $DB->update_record('local_oer_snapshot', $record);
+        }
+
+        // Define index courseid (not unique) to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $index = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+
+        // Conditionally launch add index courseid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index identifier (not unique) to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $index = new xmldb_index('identifier', XMLDB_INDEX_NOTUNIQUE, ['identifier']);
+
+        // Conditionally launch add index identifier.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111701, 'local', 'oer');
     }
 
     return true;

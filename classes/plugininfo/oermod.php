@@ -48,7 +48,7 @@ class oermod extends plugininfo {
      *
      * @param string $plugin shortname of plugin
      * @param int $courseid Moodle courseid
-     * @return \local_oer\modules\elements;
+     * @return \local_oer\modules\elements
      * @throws \coding_exception
      */
     public static function load_elements(string $plugin, int $courseid): \local_oer\modules\elements {
@@ -63,7 +63,6 @@ class oermod extends plugininfo {
         if (!in_array('local_oer\modules\module', class_implements($module))) {
             throw new \coding_exception('Convention: Subplugin class module has to implement local_oer\modules\module interface.');
         }
-        $elements = $module->load_elements($courseid);
-        return $elements;
+        return $module->load_elements($courseid);
     }
 }

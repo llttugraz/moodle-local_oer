@@ -45,7 +45,7 @@ class activecourse {
      */
     public static function get_list_of_courses($snapshot = false): array {
         global $DB;
-        $table = $snapshot ? '{local_oer_snapshot}' : '{local_oer_files}';
+        $table = $snapshot ? '{local_oer_snapshot}' : '{local_oer_elements}';
         $sql = "SELECT DISTINCT(courseid) FROM $table t " .
                 "JOIN {course} c ON t.courseid = c.id " .
                 "ORDER BY courseid ASC";

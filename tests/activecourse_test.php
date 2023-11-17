@@ -93,7 +93,9 @@ class activecourse_test extends \advanced_testcase {
         for ($i = 1; $i <= $fileamount; $i++) {
             $entry = new \stdClass();
             $entry->courseid = $courseid;
-            $entry->contenthash = hash('sha1', $courseid . $i . rand(1, 100000)); // String concatenation intended.
+            $contenthash = hash('sha1', $courseid . $i . rand(1, 100000)); // String concatenation intended.
+            $entry->identifier = identifier::compose('moodle',
+                    'unittest', 'file', 'contenthash', $contenthash);
             $entry->title = "File $i for $courseid";
             $entry->description = "Unit test file $i in course $courseid";
             $entry->context = 1;
@@ -103,7 +105,7 @@ class activecourse_test extends \advanced_testcase {
             $entry->language = "en";
             $entry->resourcetype = 2;
             $entry->classification = null;
-            $entry->state = 0;
+            $entry->releasestate = 0;
             $entry->usermodified = $USER->id;
             $entry->timecreated = time();
             $entry->timemodified = time();
@@ -113,7 +115,7 @@ class activecourse_test extends \advanced_testcase {
                 $entry->releasehash = hash('sha256', $courseid + $i + time());
                 $DB->insert_record('local_oer_snapshot', $entry);
             } else {
-                $DB->insert_record('local_oer_files', $entry);
+                $DB->insert_record('local_oer_elements', $entry);
             }
         }
         $transaction->allow_commit();

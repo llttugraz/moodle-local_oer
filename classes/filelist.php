@@ -27,41 +27,16 @@ namespace local_oer;
 
 use local_oer\helper\filestate;
 use local_oer\helper\requirements;
+use local_oer\modules\element;
 use local_oer\modules\elements;
 use local_oer\plugininfo\oermod;
 
 /**
  * Class filelist
  *
- * TODO: I think this class should be refactored. Why is there a constructor which loads the filelist into a member.
  * But also all other methods are static? The methods are too complicated and should be broken down.
  */
 class filelist {
-    /**
-     * @var array
-     */
-    private $coursefiles = null;
-
-    /**
-     * Constructor
-     *
-     * @param int $courseid
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     */
-    public function __construct($courseid) {
-        $this->coursefiles = self::get_course_files($courseid);
-    }
-
-    /**
-     * Get course files
-     *
-     * @return array
-     */
-    public function get_files() {
-        return $this->coursefiles;
-    }
-
     /**
      * Load all files from moodle course modules and return all files and modules.
      *
@@ -70,11 +45,12 @@ class filelist {
      * For future updates this part should be extracted to subplugins. So it would be easier to also support 3rd party plugins.
      *
      * @param int $courseid Moodle courseid
-     * @return array
+     * @return elements
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public static function get_course_files(int $courseid): array {
+    public static function get_course_files(int $courseid): elements {
+        global $DB;
         // Step 1: gather all elements from subplugins.
         $plugins = oermod::get_enabled_plugins();
         $elements = new elements();
@@ -82,53 +58,21 @@ class filelist {
             $elements->merge_elements(oermod::load_elements($pluginname, $courseid));
         }
 
-        // Step 2: enrich elements for oer workflow.
+        // Step 2: add stored metadata and set element state
+        $records = $DB->get_records('local_oer_elements');
+        $storedelements = [];
+        foreach ($records as $record) {
+            $storedelements[$record->identifier] = $record;
+        }
+
         foreach ($elements as $element) {
-            // Step 2.1: check if element already is stored in table.
-
-
-            // Step 2.2: if element has type OERTYPE_MOODLE FILE, check for filestate.
-        }
-        $mod = get_fast_modinfo($courseid);
-        $coursefiles = [];
-
-        $fs = get_file_storage();
-
-        foreach ($mod->cms as $cm) {
-            $skip = false;
-            switch ($cm->modname) {
-                case 'folder':
-                    $component = 'mod_folder';
-                    $area = 'content';
-                    break;
-                case 'resource':
-                    $component = 'mod_resource';
-                    $area = 'content';
-                    break;
-                default:
-                    $component = '';
-                    $area = '';
-                    $skip = true;
+            if (isset($storedelements[$element->get_identifier()])) {
+                $element->set_stored_metadata($storedelements[$element->get_identifier()]);
             }
-            if ($skip) {
-                continue;
-            }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false, 'id ASC', false);
-
-            foreach ($files as $file) {
-                [$state, $editor, $courses, $writable] = filestate::calculate_file_state($file->get_contenthash(), $courseid);
-                $coursefiles[$file->get_contenthash()][] = [
-                        'file' => $file,
-                        'module' => $cm,
-                        'state' => $state,
-                        'editor' => $editor,
-                        'courses' => $courses,
-                        'writable' => $writable,
-                ];
-            }
+            filestate::calculate_state($element, $courseid);
         }
 
-        return $coursefiles;
+        return $elements;
     }
 
     /**
