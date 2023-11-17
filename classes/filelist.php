@@ -79,14 +79,14 @@ class filelist {
      * Load a single file and the module it is added.
      *
      * @param int $courseid Moodle courseid
-     * @param string $contenthash File contenthash
-     * @return array|null
+     * @param string $identifier Element identifier
+     * @return element|null
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public static function get_single_file(int $courseid, string $contenthash): ?array {
-        $files = self::get_course_files($courseid);
-        return $files[$contenthash] ?? null;
+    public static function get_single_file(int $courseid, string $identifier): ?element {
+        $elements = self::get_course_files($courseid);
+        return $elements->find_element('identifier', $identifier) ?? null;
     }
 
     /**

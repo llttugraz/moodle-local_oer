@@ -100,7 +100,7 @@ class elements implements \Iterator, \Countable {
 
         foreach ($this->elements as $element) {
             $property = "get_$fieldname";
-            if ($element->{$property} == $fieldvalue) {
+            if ($element->$property() == $fieldvalue) {
                 return $element;
             }
         }

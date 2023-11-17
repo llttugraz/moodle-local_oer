@@ -198,16 +198,15 @@ class filestate {
     /**
      * Generate a placeholder text to show when a file is not writable.
      *
-     * @param array $file
+     * @param element $element
      * @return string
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function formatted_notwritable_output_html(array $file): string {
+    public static function formatted_notwritable_output_html(element $element): string {
         global $OUTPUT, $DB, $CFG;
         $support = \core_user::get_support_user();
-        $data = $DB->get_record('local_oer_files',
-                ['courseid' => $file['editor'], 'contenthash' => $file['file']->get_contenthash()]);
+        $data = $DB->get_record('local_oer_elements', ['identifier' => $element->get_identifier()]);
         $context = formhelper::lom_context_list();
         $resources = formhelper::lom_resource_types();
         // It ain`t much, but it`s honest work.
@@ -281,7 +280,8 @@ class filestate {
                 'classificationlist' => $classlist,
         ];
 
-        switch ($file['state']) {
+        $state = $element->get_elementstate()->state;
+        switch ($state) {
             case self::STATE_FILE_RELEASED:
                 $alert = 'success';
                 break;
@@ -293,12 +293,12 @@ class filestate {
                 [
                         'header' => get_string('metadatanotwritable', 'local_oer'),
                         'alert' => $alert,
-                        'reason' => get_string('metadatanotwritable' . $file['state'],
+                        'reason' => get_string('metadatanotwritable' . $state,
                                 'local_oer'),
                         'support' => get_string('contactsupport', 'local_oer',
                                 ['support' => $support->email]),
-                        'multiple' => count($file['courses']) > 1,
-                        'courses' => array_values($file['courses']),
+                        'multiple' => count($element->get_elementstate()->courses) > 1,
+                        'courses' => array_values($element->get_elementstate()->courses),
                         'showmetadata' => true, // TODO: this flag can be removed as STATE_FILE_ERROR does not exist anymore.
                         'metadata' => $metadata,
                         'wwwroot' => $CFG->wwwroot,

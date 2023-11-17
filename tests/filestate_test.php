@@ -65,7 +65,7 @@ class filestate_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         $this->setAdminUser();
-        global $DB;
+        global $DB, $CFG;
         $testcourse = new testcourse();
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
@@ -144,7 +144,7 @@ class filestate_test extends \advanced_testcase {
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (123' .
                 ') has been searched that is not used anywhere');
-        $identifier = identifier::compose('moodle', 'unit-test',
+        $identifier = identifier::compose('moodle', $CFG->wwwroot,
                 'file', 'contenthash', '123');
         $element->set_identifier($identifier);
         filestate::calculate_state($element, $course1->id);
@@ -153,7 +153,7 @@ class filestate_test extends \advanced_testcase {
     /**
      * Helper function to test the filestates.
      *
-     * @param string $contenthash Moodle file contenthash
+     * @param element $element
      * @param int $courseid Moodle courseid
      * @param int $expectedstate filestate constant that is expected in this test
      * @param int $expectededitor Moodle courseid of editing course that is expected in this test
@@ -183,8 +183,7 @@ class filestate_test extends \advanced_testcase {
 
         // Something is wrong with the file, so it should not be editable until the problem has been resolved.
         // The editor flag does nothing here.
-        $this->assertFalse(filestate::metadata_writable(filestate::STATE_FILE_ERROR, false));
-        $this->assertFalse(filestate::metadata_writable(filestate::STATE_FILE_ERROR, true));
+        // 2023-11-17: The state STATE_FILE_ERROR and its according code has been removed.
 
         // The file has already been released, so it is not editable anymore
         // The editor flag does nothing here.
@@ -220,22 +219,24 @@ class filestate_test extends \advanced_testcase {
     public function test_formatted_notwritable_output_html() {
         $this->resetAfterTest();
 
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $this->setAdminUser();
         $testcourse = new testcourse();
         $course1 = $this->getDataGenerator()->create_course();
         $filename = 'samefile';
         $content = 'some content that will result in the same contenthash';
         [$draftid, $file] = $testcourse->generate_file($filename, null, $content);
+        $element = $testcourse->get_element_for_file($file);
         $testcourse->generate_resource($course1, $this->getDataGenerator(), $filename, null, $content);
 
-        $testcourse->set_file_to_non_release($course1->id, $file);
-        $files = filelist::get_single_file($course1->id, $file->get_contenthash());
-        $testfile = $files[0];
-        $this->assertIsString(filestate::formatted_notwritable_output_html($testfile));
+        $testcourse->set_file_to_non_release($course1->id, $element);
+        $file = filelist::get_single_file($course1->id, $element->get_identifier());
+        $this->assertIsString(filestate::formatted_notwritable_output_html($file));
 
-        $testcourse->set_file_to_release($course1->id, $file);
-        $files = filelist::get_single_file($course1->id, $file->get_contenthash());
-        $testfile = $files[0];
-        $this->assertIsString(filestate::formatted_notwritable_output_html($testfile));
+        $testcourse->set_file_to_release($course1->id, $element);
+        $file = filelist::get_single_file($course1->id, $element->get_identifier());
+        $this->assertIsString(filestate::formatted_notwritable_output_html($file));
     }
 }

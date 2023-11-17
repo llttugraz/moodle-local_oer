@@ -87,7 +87,7 @@ class activecourse_test extends \advanced_testcase {
      * @throws \dml_exception
      */
     private function file_entry(int $courseid, bool $snapshot): void {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
         $fileamount = rand(1, 10);
         $transaction = $DB->start_delegated_transaction();
         for ($i = 1; $i <= $fileamount; $i++) {
@@ -95,7 +95,7 @@ class activecourse_test extends \advanced_testcase {
             $entry->courseid = $courseid;
             $contenthash = hash('sha1', $courseid . $i . rand(1, 100000)); // String concatenation intended.
             $entry->identifier = identifier::compose('moodle',
-                    'unittest', 'file', 'contenthash', $contenthash);
+                    $CFG->wwwroot, 'file', 'contenthash', $contenthash);
             $entry->title = "File $i for $courseid";
             $entry->description = "Unit test file $i in course $courseid";
             $entry->context = 1;

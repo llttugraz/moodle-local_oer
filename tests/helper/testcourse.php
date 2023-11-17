@@ -73,10 +73,11 @@ class testcourse {
      * @return \stdClass
      */
     public function generate_oer_non_release_metadata(int $courseid, \stored_file $file) {
+        global $CFG;
         $metadata = new \stdClass();
         $metadata->type = element::OERTYPE_MOODLEFILE;
         $metadata->courseid = $courseid;
-        $identifier = identifier::compose('moodle', 'unit-test',
+        $identifier = identifier::compose('moodle', $CFG->wwwroot,
                 'file', 'contenthash', $file->get_contenthash());
         $metadata->identifier = $identifier;
         $metadata->title = $file->get_filename();
@@ -104,9 +105,10 @@ class testcourse {
      * @throws \coding_exception
      */
     public function get_element_for_file(\stored_file $file): element {
+        global $CFG;
         $element = new element();
         $element->set_type(element::OERTYPE_MOODLEFILE);
-        $identifier = identifier::compose('moodle', 'unit-test',
+        $identifier = identifier::compose('moodle', $CFG->wwwroot,
                 'file', 'contenthash', $file->get_contenthash());
         $element->set_identifier($identifier);
         $element->set_title($file->get_filename());
