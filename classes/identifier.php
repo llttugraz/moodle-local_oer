@@ -40,9 +40,9 @@ namespace local_oer;
  * The definition is based on urn.
  *
  * Examples:
- * oer:moodle@my.example.at/main/:file:contenthash:ABC123CDE456
- * oer:opencast@example.platform.at/:video:id:456
- * oer:moodle@example.at/mooc/:course:id:27
+ * oer:moodle[at]my.example.at/main/:file:contenthash:abc123cde456
+ * oer:opencast[at]example.platform.at:video:id:456
+ * oer:moodle[at]example.at/mooc/:course:id:27
  */
 class identifier {
     /**
@@ -53,15 +53,34 @@ class identifier {
      * @throws \coding_exception
      */
     public static function validate(string $identifier): bool {
+        if (strlen($identifier) > 255) {
+            return false; // Maximum length for database field.
+        }
         $params = explode(':', $identifier);
-        if (count($params) != 6) {
+        if (count($params) != 5 || $params[0] != 'oer') {
+            return false; // There has to be exactly 5 elements starting with oer.
+        }
+        $instance = explode('@', $params[1]);
+        if (count($instance) != 2) {
             return false;
         }
-        $params[1] = clean_param($params[1], PARAM_ALPHANUMEXT);
-        $params[2] = preg_replace('/[^A-Za-z0-9\/._-]/i', '', (string) $params[2]);
+        $instance[0] = clean_param($instance[0], PARAM_ALPHANUMEXT);
+        $domain = explode('/', $instance[1]);
+        // When a slash is at the end of the domain name, explode will lead to an empty array entry.
+        // This is fine, as the slash will be at the end again on implode and lead to a valid result.
+        $domain[0] = preg_replace('/[^A-Za-z0-9\/.-]/i', '', $domain[0]);
+        foreach ($domain as $key => $part) {
+            if ($key == 0) {
+                continue;
+            }
+            $domain[$key] = preg_replace('/[^A-Za-z0-9\/_-]/i', '', $domain[$key]);
+        }
+        $instance[1] = implode('/', $domain);
+
+        $params[1] = implode('@', $instance);
+        $params[2] = clean_param($params[2], PARAM_ALPHANUMEXT);
         $params[3] = clean_param($params[3], PARAM_ALPHANUMEXT);
         $params[4] = clean_param($params[4], PARAM_ALPHANUMEXT);
-        $params[5] = clean_param($params[5], PARAM_ALPHANUMEXT);
         $cleaned = implode(':', $params);
         return $identifier === $cleaned;
     }
@@ -92,7 +111,8 @@ class identifier {
      */
     public static function compose(string $system, string $platform, string $type, string $valuetype, string $value): string {
         $platform = str_replace(['https://', 'http://'], '', $platform);
-        $list = ['oer', $system, $platform, $type, $valuetype, $value];
+        $instance = $system . '@' . $platform;
+        $list = ['oer', $instance, $type, $valuetype, $value];
         $identifier = implode(':', $list);
         self::strict_validate($identifier);
         return $identifier;
@@ -108,12 +128,13 @@ class identifier {
     public static function decompose(string $identifier): array {
         self::strict_validate($identifier);
         $params = explode(':', $identifier);
+        $instance = explode('@', $params[1]);
         return [
-                'system' => $params[1],
-                'platform' => $params[2],
-                'type' => $params[3],
-                'valuetype' => $params[4],
-                'value' => $params[5],
+                'system' => $instance[0],
+                'platform' => $instance[1],
+                'type' => $params[2],
+                'valuetype' => $params[3],
+                'value' => $params[4],
         ];
     }
 }
