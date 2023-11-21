@@ -349,7 +349,6 @@ class element {
      */
     public function set_stored_metadata(\stdClass $metadata) {
         global $DB;
-        [, $releasable,] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->set_title($metadata->title);
         $this->set_license($metadata->license);
 
@@ -365,11 +364,22 @@ class element {
         $metadata->timereleasedts = $snapshot->release;
         $metadata->upload = $metadata->releasestate == 1 ? 1 : 0;
         $metadata->ignore = $metadata->releasestate == 2 ? 1 : 0;
-        $metadata->requirementsmet = $releasable;
         unset($metadata->identifier);
         unset($metadata->title);
         unset($metadata->license);
         $this->storedmetadata = $metadata;
+        [, $releasable,] = requirements::metadata_fulfills_all_requirements($this);
+        $metadata->requirementsmet = $releasable;
+        $this->storedmetadata = $metadata;
+    }
+
+    /**
+     * True when already metadata could be added from elements table.
+     *
+     * @return bool
+     */
+    public function already_stored(): bool {
+        return !is_null($this->storedmetadata);
     }
 
     /**

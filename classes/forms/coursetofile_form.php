@@ -25,6 +25,8 @@
 
 namespace local_oer\forms;
 
+use local_oer\filelist;
+use local_oer\identifier;
 use local_oer\metadata\coursetofile;
 
 /**
@@ -51,7 +53,8 @@ class coursetofile_form extends \moodleform {
         global $OUTPUT;
         $mform = $this->_form;
         $file = $this->_customdata;
-        $courses = coursetofile::get_courses_metadata_for_file($file['contenthash'], $file['courseid']);
+        $element = filelist::get_single_file($file['courseid'], $file['identifier']);
+        $courses = coursetofile::get_courses_metadata_for_file($element, $file['courseid']);
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
@@ -59,7 +62,7 @@ class coursetofile_form extends \moodleform {
         $mform->setType('contenthash', PARAM_ALPHANUM);
         $data = [
                 'courseid' => $file['courseid'],
-                'contenthash' => $file['contenthash'],
+                'identifier' => $file['identifier'],
         ];
 
         $mform->addElement('html', '<div class="alert alert-info">' . get_string('coursetofile_info', 'local_oer') . '</div>');
@@ -159,6 +162,7 @@ class coursetofile_form extends \moodleform {
         global $DB, $USER;
         $table = 'local_oer_coursetofile';
         $file = $this->_customdata;
+        $decomposed = identifier::decompose($file['identifier']);
         foreach ($data as $key => $state) {
             if (strpos($key, self::COURSEINFO_SEPARATOR) === false) {
                 continue;
@@ -166,7 +170,7 @@ class coursetofile_form extends \moodleform {
             $course = explode(self::COURSEINFO_SEPARATOR, $key);
             if ($DB->record_exists('local_oer_courseinfo', ['courseid' => $course[0], 'coursecode' => $course[1]])) {
                 $params = [
-                        'contenthash' => $file['contenthash'],
+                        'contenthash' => $decomposed->value,
                         'courseid' => $course[0],
                         'coursecode' => $course[1],
                 ];
@@ -187,7 +191,7 @@ class coursetofile_form extends \moodleform {
                     $DB->update_record($table, $owexist);
                 } else {
                     $ow = new \stdClass();
-                    $ow->contenthash = $file['contenthash'];
+                    $ow->contenthash = $decomposed->value;
                     $ow->courseid = $course[0];
                     $ow->coursecode = $course[1];
                     $ow->state = $state;

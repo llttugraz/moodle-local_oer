@@ -96,7 +96,7 @@ class filestate_test extends \advanced_testcase {
 
         // Tests for state 2 (STATE_FILE_EDITED).
         // The element has already been edited in course1, therefore course2 does not get write capability for the file.
-        $testcourse->set_file_to_non_release($course1->id, $file);
+        $testcourse->set_file_to_non_release($course1->id, $element);
         $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
         $this->assert_file_state($element, $course1->id,
@@ -106,10 +106,9 @@ class filestate_test extends \advanced_testcase {
                 filestate::STATE_FILE_EDITED, $course1->id,
                 2, false);
 
-        // TODO: fix snapshot class, does not support element datastructure yet.
         // Tests for state 3 (STATE_FILE_RELEASED).
         // The element has been released. So it can not be edited by any of the courses.
-        $testcourse->set_file_to_release($course1->id, $file);
+        $testcourse->set_file_to_release($course1->id, $element);
         $sync = new courseinfo_sync();
         $sync->sync_course($course1->id);
         $snapshot = new snapshot($course1->id);

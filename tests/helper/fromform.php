@@ -35,7 +35,7 @@ class fromform {
      * The format of the returned array is similar to the form submit from frontend.
      *
      * @param int $courseid
-     * @param string $contenthash
+     * @param string $identifier
      * @param string $title
      * @param string $description
      * @param int $context
@@ -50,7 +50,7 @@ class fromform {
      * @return array
      * @throws \Exception
      */
-    public static function fileinfoform_submit(int $courseid, string $contenthash, string $title, string $description,
+    public static function fileinfoform_submit(int $courseid, string $identifier, string $title, string $description,
             int $context, string $license, string $language, int $resourcetype, array $persons,
             int $upload, int $ignore, array $tags = []) {
         if ($upload == 1 && $ignore == 1) {
@@ -58,7 +58,7 @@ class fromform {
         }
         $retval = [];
         $retval['courseid'] = "$courseid";
-        $retval['contenthash'] = $contenthash;
+        $retval['identifier'] = $identifier;
         $retval['storedperson'] = '{"persons":[' . implode(',', $persons) . ']}';
         $retval['storedtags'] = implode(',', $tags);
         $retval['sesskey'] = "sess" . rand(100, 100000);

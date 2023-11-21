@@ -324,7 +324,7 @@ class testcourse {
      * @return string
      * @throws \coding_exception
      */
-    private function generate_identifier(string $contenthash): string {
+    public function generate_identifier(string $contenthash): string {
         global $CFG;
         return identifier::compose('moodle', $CFG->wwwroot, 'file', 'contenthash', $contenthash);
     }

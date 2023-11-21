@@ -118,6 +118,7 @@ class filelist {
             $filesections = [];
             $modules = [];
 
+            // TODO
             //foreach ($file as $key => $duplicate) {
             //    $section = [
             //            'sectionnum' => $duplicate['module']->sectionnum,
@@ -174,13 +175,13 @@ class filelist {
      * This is a wrapper that calls get_simple_filelist with the optional contenthash parameter.
      *
      * @param int $courseid Moodle courseid
-     * @param string $contenthash File contenthash
+     * @param string $identifier Element identifier
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public static function get_simple_file(int $courseid, string $contenthash) {
-        return self::get_simple_filelist($courseid, $contenthash);
+    public static function get_simple_file(int $courseid, string $identifier): array {
+        return self::get_simple_filelist($courseid, $identifier);
     }
 }

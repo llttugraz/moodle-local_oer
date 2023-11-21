@@ -29,6 +29,7 @@ use local_oer\helper\requirements;
 use local_oer\metadata\coursecustomfield;
 use local_oer\metadata\courseinfo;
 use local_oer\metadata\coursetofile;
+use local_oer\modules\element;
 use local_oer\plugininfo\oercourseinfo;
 
 /**
@@ -99,16 +100,15 @@ class snapshot {
      * @throws \moodle_exception
      */
     public function create_snapshot_of_course_files() {
-        $files = filelist::get_course_files($this->courseid);
+        $elements = filelist::get_course_files($this->courseid);
         [$courses, $courseinfo] = $this->get_active_courseinfo_metadata();
         if (!$courseinfo) {
             logger::add($this->courseid, logger::LOGERROR, 'Course does not has courseinfo, maybe all entries are ignored');
             return;
         }
 
-        foreach ($files as $filearray) {
-            $file = $filearray[0]['file'];
-            $this->create_file_snapshot($file, $courseinfo, $courses);
+        foreach ($elements as $element) {
+            $this->create_file_snapshot($element, $courseinfo, $courses);
         }
     }
 
@@ -119,47 +119,51 @@ class snapshot {
      * the metadata to older versions. When the hash is already stored, nothing has changed, and it does not
      * need to be stored.
      *
-     * @param \stored_file $file Moodle stored file object
+     * @param element $element Datastructure to store all relevant information
      * @param array $courseinfo List of all courses (internal and external) linked to this file
      * @param array $courses Courses from local_oer_courseinfo table for this course
      * @return void
      * @throws \dml_exception
      */
-    private function create_file_snapshot(\stored_file $file, array $courseinfo, array $courses) {
+    private function create_file_snapshot(element $element, array $courseinfo, array $courses) {
         global $DB, $USER;
-        $fileinfo = $DB->get_record('local_oer_files', [
-                'courseid' => $this->courseid,
-                'contenthash' => $file->get_contenthash(),
-        ]);
-        if (!$fileinfo) {
-            // File metadata has not been stored yet, so this file can be skipped.
+        if (!$element->already_stored()) {
+            // File metadata has not been stored yet or course is not editor, so this element can be skipped.
             return;
         }
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($fileinfo);
+
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
+        $metadata = $element->get_stored_metadata();
         if (!$release) {
             // At least one criterion is not fulfilled, file cannot be released.
-            if ($fileinfo->state == 1) {
+            if ($metadata->releasestate == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
-                logger::add($this->courseid, logger::LOGERROR, 'File with hash ' . $fileinfo->contenthash .
+                logger::add($this->courseid, logger::LOGERROR, 'Element with identifier ' . $fileinfo->contenthash .
                         ' is set to release, but does not fulfill all requirements.');
             }
             return;
         }
 
+        $decomposed = identifier::decompose($element->get_identifier());
+        if ($element->get_type() == element::OERTYPE_MOODLEFILE && $decomposed->valuetype == 'contenthash') {
+            $coursemetadata = json_encode($this->get_overwritten_courseinfo_metadata($courseinfo, $decomposed->value, $courses));
+        } else {
+            $coursemetadata = $courseinfo;
+        }
+
         $snapshot = new \stdClass();
         $snapshot->courseid = $this->courseid;
-        $snapshot->contenthash = $fileinfo->contenthash;
-        $snapshot->title = $fileinfo->title;
-        $snapshot->description = $fileinfo->description;
-        $snapshot->context = $fileinfo->context;
-        $snapshot->license = $fileinfo->license;
-        $snapshot->persons = $fileinfo->persons;
-        $snapshot->tags = $fileinfo->tags;
-        $snapshot->language = $fileinfo->language;
-        $snapshot->resourcetype = $fileinfo->resourcetype;
-        $snapshot->classification = $fileinfo->classification;
-        $snapshot->coursemetadata = json_encode($this->get_overwritten_courseinfo_metadata($courseinfo, $fileinfo->contenthash,
-                $courses));
+        $snapshot->identifier = $element->get_identifier();
+        $snapshot->title = $element->get_title();
+        $snapshot->description = $metadata->description;
+        $snapshot->context = $metadata->context;
+        $snapshot->license = $element->get_license();
+        $snapshot->persons = $metadata->persons;
+        $snapshot->tags = $metadata->tags;
+        $snapshot->language = $metadata->language;
+        $snapshot->resourcetype = $metadata->resourcetype;
+        $snapshot->classification = $metadata->classification;
+        $snapshot->coursemetadata = $coursemetadata;
         $snapshot->additionaldata = $this->add_external_metadata();
         $hash = hash('sha256', json_encode($snapshot));
         $snapshot->releasehash = $hash;
@@ -167,7 +171,7 @@ class snapshot {
         $snapshot->timemodified = time();
         $snapshot->timecreated = time();
         $latestrelease = $DB->get_records('local_oer_snapshot',
-                ['courseid' => $this->courseid, 'contenthash' => $fileinfo->contenthash],
+                ['courseid' => $this->courseid, 'identifier' => $element->get_identifier()],
                 'timecreated DESC', '*', 0, 1);
         if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);

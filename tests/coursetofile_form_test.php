@@ -63,6 +63,9 @@ class coursetofile_form_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $helper = new testcourse();
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
@@ -71,7 +74,7 @@ class coursetofile_form_test extends \advanced_testcase {
 
         $customdata = [
                 'courseid' => $course1->id,
-                'contenthash' => $file->get_contenthash(),
+                'identifier' => $helper->generate_identifier($file->get_contenthash()),
         ];
 
         $helper->generate_resource($course2, $this->getDataGenerator());

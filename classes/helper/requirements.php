@@ -27,6 +27,8 @@
 
 namespace local_oer\helper;
 
+use local_oer\modules\element;
+
 /**
  * Class requirements
  */
@@ -37,15 +39,16 @@ class requirements {
      * All other requirements can be set in the plugin settings.
      * Also the classification subplugins can be set as required.
      *
-     * @param \stdClass $metadata
+     * @param element $element
      * @return array
      * @throws \dml_exception
      */
-    public static function metadata_fulfills_all_requirements(\stdClass $metadata): array {
+    public static function metadata_fulfills_all_requirements(element $element): array {
         $reqarray = [];
-        $licenseobject = license::get_license_by_shortname($metadata->license);
-        $reqarray['title'] = !empty($metadata->title);
-        $reqarray['license'] = license::test_license_correct_for_upload($metadata->license) || is_null($licenseobject);
+        $metadata = $element->get_stored_metadata();
+        $licenseobject = license::get_license_by_shortname($element->get_license());
+        $reqarray['title'] = !empty($element->get_title());
+        $reqarray['license'] = license::test_license_correct_for_upload($element->get_license()) || is_null($licenseobject);
         $people = json_decode($metadata->persons);
         $reqarray['persons'] = !empty($people->persons);
         $required = explode(',', get_config('local_oer', 'requiredfields'));
@@ -89,7 +92,7 @@ class requirements {
     }
 
     /**
-     * en the requirements change, the files that already have been set to release have to be tested against the
+     * When the requirements change, the files that already have been set to release have to be tested against the
      * new requirements and the state has to be set to 0 if the file does not meet the new requirements settings.
      * Does not affect already made releases/snapshots as the requirements had other values back then.
      *

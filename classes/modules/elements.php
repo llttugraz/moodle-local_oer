@@ -103,7 +103,6 @@ class elements implements \Iterator, \Countable {
         }
 
         foreach ($this->elements as $element) {
-
             if ($element->$function() == $fieldvalue) {
                 return $element;
             }

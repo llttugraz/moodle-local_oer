@@ -54,7 +54,7 @@ class fileinfo_form extends \moodleform {
 
         $element = filelist::get_single_file($course['courseid'], $course['identifier']);
         $metadata = $element->get_stored_metadata();
-        $alreadystored = $DB->record_exists('local_oer_elements', ['identifier' => $element->get_identifier()]);
+        $alreadystored = $element->already_stored();
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
