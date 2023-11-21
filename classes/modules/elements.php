@@ -97,10 +97,14 @@ class elements implements \Iterator, \Countable {
         if (!property_exists('local_oer\modules\element', $fieldname)) {
             throw new \coding_exception("Unknown property $fieldname");
         }
+        $function = "get_$fieldname";
+        if (!method_exists('local_oer\modules\element', $function)) {
+            throw new \coding_exception("Unknown method $function");
+        }
 
         foreach ($this->elements as $element) {
-            $property = "get_$fieldname";
-            if ($element->$property() == $fieldvalue) {
+
+            if ($element->$function() == $fieldvalue) {
                 return $element;
             }
         }

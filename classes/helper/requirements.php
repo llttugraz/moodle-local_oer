@@ -77,7 +77,7 @@ class requirements {
             }
         }
 
-        $release = $metadata->state == 1;
+        $release = $metadata->releasestate == 1;
         $releasable = true;
         foreach ($reqarray as $value) {
             if ($value === false) {

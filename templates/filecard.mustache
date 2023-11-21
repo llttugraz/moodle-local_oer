@@ -23,7 +23,6 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     {
         "viewurl": "https://moodlesite/course/view.php?id=2",
         "ignore": true,
-        "iconisimage": false,
         "icon": "config.wwwroot/theme/image.php/boost/core/1644361882/f/pdf",
         "title": "abc.pdf",
         "mimetype": "application/pdf",
@@ -36,20 +35,14 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     <div class="card shadow-sm mb-4">
         <div class="card-header container">
             <div class="row">
-                {{> local_oer/file-action-menu }}
+              {{> local_oer/file-action-menu }}
             </div>
             <div class="row">
                 <div class="col-3">
                     <div class="d-flex justify-content-start align-items-top my-2">
-                        {{#iconisimage}}
-                            <img class="m-0 img-thumbnail" alt="" aria-hidden="true" style="object-fit: cover; width: 40px; height: 40px;"
-                                 src="data:image/{{icontype}};base64, {{icon}}">
-                        {{/iconisimage}}
-                        {{^iconisimage}}
-                            <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
-                                <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
-                            </div>
-                        {{/iconisimage}}
+                        <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
+                            <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm pl-0 pt-1">

@@ -26,6 +26,7 @@
 namespace local_oer\metadata;
 
 use local_oer\helper\filestate;
+use local_oer\modules\element;
 
 /**
  * Class coursetofile
@@ -69,10 +70,10 @@ class coursetofile {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function get_courses_metadata_for_file(string $contenthash, int $courseid, array $courses = []): array {
+    public static function get_courses_metadata_for_file(element $element, int $courseid, array $courses = []): array {
         global $DB;
         if (empty($courses)) {
-            [, , $courses, $writable] = filestate::calculate_file_state($contenthash, $courseid);
+            [, , $courses, $writable] = filestate::calculate_state($element, $courseid);
         }
         $overwrites = $DB->get_records('local_oer_coursetofile', ['contenthash' => $contenthash]);
         $owformatted = [];

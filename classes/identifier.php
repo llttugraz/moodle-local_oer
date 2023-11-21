@@ -60,12 +60,12 @@ class identifier {
         if (count($params) != 5 || $params[0] != 'oer') {
             return false; // There has to be exactly 5 elements starting with oer.
         }
-        $instance = explode('@', $params[1]);
-        if (count($instance) != 2) {
+        $combined = explode('@', $params[1]);
+        if (count($combined) != 2) {
             return false;
         }
-        $instance[0] = clean_param($instance[0], PARAM_ALPHANUMEXT);
-        $domain = explode('/', $instance[1]);
+        $combined[0] = clean_param($combined[0], PARAM_ALPHANUMEXT);
+        $domain = explode('/', $combined[1]);
         // When a slash is at the end of the domain name, explode will lead to an empty array entry.
         // This is fine, as the slash will be at the end again on implode and lead to a valid result.
         $domain[0] = preg_replace('/[^A-Za-z0-9\/.-]/i', '', $domain[0]);
@@ -75,9 +75,9 @@ class identifier {
             }
             $domain[$key] = preg_replace('/[^A-Za-z0-9\/_-]/i', '', $domain[$key]);
         }
-        $instance[1] = implode('/', $domain);
+        $combined[1] = implode('/', $domain);
 
-        $params[1] = implode('@', $instance);
+        $params[1] = implode('@', $combined);
         $params[2] = clean_param($params[2], PARAM_ALPHANUMEXT);
         $params[3] = clean_param($params[3], PARAM_ALPHANUMEXT);
         $params[4] = clean_param($params[4], PARAM_ALPHANUMEXT);
@@ -101,18 +101,18 @@ class identifier {
     /**
      * Create an identifier as defined in the class header.
      *
-     * @param string $system The system where the resource comes from (e.g. moodle, opencast ...)
-     * @param string $platform The domain of the hosted instance of that system (http(s):// is removed)
+     * @param string $platform The platform where the resource comes from (e.g. moodle, opencast ...)
+     * @param string $instance The domain of the hosted instance of that system (http(s):// is removed)
      * @param string $type The type of the resource (e.g. file, video, course, activity ... )
      * @param string $valuetype The type of the value (id, contenthash ...)
      * @param string $value The value itself
      * @return string
      * @throws \coding_exception
      */
-    public static function compose(string $system, string $platform, string $type, string $valuetype, string $value): string {
-        $platform = str_replace(['https://', 'http://'], '', $platform);
-        $instance = $system . '@' . $platform;
-        $list = ['oer', $instance, $type, $valuetype, $value];
+    public static function compose(string $platform, string $instance, string $type, string $valuetype, string $value): string {
+        $instance = str_replace(['https://', 'http://'], '', $instance);
+        $combined = $platform . '@' . $instance;
+        $list = ['oer', $combined, $type, $valuetype, $value];
         $identifier = implode(':', $list);
         self::strict_validate($identifier);
         return $identifier;
@@ -122,19 +122,19 @@ class identifier {
      * Decompose all elements of the identifier to an array. The first part (oer) is not added to the array.
      *
      * @param string $identifier
-     * @return array
+     * @return \stdClass
      * @throws \coding_exception
      */
-    public static function decompose(string $identifier): array {
+    public static function decompose(string $identifier): \stdClass {
         self::strict_validate($identifier);
         $params = explode(':', $identifier);
-        $instance = explode('@', $params[1]);
-        return [
-                'system' => $instance[0],
-                'platform' => $instance[1],
-                'type' => $params[2],
-                'valuetype' => $params[3],
-                'value' => $params[4],
-        ];
+        $combined = explode('@', $params[1]);
+        $decomposed = new \stdClass();
+        $decomposed->platform = $combined[0];
+        $decomposed->instance = $combined[1];
+        $decomposed->type = $params[2];
+        $decomposed->valuetype = $params[3];
+        $decomposed->value = $params[4];
+        return $decomposed;
     }
 }

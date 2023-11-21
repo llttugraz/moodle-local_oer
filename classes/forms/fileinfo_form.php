@@ -31,6 +31,7 @@ use local_oer\helper\formhelper;
 use local_oer\helper\license;
 use local_oer\logger;
 use local_oer\plugininfo\oerclassification;
+use function PHPUnit\Framework\assertLessThan;
 
 /**
  * Formular to define all necessary metadata fields.
@@ -40,6 +41,9 @@ class fileinfo_form extends \moodleform {
      * Mform definition function, required by moodleform.
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     protected function definition() {
         $mform = $this->_form;
@@ -48,24 +52,23 @@ class fileinfo_form extends \moodleform {
         global $DB, $OUTPUT;
         $reqfields = static::get_required_fields();
 
-        $files = filelist::get_single_file($course['courseid'], $course['contenthash']);
-        $file = $files[0]; // We just need the first entry, all others are duplicates if available.
+        $element = filelist::get_single_file($course['courseid'], $course['identifier']);
+        $metadata = $element->get_stored_metadata();
+        $alreadystored = $DB->record_exists('local_oer_elements', ['identifier' => $element->get_identifier()]);
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
-        $mform->addElement('hidden', 'contenthash', null);
-        $mform->setType('contenthash', PARAM_ALPHANUM);
+        $mform->addElement('hidden', 'identifier', null);
+        $mform->setType('identifier', PARAM_TEXT);
 
-        if (!$file['writable']) {
+        if (!$element->get_elementstate()->writable) {
             $mform->addElement('hidden', 'nosave', true);
-            $mform->setType('contenthash', PARAM_BOOL);
-            $notwritable = filestate::formatted_notwritable_output_html($file);
+            $mform->setType('identifier', PARAM_BOOL);
+            $notwritable = filestate::formatted_notwritable_output_html($element);
             $mform->addElement('html', $notwritable);
             return;
         }
 
-        $fromdb = $DB->get_record('local_oer_files',
-                ['courseid' => $course['courseid'], 'contenthash' => $course['contenthash']]);
         $preference = $DB->get_record('local_oer_preference', ['courseid' => $course['courseid']]);
 
         $mform->addElement('text', 'title', get_string('title', 'local_oer'), 'wrap="virtual"');
@@ -83,51 +86,51 @@ class fileinfo_form extends \moodleform {
 
         $data = [];
         $data['courseid'] = $course['courseid'];
-        $data['contenthash'] = $course['contenthash'];
-        $data['title'] = $fromdb->title ?? $file['file']->get_filename();
-        $data['description'] = $fromdb->description ?? '';
+        $data['identifier'] = $course['identifier'];
+        $data['title'] = $element->get_title();
+        $data['description'] = $metadata->description ?? '';
         // For some fields there are three posibilities.
         // Either default defined for form is used.
         // Or it has stored already then the fromdb value is used.
         // Or it has not been stored and a preference value is present for that field.
-        if ($fromdb) {
-            $data['context'] = $fromdb->context;
+        if ($alreadystored) {
+            $data['context'] = $metadata->context;
         } else if ($preference && !is_null($preference->context)) {
             $data['context'] = $preference->context;
         }
-        if ($fromdb) {
-            $data['license'] = $fromdb->license;
+        if ($alreadystored) {
+            $data['license'] = $element->get_license();
         } else if ($preference && !is_null($preference->license)) {
             $data['license'] = $preference->license;
         } else {
-            $data['license'] = $file['file']->get_license();
+            $data['license'] = $element->get_license();
         }
-        $data['storedperson'] = $fromdb->persons ?? '';
-        $data['storedperson'] = !$fromdb && $preference && !is_null($preference->persons)
+        $data['storedperson'] = $metadata->persons ?? '';
+        $data['storedperson'] = !$alreadystored && $preference && !is_null($preference->persons)
                 ? $preference->persons : $data['storedperson'];
-        $data['storedtags'] = $fromdb->tags ?? '';
-        $data['storedtags'] = !$fromdb && $preference && !is_null($preference->tags)
+        $data['storedtags'] = $metadata->tags ?? '';
+        $data['storedtags'] = !$alreadystored && $preference && !is_null($preference->tags)
                 ? $preference->tags : $data['storedtags'];
-        if ($fromdb && isset($fromdb->language)) {
-            $data['language'] = $fromdb->language;
+        if ($alreadystored && !empty($metadata->language)) {
+            $data['language'] = $metadata->language;
         } else if ($preference && !is_null($preference->language)) {
             $data['language'] = $preference->language;
         }
-        if ($fromdb) {
-            $data['resourcetype'] = $fromdb->resourcetype;
+        if ($alreadystored) {
+            $data['resourcetype'] = $metadata->resourcetype;
         } else if ($preference && !is_null($preference->resourcetype)) {
             $data['resourcetype'] = $preference->resourcetype;
         }
 
-        if ($fromdb) {
-            $this->set_state($data, $fromdb->state);
-        } else if ($preference && !is_null($preference->state)) {
-            $this->set_state($data, $preference->state);
+        if ($alreadystored) {
+            $this->set_state($data, $metadata->releasestate);
+        } else if ($preference && !is_null($preference->releasestate)) {
+            $this->set_state($data, $preference->releasestate);
         }
 
         self::add_shared_fields_to_form($mform, false);
-        $classificationdata = $fromdb ? $fromdb->classification : null;
-        $classificationdata = !$fromdb && $preference && !is_null($preference->classification)
+        $classificationdata = $alreadystored ? $metadata->classification : null;
+        $classificationdata = !$alreadystored && $preference && !is_null($preference->classification)
                 ? $preference->classification : $classificationdata;
         $classificationdata = !is_null($classificationdata) ? json_decode($classificationdata) : null;
         self::prepare_classification_values_for_form($mform, $classificationdata, $data);
@@ -142,8 +145,8 @@ class fileinfo_form extends \moodleform {
         $prefhtml = $OUTPUT->render_from_template('local_oer/preferenceform',
                 [
                         'enabled' => $preference !== false,
-                        'saved' => $fromdb !== false,
-                        'contenthash' => $course['contenthash'],
+                        'saved' => $alreadystored,
+                        'identifier' => $course['identifier'],
                         'courseid' => $course['courseid'],
                 ]);
         $mform->addElement('html', $prefhtml);
@@ -328,9 +331,11 @@ class fileinfo_form extends \moodleform {
      */
     public function update_metadata(array $fromform) {
         global $DB;
-        $files = filelist::get_single_file($fromform['courseid'], $fromform['contenthash']);
-        $fromdb = $DB->get_record('local_oer_files',
-                ['courseid' => $fromform['courseid'], 'contenthash' => $fromform['contenthash']]);
+        $files = filelist::get_single_file($fromform['courseid'], $fromform['identifier']);
+        $fromdb = $DB->get_record('local_oer_elements', [
+                'courseid' => $fromform['courseid'], // Only update if the course is the editor.
+                'identifier' => $fromform['identifier'],
+        ]);
         // License is stored back to file.
         // When file is used more than once in a course, the license will be stored as the same for all files.
         foreach ($files as $file) {
@@ -339,22 +344,22 @@ class fileinfo_form extends \moodleform {
         $timestamp = time();
         if ($fromdb) {
             $record = $this->add_values_from_form($fromdb, $fromform, $timestamp);
-            $DB->update_record('local_oer_files', $record);
+            $DB->update_record('local_oer_elements', $record);
         } else {
             $record = new \stdClass();
             $record->courseid = $fromform['courseid'];
-            $record->contenthash = $fromform['contenthash'];
+            $record->identifier = $fromform['identifier'];
             $record = $this->add_values_from_form($record, $fromform, $timestamp);
             $record->timecreated = $timestamp;
             // Update 15.11.2022: File in multiple courses https://github.com/llttugraz/moodle-local_oer/issues/14 .
-            // Check if the contenthash is not already stored with another courseid.
-            if ($duplicate = $DB->get_record('local_oer_files', ['contenthash' => $record->contenthash])) {
+            // Check if the identifier is not already stored with another courseid.
+            if ($duplicate = $DB->get_record('local_oer_elements', ['identifier' => $record->identifier])) {
                 logger::add($record->courseid, logger::LOGERROR,
-                        'Tried to create duplicate file entry for file ' . $record->contenthash . '.' .
+                        'Tried to create duplicate file entry for file ' . $record->identifier . '.' .
                         'This code should not be reachable');
                 return;
             }
-            $DB->insert_record('local_oer_files', $record);
+            $DB->insert_record('local_oer_elements', $record);
         }
     }
 
@@ -378,7 +383,7 @@ class fileinfo_form extends \moodleform {
         $this->set_value($record, $fromform, 'resourcetype', 0);
         $state = isset($fromform['upload']) && $fromform['upload'] == 1 ? 1 : 0;
         $state = isset($fromform['ignore']) && $fromform['ignore'] == 1 ? 2 : $state;
-        $record->state = $state;
+        $record->releasestate = $state;
         $record->preference = $record->preference ?? 1;
         $record->usermodified = $USER->id;
         $record->timemodified = $timestamp;

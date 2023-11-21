@@ -71,15 +71,13 @@ class testcourse {
      * @param int $courseid
      * @param \stored_file $file
      * @return \stdClass
+     * @throws \coding_exception
      */
     public function generate_oer_non_release_metadata(int $courseid, \stored_file $file) {
-        global $CFG;
         $metadata = new \stdClass();
         $metadata->type = element::OERTYPE_MOODLEFILE;
         $metadata->courseid = $courseid;
-        $identifier = identifier::compose('moodle', $CFG->wwwroot,
-                'file', 'contenthash', $file->get_contenthash());
-        $metadata->identifier = $identifier;
+        $metadata->identifier = $this->generate_identifier($file->get_contenthash());
         $metadata->title = $file->get_filename();
         $metadata->description = '';
         $metadata->context = 0;
@@ -105,12 +103,9 @@ class testcourse {
      * @throws \coding_exception
      */
     public function get_element_for_file(\stored_file $file): element {
-        global $CFG;
         $element = new element();
         $element->set_type(element::OERTYPE_MOODLEFILE);
-        $identifier = identifier::compose('moodle', $CFG->wwwroot,
-                'file', 'contenthash', $file->get_contenthash());
-        $element->set_identifier($identifier);
+        $element->set_identifier($this->generate_identifier($file->get_contenthash()));
         $element->set_title($file->get_filename());
         $element->set_license($file->get_license());
         $element->set_mimetype($file->get_mimetype());
@@ -127,6 +122,7 @@ class testcourse {
      * @param int $courseid
      * @param element $element
      * @return int
+     * @throws \coding_exception
      * @throws \dml_exception
      */
     public function set_file_to_release(int $courseid, element $element) {
@@ -154,7 +150,7 @@ class testcourse {
         $decompose = identifier::decompose($element->get_identifier());
         // All entries with the same contenthash are the same file.
         // Maybe some metadata in the table differs, but that is of no concern for the tests.
-        $records = $DB->get_records('files', ['contenthash' => $decompose['value']]);
+        $records = $DB->get_records('files', ['contenthash' => $decompose->value]);
         $file = null;
         foreach ($records as $record) {
             if ($record->filename != '.') {
@@ -290,10 +286,10 @@ class testcourse {
      * Returns the contenthash of the first found
      *
      * @param \stdClass $course Course object of Moodle test data generator.
-     * @return null
+     * @return string|null
      * @throws \dml_exception
      */
-    public function get_contenthash_of_first_found_file($course) {
+    public function get_contenthash_of_first_found_file(\stdClass $course): ?string {
         global $DB;
         $module = $DB->get_record('modules', ['name' => 'resource']);
         $cms = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id], 'id ASC');
@@ -308,5 +304,28 @@ class testcourse {
             }
         }
         return $contenthash;
+    }
+
+    /**
+     * Wrapper for get_contenthash_of_first_found_file to create an identifier for the contenthash.
+     *
+     * @param \stdClass $course Course object of Moodle test data generator.
+     * @return string|null
+     */
+    public function get_identifier_of_first_found_file(\stdClass $course): ?string {
+        $contenthash = $this->get_contenthash_of_first_found_file($course);
+        return $this->generate_identifier($contenthash);
+    }
+
+    /**
+     * To ensure the identifier in all tests has the same format, use this function in testcourse functions.
+     *
+     * @param string $contenthash
+     * @return string
+     * @throws \coding_exception
+     */
+    private function generate_identifier(string $contenthash): string {
+        global $CFG;
+        return identifier::compose('moodle', $CFG->wwwroot, 'file', 'contenthash', $contenthash);
     }
 }

@@ -83,11 +83,11 @@ class filelist_test extends \advanced_testcase {
      * @covers ::get_single_file
      */
     public function test_get_single_file() {
-        $contenthash = $this->data['helper']->get_contenthash_of_first_found_file($this->data['course2']);
-        $file = filelist::get_single_file($this->data['course2']->id, $contenthash);
-        $this->assertIsArray($file);
-        $this->assertEquals($contenthash, $file[0]['file']->get_contenthash());
-        // TODO: refactor, why is there an additional layer in the array?
+        $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course2']);
+        $file = filelist::get_single_file($this->data['course2']->id, $identifier);
+        $this->assertIsObject($file);
+        $this->assertInstanceOf('\local_oer\modules\element', $file);
+        $this->assertEquals($identifier, $file->get_identifier());
     }
 
     /**

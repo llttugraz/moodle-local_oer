@@ -62,13 +62,6 @@ class get_files extends \external_api {
                 [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
                         'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
-                        'sections' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
-                                                'sectionnum' => new \external_value(PARAM_INT, 'Number of section in course'),
-                                                'sectionname' => new \external_value(PARAM_TEXT, 'Name of section in course'),
-                                        ])
-                        ),
                         'files' => new \external_multiple_structure(get_file::external_file_return_value()),
                 ]);
     }
@@ -89,7 +82,6 @@ class get_files extends \external_api {
         return [
                 'courseid' => $courseid,
                 'context' => $context->id,
-                'sections' => $sections,
                 'files' => $files,
         ];
     }

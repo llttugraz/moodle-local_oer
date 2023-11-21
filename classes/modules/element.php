@@ -25,6 +25,9 @@
 
 namespace local_oer\modules;
 
+use local_oer\helper\requirements;
+use local_oer\requirement_test;
+
 /**
  * Class element
  *
@@ -120,9 +123,9 @@ class element {
     /**
      * Data added by the user in GUI or added by local_oer plugin will be stored here.
      *
-     * @var \stdClass
+     * @var \stdClass|null
      */
-    private \stdClass $storedmetadata;
+    private ?\stdClass $storedmetadata = null;
 
     /**
      * Set the type for the element.
@@ -342,11 +345,28 @@ class element {
      * @param \stdClass $metadata Metadata from local_oer_elements table.
      * @return void
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function set_stored_metadata(\stdClass $metadata) {
-        unset($metadata->identifier);
+        global $DB;
+        [, $releasable,] = requirements::metadata_fulfills_all_requirements($metadata);
         $this->set_title($metadata->title);
         $this->set_license($metadata->license);
+
+        // There could be more than one snapshot, so only get the newest.
+        $timestamps = $DB->get_records('local_oer_snapshot', ['identifier' => $this->get_identifier()],
+                'timecreated DESC', 'id,timecreated', 0, 1);
+        $snapshot = new \stdClass();
+        $snapshot->release = empty($timestamps) ? 0 : reset($timestamps)->timecreated;
+
+        $metadata->timemodified = $metadata->timemodified > 0 ? userdate($metadata->timemodified) : '-';
+        $metadata->timereleased = (!is_null($snapshot->release) && $snapshot->release > 0)
+                ? userdate($snapshot->release) : '-';
+        $metadata->timereleasedts = $snapshot->release;
+        $metadata->upload = $metadata->releasestate == 1 ? 1 : 0;
+        $metadata->ignore = $metadata->releasestate == 2 ? 1 : 0;
+        $metadata->requirementsmet = $releasable;
+        unset($metadata->identifier);
         unset($metadata->title);
         unset($metadata->license);
         $this->storedmetadata = $metadata;
@@ -355,9 +375,9 @@ class element {
     /**
      * Get the stored metadata if already stored in local_oer_elements. Empty array else.
      *
-     * @return \stdClass
+     * @return \stdClass|null
      */
-    public function get_stored_metadata(): \stdClass {
+    public function get_stored_metadata(): ?\stdClass {
         return $this->storedmetadata;
     }
 

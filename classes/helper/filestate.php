@@ -78,7 +78,7 @@ class filestate {
                 // Step 1: Load usage of contenthash.
                 // Step 2: Extract courseids from contexts.
                 $decomposed = identifier::decompose($element->get_identifier());
-                $courses = self::find_courses_that_use_this_element($decomposed['value']);
+                $courses = self::find_courses_that_use_this_element($decomposed->value);
             // There is intentionally no break, as step 3 is needed.
             case element::OERTYPE_EXTERNAL:
                 // Step 3: Determine OER element state. Is element being edited or already released?

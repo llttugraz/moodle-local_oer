@@ -94,19 +94,19 @@ class identifier_test extends \advanced_testcase {
      */
     public function test_compose() {
         $this->resetAfterTest();
-        $system = 'moodle';
-        $platform = 'localhost.root/moodle_instance/';
+        $platform = 'moodle';
+        $instance = 'localhost.root/moodle_instance/';
         $type = 'file';
         $valuetype = 'contenthash';
         $value = 'd7ed44309ee5a94692bbf5c029f96553fc359def';
-        $identifier = identifier::compose($system, $platform, $type, $valuetype, $value);
+        $identifier = identifier::compose($platform, $instance, $type, $valuetype, $value);
         $expected = 'oer:moodle@localhost.root/moodle_instance/:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
         $this->assertEquals($expected, $identifier);
-        $platform = 'local_host.root/moodle_instance/';
+        $instance = 'local_host.root/moodle_instance/';
         $exception = 'oer:moodle@local_host.root/moodle_instance/:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Identifier contains not allowed characters: ' . $exception);
-        identifier::compose($system, $platform, $type, $valuetype, $value);
+        identifier::compose($platform, $instance, $type, $valuetype, $value);
     }
 
     /**
@@ -120,12 +120,12 @@ class identifier_test extends \advanced_testcase {
         $this->resetAfterTest();
         $identifier = 'oer:moodle@localhost.root/moodle_instance/:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
         $decomposed = identifier::decompose($identifier);
-        $this->assertCount(5, $decomposed);
-        $this->assertEquals('moodle', $decomposed['system']);
-        $this->assertEquals('localhost.root/moodle_instance/', $decomposed['platform']);
-        $this->assertEquals('file', $decomposed['type']);
-        $this->assertEquals('contenthash', $decomposed['valuetype']);
-        $this->assertEquals('d7ed44309ee5a94692bbf5c029f96553fc359def', $decomposed['value']);
+        $this->assertCount(5, (array) $decomposed);
+        $this->assertEquals('moodle', $decomposed->platform);
+        $this->assertEquals('localhost.root/moodle_instance/', $decomposed->instance);
+        $this->assertEquals('file', $decomposed->type);
+        $this->assertEquals('contenthash', $decomposed->valuetype);
+        $this->assertEquals('d7ed44309ee5a94692bbf5c029f96553fc359def', $decomposed->value);
         $exception = 'oer:moodle@localhost.root/moodle_instance/:file:contenthash:d7ed44309ee5a94692.bbf5c029f96553fc359def';
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Identifier contains not allowed characters: ' . $exception);

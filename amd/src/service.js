@@ -17,14 +17,14 @@
  * Open Educational Resources Plugin
  *
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2022 Educational Technologies, Graz, University of Technology
+ * @copyright  2022-2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import * as Ajax from 'core/ajax';
 
 /**
- * Load all file informations from backend with ajax service.
+ * Load all file information from backend with ajax service.
  *
  * @returns {*}
  */
@@ -39,17 +39,17 @@ export const loadFiles = () => {
 };
 
 /**
- * Load a informations from a single file from backend.
+ * Load information from a single file from backend.
  *
- * @param {string} contenthash
+ * @param {string} identifier
  * @returns {*}
  */
-export const loadFile = (contenthash) => {
+export const loadFile = (identifier) => {
     let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
     return Ajax.call([
         {
             methodname: 'local_oer_get_file',
-            args: {courseid: courseid, contenthash: contenthash}
+            args: {courseid: courseid, identifier: identifier}
         },
     ]);
 };

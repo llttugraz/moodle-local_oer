@@ -17,7 +17,7 @@
  * Open Educational Resources Plugin
  *
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2022 Educational Technologies, Graz, University of Technology
+ * @copyright  2022-2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -138,11 +138,11 @@ const saveForm = (modal, element, options, type, title) => {
             modal.destroy();
             if (options.hasOwnProperty('preference')) {
                 delete options.preference;
-                replaceFileInfo(Service.loadFile(options.contenthash));
+                replaceFileInfo(Service.loadFile(options.identifier));
             }
             showFormModal(formSubmit, type, title, options);
         } else if (type === 'FileinfoForm') {
-            replaceFileInfo(Service.loadFile(options.contenthash));
+            replaceFileInfo(Service.loadFile(options.identifier));
         } else if (type === 'PreferenceForm') {
             prepareFiles(Service.loadFiles());
         }
@@ -156,7 +156,7 @@ const replaceFileInfo = (promises) => {
         let filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
         let output = JSON.parse(filelist);
         output.files.forEach(function(file, index) {
-            if (file.contenthash === response.file.contenthash) {
+            if (file.identifier === response.file.identifier) {
                 output.files[index] = response.file;
             }
         });
@@ -258,7 +258,7 @@ const initSetPreferenceListener = (modal) => {
     button.addEventListener("click", function(action) {
         action.preventDefault();
         let options = {
-            contenthash: button.dataset.contenthash,
+            identifier: button.dataset.identifier,
             preference: button.dataset.preference
         };
         let element = document.getElementById("local_oer_files_main_area");

@@ -17,7 +17,7 @@
  * Open Educational Resources Plugin
  *
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2021 Educational Technologies, Graz, University of Technology
+ * @copyright  2021-2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,25 +26,24 @@ import * as Output from 'local_oer/output';
 /**
  * Add listener to the filecard file menu
  *
- * @param {string} contenthash
+ * @param {string} identifier
  */
-export const initActionMenuListener = (contenthash) => {
-    let menu = document.getElementById("local_oer-action-menu-" + contenthash);
-    if (menu === null) {
+export const initActionMenuListener = (identifier) => {
+    const menu = document.querySelectorAll(`[data-oeractionmenu="${identifier}"]`);
+    if(menu === null) {
         return;
     }
-
-    menu.addEventListener("click", function(action) {
+    menu[0].addEventListener("click", function (action) {
         action.preventDefault();
-        let type = action.target.dataset.action;
-        let ch = action.target.dataset.contenthash;
-        let title = action.target.dataset.title;
+        const type = action.target.dataset.action;
+        const ch = action.target.dataset.identifier;
+        const title = action.target.dataset.title;
         switch (type) {
             case 'edit-file':
-                Output.showForm("FileinfoForm", title, {contenthash: ch});
+                Output.showForm("FileinfoForm", title, {identifier: ch});
                 break;
             case 'course-to-file':
-                Output.showForm("CourseToFileForm", title, {contenthash: ch});
+                Output.showForm("CourseToFileForm", title, {identifier: ch});
                 break;
         }
     });
