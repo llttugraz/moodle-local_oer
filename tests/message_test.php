@@ -25,8 +25,6 @@
 
 namespace local_oer;
 
-use local_oer\testcourse;
-
 /**
  * Class message_test
  *
@@ -54,7 +52,7 @@ class message_test extends \advanced_testcase {
         $helper->set_files_to($course->id, 5, true);
         $helper->sync_course_info($course->id);
         $this->waitForSecond();
-        $files = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        $files = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
         $this->preventResetByRollback();
         unset_config('noemailever');
         $sink = $this->redirectEmails();

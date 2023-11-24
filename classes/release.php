@@ -27,6 +27,7 @@ namespace local_oer;
 
 use local_oer\helper\formhelper;
 use local_oer\helper\license;
+use local_oer\modules\element;
 use local_oer\plugininfo\oerclassification;
 
 /**
@@ -71,18 +72,17 @@ class release {
      * @throws \moodle_exception
      */
     public function get_released_files() {
-        $files = filelist::get_course_files($this->courseid);
+        $elements = filelist::get_course_files($this->courseid);
         $snapshot = new snapshot($this->courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
         $release = [];
-        foreach ($files as $filearray) {
-            $file = $filearray[0]['file'];
-            if (!isset($metadata[$file->get_contenthash()])) {
+        foreach ($elements as $element) {
+            if (!isset($metadata[$element->get_identifier()])) {
                 continue;
             }
             $release[] = [
-                    'metadata' => $this->get_file_release_metadata_json($file, $metadata[$file->get_contenthash()]),
-                    'storedfile' => $file,
+                    'metadata' => $this->get_file_release_metadata_json($element, $metadata[$element->get_identifier()]),
+                    'storedfile' => $element,
             ];
         }
         return $release;
@@ -91,19 +91,19 @@ class release {
     /**
      * Prepare the stored metadata of snapshot table for output.
      *
-     * @param \stored_file $file
-     * @param \stdClass $fileinfo
+     * @param element $element
+     * @param \stdClass $elementinfo
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function get_file_release_metadata_json(\stored_file $file, \stdClass $fileinfo): array {
+    private function get_file_release_metadata_json(element $element, \stdClass $elementinfo): array {
         global $CFG;
         $contexts = formhelper::lom_context_list(false);
         $resourcetypes = formhelper::lom_resource_types(false);
-        $classification = self::prepare_classification_fields($fileinfo->classification);
-        $licenseobject = license::get_license_by_shortname($fileinfo->license);
-        $license = $fileinfo->license;
+        $classification = self::prepare_classification_fields($elementinfo->classification);
+        $licenseobject = license::get_license_by_shortname($elementinfo->license);
+        $license = $elementinfo->license;
         if (get_config('local_oer', 'uselicensereplacement') == 1) {
             $replacement = get_config('local_oer', 'licensereplacement');
             $replacement = explode("\r\n", $replacement);
@@ -116,7 +116,7 @@ class release {
                 $list[$entry[0]] = $entry[1];
             }
             if (isset($list[$fileinfo->license])) {
-                $license = $list[$fileinfo->license];
+                $license = $list[$elementinfo->license];
             }
         }
 
@@ -127,9 +127,14 @@ class release {
         ];
 
         $coursecontext = \context_course::instance($this->courseid);
+        $decomposed = identifier::decompose($element->get_identifier());
+        $contenthash = '';
+        if ($element->get_type() == element::OERTYPE_MOODLEFILE && $decomposed->valuetype == 'contenthash') {
+            $contenthash = $decomposed->value;
+        }
         $metadata = [
-                'title' => $fileinfo->title,
-                'contenthash' => $fileinfo->contenthash,
+                'title' => $elementinfo->title,
+                'contenthash' => $contenthash,
                 'fileurl' => $CFG->wwwroot . '/pluginfile.php/' .
                         $coursecontext->id . '/local_oer/public/' .
                         $fileinfo->id . '/' . $fileinfo->contenthash,

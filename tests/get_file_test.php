@@ -212,6 +212,8 @@ class get_file_test extends \advanced_testcase {
      */
     public function test_service() {
         $this->setAdminUser();
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
         $helper = new \local_oer\testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $identifier = $helper->get_identifier_of_first_found_file($course);
@@ -224,7 +226,7 @@ class get_file_test extends \advanced_testcase {
         $this->assertEquals(\context_course::instance($course->id)->id, $result['context']);
         $this->assertArrayHasKey('file', $result);
         $this->assertArrayHasKey('identifier', $result['file']);
-        $this->assertEquals($identifier, $result['file']['contenthash']);
+        $this->assertEquals($identifier, $result['file']['identifier']);
         // Does it make sense to test all values here?
         // The service will ensure all fields that are set in service_returns are set.
         // An error will be thrown if a field is missing. Additional fields will be removed by external_api.

@@ -123,7 +123,7 @@ class filelist_test extends \advanced_testcase {
     }
 
     /**
-     * Test get_simple_filelist
+     * Test get_simple_file
      *
      * @return void
      * @throws \coding_exception
@@ -135,9 +135,9 @@ class filelist_test extends \advanced_testcase {
      * @covers ::select_file_icon_or_thumbnail
      */
     public function test_get_simple_file() {
-        $contenthash = $this->data['helper']->get_contenthash_of_first_found_file($this->data['course1']);
-        $file = filelist::get_simple_file($this->data['course1']->id, $contenthash);
+        $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course1']);
+        $file = filelist::get_simple_file($this->data['course1']->id, $identifier);
         $this->assertIsArray($file);
-        $this->assertEquals($contenthash, $file['contenthash']);
+        $this->assertEquals($identifier, $file['identifier']);
     }
 }

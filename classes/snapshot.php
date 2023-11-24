@@ -63,15 +63,15 @@ class snapshot {
      */
     public function get_latest_course_snapshot() {
         global $DB;
-        $files = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id ASC');
+        $records = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid], 'id ASC');
         $result = [];
-        foreach ($files as $file) {
-            if (isset($result[$file->contenthash])) {
-                if ($result[$file->contenthash]->timecreated <= $file->timecreated) {
-                    $result[$file->contenthash] = $file;
+        foreach ($records as $record) {
+            if (isset($result[$record->identifier])) {
+                if ($result[$record->identifier]->timecreated <= $record->timecreated) {
+                    $result[$record->identifier] = $record;
                 }
             } else {
-                $result[$file->contenthash] = $file;
+                $result[$record->identifier] = $record;
             }
         }
         return $result;
@@ -103,7 +103,7 @@ class snapshot {
         $elements = filelist::get_course_files($this->courseid);
         [$courses, $courseinfo] = $this->get_active_courseinfo_metadata();
         if (!$courseinfo) {
-            logger::add($this->courseid, logger::LOGERROR, 'Course does not has courseinfo, maybe all entries are ignored');
+            logger::add($this->courseid, logger::LOGERROR, 'Course does not have courseinfo, maybe all entries are ignored');
             return;
         }
 
@@ -138,7 +138,7 @@ class snapshot {
             // At least one criterion is not fulfilled, file cannot be released.
             if ($metadata->releasestate == 1) {
                 // So the file cannot be released, but the state is release? There has to be an error somewhere - add to log.
-                logger::add($this->courseid, logger::LOGERROR, 'Element with identifier ' . $fileinfo->contenthash .
+                logger::add($this->courseid, logger::LOGERROR, 'Element with identifier ' . $metadata->identifier .
                         ' is set to release, but does not fulfill all requirements.');
             }
             return;

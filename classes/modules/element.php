@@ -128,6 +128,24 @@ class element {
     private ?\stdClass $storedmetadata = null;
 
     /**
+     * Relative id of course section. Not the database id, but the position in section order.
+     *
+     * Set to -1 if the element is not from an activity from a section.
+     *
+     * @var int
+     */
+    private int $section = -1;
+
+    /**
+     * Array of sections if this element is used more often in the same course.
+     *
+     * This will be calculated in base plugin during element collection.
+     *
+     * @var int[]
+     */
+    private array $sections = [];
+
+    /**
      * Set the type for the element.
      *
      * Only defined types can be used.
@@ -389,6 +407,53 @@ class element {
      */
     public function get_stored_metadata(): ?\stdClass {
         return $this->storedmetadata;
+    }
+
+    /**
+     * Set the relative course section number.
+     *
+     * Also add the section to the sections array.
+     *
+     * @param int $section
+     * @return void
+     */
+    public function set_section(int $section) {
+        $this->section = $section;
+        if ($section >= 0 && !in_array($section, $this->sections)) {
+            $this->sections[] = $section;
+        }
+    }
+
+    /**
+     * Add a section where this element is used.
+     *
+     * @param int $section
+     * @return void
+     */
+    public function add_to_sections(int $section) {
+        if ($section < 0 || in_array($section, $this->sections)) {
+            // Do not add if negative value or if already set.
+            return;
+        }
+        $this->sections[] = $section;
+    }
+
+    /**
+     * Return relative section id.
+     *
+     * @return int
+     */
+    public function get_section(): int {
+        return $this->section;
+    }
+
+    /**
+     * Return list of sections this element is used.
+     *
+     * @return int[]
+     */
+    public function get_sections(): array {
+        return $this->sections;
     }
 
     /**

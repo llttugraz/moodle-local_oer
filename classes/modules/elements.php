@@ -111,6 +111,20 @@ class elements implements \Iterator, \Countable {
     }
 
     /**
+     * Load the element on given position.
+     *
+     * @param int $key Position of element in array.
+     * @return element
+     * @throws \coding_exception
+     */
+    public function get_element_by_key(int $key) {
+        if (!isset($this->elements[$key])) {
+            throw new \coding_exception("Out of range! Position: $key Elements " . $this->count());
+        }
+        return $this->elements[$key];
+    }
+
+    /**
      * Return current element.
      *
      * PHP iterator interface.

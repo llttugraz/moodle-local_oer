@@ -161,7 +161,8 @@ class filestate {
                 // So it will be inherited to the first course in the list.
                 $editorid = array_key_first($courses);
                 $DB->set_field('local_oer_elements', 'courseid', $editorid, ['identifier' => $element->get_identifier()]);
-                logger::add($editorid, 'Inherited file ' . $element->get_identifier() . ' from course ' . $oerelement->courseid);
+                logger::add($editorid, logger::LOGERROR,
+                        'Inherited file ' . $element->get_identifier() . ' from course ' . $oerelement->courseid);
             }
             $courses[$editorid]['editor'] = true;
         }

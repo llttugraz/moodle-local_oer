@@ -67,12 +67,19 @@ class filelist {
             $storedelements[$record->identifier] = $record;
         }
 
-        foreach ($elements as $element) {
+        $visited = [];
+        foreach ($elements as $key => $element) {
+            if (isset($visited[$element->get_identifier()])) {
+                // This element is multiple times in this course, only show it once.
+                $elements->get_element_by_key($visited[$element->get_identifier()])->add_to_sections($element->get_section());
+                $elements->remove_element($elements->key());
+                continue;
+            }
             filestate::calculate_state($element, $courseid);
             if (isset($storedelements[$element->get_identifier()])) {
                 $element->set_stored_metadata($storedelements[$element->get_identifier()]);
             }
-
+            $visited[$element->get_identifier()] = $key;
         }
 
         return $elements;
@@ -118,7 +125,15 @@ class filelist {
             $filesections = [];
             $modules = [];
 
-            // TODO
+            foreach ($element->get_sections() as $section) {
+                $sec = [
+                        'sectionnum' => $section,
+                        'sectionname' => get_section_name($courseid, $section),
+                ];
+                $filesections[] = $sec;
+                $sections[$section] = $sec;
+            }
+            // TODO modules
             //foreach ($file as $key => $duplicate) {
             //    $section = [
             //            'sectionnum' => $duplicate['module']->sectionnum,

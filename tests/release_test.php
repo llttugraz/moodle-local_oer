@@ -49,6 +49,10 @@ class release_test extends \advanced_testcase {
      */
     public function test_get_released_files() {
         $this->resetAfterTest();
+
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $this->setAdminUser();
         global $DB;
         $helper = new testcourse();

@@ -64,6 +64,9 @@ class filestate_test extends \advanced_testcase {
     public function test_calculate_file_state() {
         $this->resetAfterTest(true);
 
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $this->setAdminUser();
         global $DB, $CFG;
         $testcourse = new testcourse();
@@ -133,7 +136,7 @@ class filestate_test extends \advanced_testcase {
         $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_RELEASED, $course2->id,
                 1, false);
-        $DB->delete_records('local_oer_snapshot', ['contenthash' => $file->get_contenthash()]);
+        $DB->delete_records('local_oer_snapshot', ['identifier' => $element->get_identifier()]);
         $this->assert_file_state($element, $course2->id,
                 filestate::STATE_FILE_EDITED, $course2->id,
                 1, true);
