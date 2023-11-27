@@ -1,0 +1,16 @@
+{
+    "authors": [
+        {
+            "name": "Christian Ortner",
+            "email": "christian.ortner@tugraz.at",
+            "role": "Maintainer"
+        }
+    ],
+    "description": "Moodle Plugin to release OER (Open Educational Resources)",
+    "keywords": ["OER", "OEAA", "Moodle"],
+    "name": "llttugraz/moodle-local_oer",
+    "require": {
+        "moodle/moodle": "4.1 - 4.2"
+    },
+    "license": "GPL-3.0-or-later"
+}
