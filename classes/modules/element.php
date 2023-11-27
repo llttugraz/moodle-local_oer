@@ -146,6 +146,22 @@ class element {
     private array $sections = [];
 
     /**
+     * If the element is a file stored in moodle, set the stored file object.
+     *
+     * @var \stored_file
+     */
+    private \stored_file $stored_file;
+
+    /**
+     * If the element is from a moodle activity, add the module info here.
+     *
+     * A file can be used in multiple coursemodules, so this is an array of moduleinfo.
+     *
+     * @var \stdClass[]
+     */
+    private array $moduleinfo = [];
+
+    /**
      * Set the type for the element.
      *
      * Only defined types can be used.
@@ -254,18 +270,18 @@ class element {
     }
 
     /**
-     * Get the identifier type of this element.
+     * Get the origin of this element.
      *
      * @return string
      * @throws \coding_exception
      */
-    public function get_source(): string {
-        $this->not_empty('source', $this->source);
-        return $this->source;
+    public function get_origin(): string {
+        $this->not_empty('origin', $this->origin);
+        return $this->origin;
     }
 
     /**
-     * Set the origin of this element.
+     * Set the source of this element.
      *
      * @param string $value
      * @return void
@@ -278,14 +294,14 @@ class element {
     }
 
     /**
-     * Get the identifier type of this element.
+     * Get the source url of this element.
      *
      * @return string
      * @throws \coding_exception
      */
-    public function get_origin(): string {
-        $this->not_empty('origin', $this->origin);
-        return $this->origin;
+    public function get_source(): string {
+        $this->not_empty('source', $this->source);
+        return $this->source;
     }
 
     /**
@@ -392,6 +408,33 @@ class element {
     }
 
     /**
+     * Add or overwrite a field in stored metadata.
+     *
+     * @param string $name
+     * @param $value
+     * @param bool $mustexist
+     * @return void
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     */
+    public function set_stored_metadata_field(string $name, $value, bool $mustexist = true): void {
+        if (is_null($this->storedmetadata)) {
+            throw new \coding_exception("Stored metadata has not been set yet, use set_stored_metadata before updating fields");
+        }
+        if ($mustexist && !isset($this->storedmetadata->$name)) {
+            throw new \coding_exception("Field $name not yet defined in storedmetadata");
+        }
+        validate_param($name, PARAM_ALPHA); // Throws invalid parameter exception.
+        $reflection = new \ReflectionClass($this);
+        $notallowed = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
+        if (in_array($name, $notallowed)) {
+            throw new \coding_exception("Field $name not allowed to be added to storedmetadata, use element->set_$name instead");
+        }
+
+        $this->storedmetadata->$name = $value;
+    }
+
+    /**
      * True when already metadata could be added from elements table.
      *
      * @return bool
@@ -454,6 +497,58 @@ class element {
      */
     public function get_sections(): array {
         return $this->sections;
+    }
+
+    /**
+     * Set the stored file.
+     *
+     * @param \stored_file $file
+     * @return void
+     */
+    public function set_storedfile(\stored_file $file): void {
+        $this->stored_file = $file;
+    }
+
+    /**
+     * Return the stored file of this element.
+     *
+     * @return \stored_file|null
+     */
+    public function get_storedfile(): ?\stored_file {
+        return $this->stored_file ?? null;
+    }
+
+    /**
+     * Set the module info
+     *
+     * @param int $cmid Moodle course module id
+     * @param string $name Name of coursemodule
+     * @param \moodle_url $url Url to the module
+     * @return void
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    public function set_moduleinfo(int $cmid, string $name, \moodle_url $url): void {
+        if (!\context_module::instance($cmid)) {
+            throw new \moodle_exception("Context unknown or not a course module id: $cmid");
+        }
+        if (empty($name)) {
+            throw new \coding_exception("Name cannot be empty");
+        }
+        $moduleinfo = new \stdClass();
+        $moduleinfo->cmid = $cmid;
+        $moduleinfo->name = $name;
+        $moduleinfo->url = $url;
+        $this->moduleinfo[$cmid] = $moduleinfo;
+    }
+
+    /**
+     * Get the module info
+     *
+     * @return array
+     */
+    public function get_moduleinfo(): array {
+        return $this->moduleinfo;
     }
 
     /**

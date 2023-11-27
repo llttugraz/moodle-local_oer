@@ -133,19 +133,13 @@ class filelist {
                 $filesections[] = $sec;
                 $sections[$section] = $sec;
             }
-            // TODO modules
-            //foreach ($file as $key => $duplicate) {
-            //    $section = [
-            //            'sectionnum' => $duplicate['module']->sectionnum,
-            //            'sectionname' => get_section_name($courseid, $duplicate['module']->sectionnum),
-            //    ];
-            //    $filesections[] = $section;
-            //    $sections[$section['sectionnum']] = $section;
-            //    $modules[] = [
-            //            'moduleurl' => !is_null($duplicate['module']->url) ? $duplicate['module']->url->out() : '#',
-            //            'modulename' => $duplicate['module']->name ?? 'Module not found',
-            //    ];
-            //}
+            foreach ($element->get_moduleinfo() as $module) {
+                $modules[] = [
+                        'moduleurl' => !is_null($module->url) ? $module->url->out() : '#',
+                        'modulename' => $module->name ?? 'Module not found',
+                ];
+            }
+
             $icon = icon::select_file_icon($element->get_mimetype(), $renderer, $icons);
             $preference = $DB->get_record('local_oer_preference', ['courseid' => $courseid]);
             $ignore = $preference && $preference->state == 2 ? 1 : 0;

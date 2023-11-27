@@ -38,6 +38,18 @@ require_once(__DIR__ . '/helper/testcourse.php');
  */
 class snapshothelper_test extends \advanced_testcase {
     /**
+     * Setup test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+    }
+
+    /**
      * Test the helper to create snapshots.
      *
      * As this function uses the snapshot class to create snapshots, the detailed snapshot tests could be found there.
@@ -49,11 +61,7 @@ class snapshothelper_test extends \advanced_testcase {
      * @covers \local_oer\helper\snapshothelper::create_snapshots_of_all_active_courses
      */
     public function test_create_snapshots_of_all_active_courses() {
-        $this->resetAfterTest();
-
         global $DB;
-        $this->setAdminUser();
-
         $testcourse = new testcourse();
 
         // Every testcourse has already 5 resources with files generated.
@@ -110,9 +118,7 @@ class snapshothelper_test extends \advanced_testcase {
      * @covers \local_oer\helper\snapshothelper::get_latest_snapshot_timestamp
      */
     public function test_get_latest_snapshot_timestamp() {
-        $this->resetAfterTest();
         global $DB;
-        $this->setAdminUser();
 
         $latest = snapshothelper::get_latest_snapshot_timestamp();
         $this->assertEquals(0, $latest, 'Returns zero if no records are in the table');

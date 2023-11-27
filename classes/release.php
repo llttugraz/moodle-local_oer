@@ -71,7 +71,7 @@ class release {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function get_released_files() {
+    public function get_released_files(): array {
         $elements = filelist::get_course_files($this->courseid);
         $snapshot = new snapshot($this->courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
@@ -90,6 +90,10 @@ class release {
 
     /**
      * Prepare the stored metadata of snapshot table for output.
+     *
+     * TODO: there is an inconsistency between $element and $elementinfo regarding the license.
+     * $elementinfo is a record from the snapshot table with the released license in it. It is possible that $element has a
+     * different license set at this point.
      *
      * @param element $element
      * @param \stdClass $elementinfo
@@ -115,7 +119,7 @@ class release {
                 }
                 $list[$entry[0]] = $entry[1];
             }
-            if (isset($list[$fileinfo->license])) {
+            if (isset($list[$elementinfo->license])) {
                 $license = $list[$elementinfo->license];
             }
         }
@@ -134,27 +138,29 @@ class release {
         }
         $metadata = [
                 'title' => $elementinfo->title,
-                'contenthash' => $contenthash,
+                'identifier' => $element->get_identifier(),
+                'contenthash' => $contenthash, // Deprecated, only for backwards compatibility.
                 'fileurl' => $CFG->wwwroot . '/pluginfile.php/' .
                         $coursecontext->id . '/local_oer/public/' .
-                        $fileinfo->id . '/' . $fileinfo->contenthash,
-                'abstract' => $fileinfo->description ?? '',
+                        $elementinfo->id . '/' . $contenthash,
+                'abstract' => $elementinfo->description ?? '',
                 'license' => $fulllicense,
-                'context' => $contexts[$fileinfo->context],
-                'resourcetype' => $resourcetypes[$fileinfo->resourcetype],
-                'language' => $fileinfo->language,
-                'persons' => json_decode($fileinfo->persons)->persons,
-                'tags' => is_null($fileinfo->tags) || $fileinfo->tags == '' ? [] : explode(',', $fileinfo->tags),
-                'mimetype' => $file->get_mimetype(),
-                'filesize' => $file->get_filesize(),
-                'filecreationtime' => $file->get_timecreated(),
-                'timereleased' => $fileinfo->timecreated,
+                'context' => $contexts[$elementinfo->context],
+                'resourcetype' => $resourcetypes[$elementinfo->resourcetype],
+                'language' => $elementinfo->language,
+                'persons' => json_decode($elementinfo->persons)->persons,
+                'tags' => empty($elementinfo->tags) ? [] : explode(',', $elementinfo->tags),
+                'mimetype' => $element->get_mimetype(),
+                'filesize' => $element->get_filesize(),
+            // TODO: Same as timereleased? Where did the timestamp before was read?
+                'filecreationtime' => $elementinfo->timecreated,
+                'timereleased' => $elementinfo->timecreated,
                 'classification' => $classification,
-                'courses' => json_decode($fileinfo->coursemetadata),
+                'courses' => json_decode($elementinfo->coursemetadata),
         ];
 
-        if ($fileinfo->additionaldata) {
-            $additionaldata = json_decode($fileinfo->additionaldata);
+        if ($elementinfo->additionaldata) {
+            $additionaldata = json_decode($elementinfo->additionaldata);
             foreach ($additionaldata as $key => $value) {
                 // Do not overwrite existing data.
                 if (!isset($metadata[$key])) {

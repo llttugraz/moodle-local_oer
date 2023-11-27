@@ -108,28 +108,33 @@ class requirements {
      */
     public static function reset_releasestate_if_necessary(): void {
         global $DB, $USER;
-        $files = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        $records = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
         $courses = [];
-        foreach ($files as $file) {
-            [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($file);
+        foreach ($records as $record) {
+            $element = new element();
+            $element->set_type($record->type);
+            $element->set_identifier($record->identifier);
+            $element->set_stored_metadata($record);
+            [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($element);
             if (!$release) {
-                $courses[$file->courseid][] = $file;
-                $file->state = 0;
-                $file->usermodified = $USER->id;
-                $file->timemodified = time();
-                $DB->update_record('local_oer_files', $file);
+                $courses[$record->courseid][$element->get_identifier()] = $element->get_title();
+                $record->releasestate = 0;
+                $record->usermodified = $USER->id;
+                $record->timemodified = time();
+                $DB->update_record('local_oer_elements', $record);
             }
         }
         if (!empty($courses)) {
-            foreach ($courses as $course => $files) {
+            foreach ($courses as $course => $elements) {
                 // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
-                $filelist = \local_oer\filelist::get_course_files($course);
-                foreach ($files as $key => $file) {
-                    if (!isset($filelist[$file->contenthash])) {
-                        unset($files[$key]);
+                $elementlist = \local_oer\filelist::get_course_files($course);
+                foreach ($elements as $identifier => $title) {
+                    if(!$elementlist->find_element('identifier', $identifier)) {
+                        unset($elements[$identifier]);
                     }
                 }
-                if (empty($files)) {
+
+                if (empty($elements)) {
                     continue;
                 }
                 $coursecontext = \context_course::instance($course);
@@ -142,7 +147,7 @@ class requirements {
                 foreach ($users as $userid) {
                     if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
                         $user = $DB->get_record('user', ['id' => $userid->id]);
-                        \local_oer\message::send_requirementschanged($user, $files, $course);
+                        \local_oer\message::send_requirementschanged($user, $elements, $course);
                     }
                 }
             }

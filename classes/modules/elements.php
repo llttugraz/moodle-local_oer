@@ -68,6 +68,11 @@ class elements implements \Iterator, \Countable {
      */
     public function remove_element(int $pos) {
         unset($this->elements[$pos]);
+        // Rearrange elements so that there are no holes in the array.
+        $this->elements = array_values($this->elements);
+        if ($this->pos > 0) {
+            $this->pos--;
+        }
     }
 
     /**

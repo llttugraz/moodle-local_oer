@@ -39,6 +39,18 @@ require_once(__DIR__ . '/helper/testcourse.php');
  */
 class snapshot_test extends \advanced_testcase {
     /**
+     * Setup test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+    }
+
+    /**
      * Test get latest course snapshot
      *
      * @return void
@@ -48,9 +60,6 @@ class snapshot_test extends \advanced_testcase {
      * @covers ::get_latest_course_snapshot
      */
     public function test_get_latest_course_snapshot() {
-        $this->resetAfterTest();
-        global $DB;
-        $this->setAdminUser();
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
@@ -69,7 +78,6 @@ class snapshot_test extends \advanced_testcase {
      * @covers ::get_file_history
      */
     public function test_get_file_history() {
-        $this->resetAfterTest();
         // TODO: feature has to be implemented in snapshot.
     }
 
@@ -84,8 +92,6 @@ class snapshot_test extends \advanced_testcase {
      * @covers ::create_file_snapshot
      */
     public function test_create_snapshot_of_course_files() {
-        $this->resetAfterTest();
-        $this->setAdminUser();
         global $DB;
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());

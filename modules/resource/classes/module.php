@@ -66,6 +66,8 @@ class module implements \local_oer\modules\module {
                 $element->set_filesize($file->get_filesize());
                 $element->set_mimetype($file->get_mimetype());
                 $element->set_section($cm->sectionnum);
+                $element->set_storedfile($file);
+                $element->set_moduleinfo($cm->id, $cm->name, $cm->url);
                 $elements->add_element($element);
             }
         }

@@ -87,6 +87,7 @@ class zipper_test extends \advanced_testcase {
         $this->setAdminUser();
         // TODO: test is dependent from subplugin.
         set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);

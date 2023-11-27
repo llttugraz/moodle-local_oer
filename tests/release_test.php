@@ -94,14 +94,19 @@ class release_test extends \advanced_testcase {
      */
     public function test_get_file_release_metadata_json() {
         $this->resetAfterTest();
+
+        // TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $this->setAdminUser();
         global $DB;
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
         $helper->set_files_to($course->id, 1, true);
-        $contenthash = $helper->get_contenthash_of_first_found_file($course);
-        $files = $DB->get_records('files', ['contenthash' => $contenthash]);
+        $identifier = $helper->get_identifier_of_first_found_file($course);
+        $decomposed = identifier::decompose($identifier);
+        $files = $DB->get_records('files', ['contenthash' => $decomposed->value]);
         $this->assertCount(2, $files, 'One file should be found, the second entry is the folder.');
         $fileid = 0;
         foreach ($files as $file) {
@@ -112,6 +117,7 @@ class release_test extends \advanced_testcase {
         $fs = get_file_storage();
         $file = $fs->get_file_by_id($fileid);
         $this->assertTrue(is_a($file, 'stored_file'));
+        $element = $helper->get_element_for_file($file);
 
         $release = new release($course->id);
         $releasemetadata = new \ReflectionMethod($release, 'get_file_release_metadata_json');
@@ -122,10 +128,10 @@ class release_test extends \advanced_testcase {
         $snapshots = $snapshot->get_latest_course_snapshot();
         $this->assertCount(1, $snapshots);
         $keys = array_keys($snapshots);
-        $this->assertEquals($contenthash, reset($keys));
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $this->assertEquals($identifier, reset($keys));
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts = [
-                'general' => 16,
+                'general' => 17,
                 'persons' => 2,
                 'tags' => 0,
                 'courses' => 1,
@@ -136,10 +142,10 @@ class release_test extends \advanced_testcase {
         // Add some tags to metadata.
         $tags = 'Impressive,UnitTest,Tags';
         $expectedcounts['tags'] = 3;
-        $DB->set_field('local_oer_files', 'tags', $tags, ['courseid' => $course->id, 'contenthash' => $contenthash]);
+        $DB->set_field('local_oer_elements', 'tags', $tags, ['courseid' => $course->id, 'identifier' => $identifier]);
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
@@ -149,7 +155,7 @@ class release_test extends \advanced_testcase {
         $replacement = "xx=>replacement\r\nabc=>otherreplacement\r\ncc-4.0=>replacedtextintest\r\nlast=>lastline";
         set_config('uselicensereplacement', 1, 'local_oer');
         set_config('licensereplacement', $replacement, 'local_oer');
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $license = $metadata['license'];
         $this->assertEquals('replacedtextintest', $license['shortname']);
 
@@ -192,12 +198,12 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
         // Add additional data to latest snapshot, to test if additional data is added correctly to result.
-        $modifiedsnapshot = $snapshots[$contenthash];
+        $modifiedsnapshot = $snapshots[$identifier];
         $additionaldata = [
                 'semester' => 'WS',
                 'hoursperunit' => 10,
@@ -206,7 +212,7 @@ class release_test extends \advanced_testcase {
         ];
         $modifiedsnapshot->additionaldata = json_encode($additionaldata);
         $DB->update_record('local_oer_snapshot', $modifiedsnapshot);
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['general'] = $expectedcounts['general'] + 3; // Three new fields have been added.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
@@ -238,8 +244,8 @@ class release_test extends \advanced_testcase {
         $helper->sync_course_info($course->id);
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
-        $expectedcounts['general'] = 16; // New release should not have injected additional fields.
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $expectedcounts['general'] = 17; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 1;
         $expectedcounts['course'] = [11]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -250,8 +256,8 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
-        $expectedcounts['general'] = 16; // New release should not have injected additional fields.
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $expectedcounts['general'] = 17; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 2;
         $expectedcounts['course'] = [10, true, 1]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -277,7 +283,7 @@ class release_test extends \advanced_testcase {
         $helper->generate_resource($course2, $this->getDataGenerator(), $file->get_filename(), null, $file->get_content());
         $helper->sync_course_info($course2->id);
         $coursetofile = new \stdClass();
-        $coursetofile->contenthash = $contenthash;
+        $coursetofile->contenthash = $decomposed->value;
         $coursetofile->courseid = $course2->id;
         $coursetofile->coursecode = 'moodlecourse-' . $course2->id;
         $coursetofile->state = coursetofile::COURSETOFILE_ENABLED;
@@ -287,7 +293,7 @@ class release_test extends \advanced_testcase {
         $DB->insert_record('local_oer_coursetofile', $coursetofile);
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $file, $snapshots[$contenthash]);
+        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['courses'] = 3;
         $expectedcounts['course'] = [10, true, 1];
         $this->assert_count_metadata($metadata, $expectedcounts);

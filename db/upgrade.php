@@ -780,7 +780,7 @@ function xmldb_local_oer_upgrade($oldversion) {
 
     if ($oldversion < 2023111701) {
 
-        $records = $DB->get_records('local_oer_snapshots');
+        $records = $DB->get_records('local_oer_snapshot');
 
         // Rename field contenthash on table local_oer_snapshot to identifier.
         $table = new xmldb_table('local_oer_snapshot');

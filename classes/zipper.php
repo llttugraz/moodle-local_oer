@@ -85,11 +85,11 @@ class zipper {
             $filetozip = ['metadata' => $metadata, 'file' => $file];
             if ((($filesize + $size) <= $maxpackagesize) || $onlyonepackage) {
                 $size += $filesize;
-                $packages[$package][$file->get_contenthash()] = $filetozip;
+                $packages[$package][$file->get_identifier()] = $filetozip;
             } else {
                 $size = $filesize;
                 $package += 1;
-                $packages[$package][$file->get_contenthash()] = $filetozip;
+                $packages[$package][$file->get_identifier()] = $filetozip;
             }
 
             // Write informations for logging.
@@ -139,10 +139,11 @@ class zipper {
         $ziplist = [];
         foreach ($package as $key => $item) {
             $metafile = $this->create_metadata_json_temp($key, $item['metadata']);
-            $file = $item['file'];
+            $element = $item['file'];
+            $file = $element->get_storedfile();
             $tempfile = $file->copy_content_to_temp($this->tempfolder);
             $filearray = explode('/', $tempfile);
-            $filearray[count($filearray) - 1] = $key;
+            $filearray[count($filearray) - 1] = hash('sha1', $key);
             $renamedfile = implode('/', $filearray);
             rename($tempfile, $renamedfile);
             $ziplist[$key . '.json'] = $metafile;
@@ -158,12 +159,13 @@ class zipper {
      * @param array $metadata
      * @return false|string
      */
-    private function create_metadata_json_temp($contenthash, $metadata) {
+    private function create_metadata_json_temp($identifier, $metadata) {
         $dir = $this->tempfolder;
         if (!$dir = make_temp_directory($dir)) {
             return false;
         }
-        $filename = $dir . '/' . $contenthash . '.json';
+        $hashed = hash('sha1', $identifier);
+        $filename = $dir . '/' . $hashed . '.json';
         if ($tempfile = fopen($filename, 'w')) {
             fputs($tempfile, json_encode($metadata, JSON_UNESCAPED_UNICODE));
             fclose($tempfile);
