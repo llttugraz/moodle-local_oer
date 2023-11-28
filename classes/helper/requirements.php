@@ -129,7 +129,7 @@ class requirements {
                 // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
                 $elementlist = \local_oer\filelist::get_course_files($course);
                 foreach ($elements as $identifier => $title) {
-                    if(!$elementlist->find_element('identifier', $identifier)) {
+                    if (!$elementlist->find_element('identifier', $identifier)) {
                         unset($elements[$identifier]);
                     }
                 }

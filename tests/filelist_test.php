@@ -98,8 +98,8 @@ class filelist_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::get_simple_filelist
-     * @covers ::prepare_file_icon_renderer
-     * @covers ::select_file_icon_or_thumbnail
+     * @covers \local_oer\icon::prepare_file_icon_renderer
+     * @covers \local_oer\icon::select_file_icon_or_thumbnail
      */
     public function test_get_simple_filelist() {
         [$files, $sections] = filelist::get_simple_filelist($this->data['course1']->id);
@@ -131,8 +131,8 @@ class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_simple_file
      * @covers ::get_simple_filelist
-     * @covers ::prepare_file_icon_renderer
-     * @covers ::select_file_icon_or_thumbnail
+     * @covers \local_oer\icon::prepare_file_icon_renderer
+     * @covers \local_oer\icon::select_file_icon_or_thumbnail
      */
     public function test_get_simple_file() {
         $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course1']);

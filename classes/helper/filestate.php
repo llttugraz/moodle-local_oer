@@ -79,8 +79,7 @@ class filestate {
                 // Step 2: Extract courseids from contexts.
                 $decomposed = identifier::decompose($element->get_identifier());
                 $courses = self::find_courses_that_use_this_element($decomposed->value);
-            // There is intentionally no break, as step 3 is needed.
-            case element::OERTYPE_EXTERNAL:
+            case element::OERTYPE_EXTERNAL: // There is intentionally no break, as step 3 is needed.
                 // Step 3: Determine OER element state. Is element being edited or already released?
                 [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
                 break;
@@ -121,7 +120,7 @@ class filestate {
 
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            [, $course,] = get_context_info_array($contextid);
+            [, $course, ] = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id' => $course->id,
                     'name' => format_string($course->fullname),

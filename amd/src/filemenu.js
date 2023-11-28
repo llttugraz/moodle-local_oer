@@ -30,10 +30,10 @@ import * as Output from 'local_oer/output';
  */
 export const initActionMenuListener = (identifier) => {
     const menu = document.querySelectorAll(`[data-oeractionmenu="${identifier}"]`);
-    if(menu === null) {
+    if (menu === null) {
         return;
     }
-    menu[0].addEventListener("click", function (action) {
+    menu[0].addEventListener("click", function(action) {
         action.preventDefault();
         const type = action.target.dataset.action;
         const ch = action.target.dataset.identifier;

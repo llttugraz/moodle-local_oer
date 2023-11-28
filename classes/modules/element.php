@@ -150,7 +150,7 @@ class element {
      *
      * @var \stored_file
      */
-    private \stored_file $stored_file;
+    private \stored_file $storedfile;
 
     /**
      * If the element is from a moodle activity, add the module info here.
@@ -402,7 +402,7 @@ class element {
         unset($metadata->title);
         unset($metadata->license);
         $this->storedmetadata = $metadata;
-        [, $releasable,] = requirements::metadata_fulfills_all_requirements($this);
+        [, $releasable, ] = requirements::metadata_fulfills_all_requirements($this);
         $metadata->requirementsmet = $releasable;
         $this->storedmetadata = $metadata;
     }
@@ -506,7 +506,7 @@ class element {
      * @return void
      */
     public function set_storedfile(\stored_file $file): void {
-        $this->stored_file = $file;
+        $this->storedfile = $file;
     }
 
     /**
@@ -515,7 +515,7 @@ class element {
      * @return \stored_file|null
      */
     public function get_storedfile(): ?\stored_file {
-        return $this->stored_file ?? null;
+        return $this->storedfile ?? null;
     }
 
     /**

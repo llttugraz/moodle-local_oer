@@ -25,8 +25,6 @@
 
 namespace local_oer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Test identifier class.
  *
