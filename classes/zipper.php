@@ -39,32 +39,18 @@ class zipper {
     private $tempfolder = null;
 
     /**
-     * Constructor.
-     *
-     * Load settings for ZIP functionality.
-     *
-     * @throws \dml_exception
-     */
-    public function __construct() {
-        $this->maxpackagesize = get_config('local_oer', 'zipperfilesize');
-        $this->extendedfiles = get_config('local_oer', 'extendedpullservice');
-    }
-
-    /**
      * Separate files to package size
      *
      * @param int $courseid Moodle courseid
      * @param bool $onlyonepackage bool to bypass the maxpackagesize setting
-     * @param bool $overwriteextended bool to bypass the extended files setting
      * @return array[]
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function separate_files_to_packages($courseid, $onlyonepackage = false, $overwriteextended = false) {
-        $maxpackagesize = $onlyonepackage ? 0 : $this->maxpackagesize;
+    public function separate_files_to_packages(int $courseid, bool $onlyonepackage = false): array {
+        $maxpackagesize = $onlyonepackage ? 0 : get_config('local_oer', 'zipperfilesize');
         $onlyonepackage = $maxpackagesize == 0 ? true : $onlyonepackage;
-        $extendedfiles = $overwriteextended ? 1 : $this->extendedfiles;
 
         $packages = [];
         $info = [];
@@ -73,7 +59,7 @@ class zipper {
         $size = 0;
         $package = 0;
 
-        $release = new release($courseid, $extendedfiles);
+        $release = new release($courseid);
         $files = $release->get_released_files();
         foreach ($files as $filearray) {
             $file = $filearray['storedfile'];
@@ -92,7 +78,7 @@ class zipper {
                 $packages[$package][$file->get_identifier()] = $filetozip;
             }
 
-            // Write informations for logging.
+            // Write information for logging.
             $info[$package]['files'] = isset($info[$package]['files']) ? $info[$package]['files'] + 1 : 1;
             $info[$package]['filesize'] = isset($info[$package]['filesize']) ?
                     $info[$package]['filesize'] + $filesize : $filesize;
@@ -109,13 +95,14 @@ class zipper {
      *
      * @param int $courseid
      * @param array $package
-     * @return false|string
+     * @return string|null
      * @throws \coding_exception
+     * @throws \file_exception
      */
-    public function compress_file_package($courseid, $package) {
+    public function compress_file_package(int $courseid, array $package): ?string {
         global $CFG;
         if (empty($package)) {
-            return false;
+            return null;
         }
         $this->tempfolder = 'oer_' . $courseid . '_' . time();
         $files = $this->prepare_files_to_zip($package);
@@ -126,7 +113,7 @@ class zipper {
             unlink($file);
         }
 
-        return $success ? $zipfile : false;
+        return $success ? $zipfile : null;
     }
 
     /**
@@ -134,8 +121,9 @@ class zipper {
      *
      * @param array $package
      * @return array
+     * @throws \file_exception
      */
-    private function prepare_files_to_zip($package) {
+    private function prepare_files_to_zip(array $package): array {
         $ziplist = [];
         foreach ($package as $key => $item) {
             $metafile = $this->create_metadata_json_temp($key, $item['metadata']);
@@ -155,14 +143,15 @@ class zipper {
     /**
      * Create metadata json
      *
-     * @param $identifier
-     * @param $metadata
-     * @return false|string
+     * @param string $identifier
+     * @param array $metadata
+     * @return string
+     * @throws \file_exception
      */
-    private function create_metadata_json_temp($identifier, $metadata) {
+    private function create_metadata_json_temp(string $identifier, array $metadata): string {
         $dir = $this->tempfolder;
         if (!$dir = make_temp_directory($dir)) {
-            return false;
+            throw new \file_exception("Could not create directory in tempfolder");
         }
         $hashed = hash('sha1', $identifier);
         $filename = $dir . '/' . $hashed . '.json';
@@ -171,15 +160,16 @@ class zipper {
             fclose($tempfile);
             return $filename;
         }
-        return false;
+        throw new \file_exception("Something went wrong, could not create json temp file.");
     }
 
     /**
      * Delete temp folder
      *
      * @param string $zipfile
+     * @return void
      */
-    public function delete_temp_folder($zipfile) {
+    public function delete_temp_folder(string $zipfile): void {
         global $CFG;
         unlink($zipfile);
         rmdir($CFG->tempdir . '/' . $this->tempfolder);
@@ -194,12 +184,12 @@ class zipper {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function download_zip_file(int $courseid) {
-        [$packages, $info] = $this->separate_files_to_packages($courseid, true);
-        if (empty($packages)) {
-            return;
-        }
+    public function download_zip_file(int $courseid): void {
+        [$packages, ] = $this->separate_files_to_packages($courseid, true);
         $file = $this->compress_file_package($courseid, $packages[0]);
+        if (is_null($file)) {
+            throw new \Exception("Failed to zip elements for course $courseid");
+        }
         $fileary = explode('/', $file);
         $filename = end($fileary);
         send_file($file, $filename, 0, false,
