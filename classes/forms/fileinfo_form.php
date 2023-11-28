@@ -31,7 +31,6 @@ use local_oer\helper\formhelper;
 use local_oer\helper\license;
 use local_oer\logger;
 use local_oer\plugininfo\oerclassification;
-use function PHPUnit\Framework\assertLessThan;
 
 /**
  * Formular to define all necessary metadata fields.

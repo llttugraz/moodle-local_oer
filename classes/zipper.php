@@ -155,8 +155,8 @@ class zipper {
     /**
      * Create metadata json
      *
-     * @param string $contenthash
-     * @param array $metadata
+     * @param $identifier
+     * @param $metadata
      * @return false|string
      */
     private function create_metadata_json_temp($identifier, $metadata) {

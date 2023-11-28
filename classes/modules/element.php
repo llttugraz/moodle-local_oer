@@ -411,7 +411,7 @@ class element {
      * Add or overwrite a field in stored metadata.
      *
      * @param string $name
-     * @param $value
+     * @param mixed $value Value can be string, int, array ...
      * @param bool $mustexist
      * @return void
      * @throws \coding_exception
