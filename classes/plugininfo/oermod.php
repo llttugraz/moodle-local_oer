@@ -25,6 +25,9 @@
 
 namespace local_oer\plugininfo;
 
+use local_oer\modules\element;
+use local_oer\modules\module;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/oer/classes/plugininfo/plugininfo.php');
@@ -64,5 +67,53 @@ class oermod extends plugininfo {
             throw new \coding_exception('Convention: Subplugin class module has to implement local_oer\modules\module interface.');
         }
         return $module->load_elements($courseid);
+    }
+
+    /**
+     * Write the allowed data back to the external source of the element.
+     *
+     * External can be another Moodle plugin or a non-Moodle tool/platform.
+     *
+     * @param element $element
+     * @return void
+     * @throws \coding_exception
+     */
+    public static function write_external_metadata(element $element): void {
+        $module = self::get_module($element);
+        $module->write_to_source($element);
+    }
+
+    /**
+     * @param element $element
+     * @return ?string
+     * @throws \coding_exception
+     */
+    public static function get_writable_fields(element $element): ?string {
+        $module = self::get_module($element);
+        $fields = $module->writable_fields();
+        if (empty($fields)) {
+            return null;
+        }
+        $language = [];
+        foreach ($fields as $field) {
+            $language[] = get_string($field[0], $field[1]);
+        }
+        $writable = implode(', ', $language);
+        return get_string('writablefields', 'local_oer', ['fields' => $writable]);
+    }
+
+    /**
+     * Get the subplugin module class for an element.
+     *
+     * @param element $element
+     * @return module
+     * @throws \coding_exception
+     */
+    private static function get_module(element $element): module {
+        $subplugin = $element->get_subplugin();
+        if (!class_exists($subplugin)) {
+            throw new \coding_exception("Class $subplugin does not exist");
+        }
+        return new $subplugin();
     }
 }

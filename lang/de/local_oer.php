@@ -463,3 +463,4 @@ $string['nocourseinfo'] = 'Die Kurs-Metadaten dieses Kurses sind noch nicht für
 $string['editor'] = 'Editor';
 $string['oneeditorselectederror'] = 'Mindestens eine der Optionen für die Metadaten des ' .
         'editierenden Kurses muss ausgewählt sein.';
+$string['writablefields'] = 'Die Metadaten für die Felder: "{$a->fields}" werden wieder in der ursprünglichen Quelle gespeichert.';

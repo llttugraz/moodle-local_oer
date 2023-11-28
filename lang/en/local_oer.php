@@ -50,7 +50,7 @@ $string['resourcetype'] = 'Resource Type';
 $string['role'] = 'Role';
 $string['author'] = 'Author';
 $string['publisher'] = 'Publisher';
-$string['license'] = 'License';
+$string['license'] = 'Licence';
 $string['tags'] = 'Tags';
 $string['noselection'] = 'no selection';
 $string['figure'] = 'Figure';
@@ -434,3 +434,4 @@ $string['nocourseinfo'] = 'The course metadata of this course has not been synch
 $string['editor'] = 'Editor';
 $string['oneeditorselectederror'] = 'At least one of the editor courses metadata ' .
         'options has to be selected.';
+$string['writablefields'] = 'The metadata for the fields: "{$a->fields}" will be stored back to the original source.';

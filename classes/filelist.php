@@ -26,7 +26,6 @@
 namespace local_oer;
 
 use local_oer\helper\filestate;
-use local_oer\helper\requirements;
 use local_oer\modules\element;
 use local_oer\modules\elements;
 use local_oer\plugininfo\oermod;
@@ -71,7 +70,11 @@ class filelist {
         foreach ($elements as $key => $element) {
             if (isset($visited[$element->get_identifier()])) {
                 // This element is multiple times in this course, only show it once.
-                $elements->get_element_by_key($visited[$element->get_identifier()])->add_to_sections($element->get_section());
+                $primary = $elements->get_element_by_key($visited[$element->get_identifier()]);
+                $primary->add_to_sections($element->get_section());
+                if ($primary->get_type() == element::OERTYPE_MOODLEFILE && !empty($element->get_storedfiles())) {
+                    $primary->set_storedfile($element->get_storedfiles()[0]);
+                }
                 $elements->remove_element($elements->key());
                 continue;
             }
@@ -168,6 +171,7 @@ class filelist {
                     'writable' => $element->get_elementstate()->writable,
                     'coursetofile' => $overwritemetadata == 1 && $element->get_elementstate()->editor == $courseid,
                     'wwwroot' => $CFG->wwwroot, // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
+                    'subplugin' => $element->get_origin(),
             ];
 
             if (!empty($identifier) && $element->get_identifier() == $identifier) {

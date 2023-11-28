@@ -31,6 +31,7 @@ use local_oer\helper\formhelper;
 use local_oer\helper\license;
 use local_oer\logger;
 use local_oer\plugininfo\oerclassification;
+use local_oer\plugininfo\oermod;
 
 /**
  * Formular to define all necessary metadata fields.
@@ -150,6 +151,14 @@ class fileinfo_form extends \moodleform {
                 ]);
         $mform->addElement('html', $prefhtml);
 
+        if ($writablefields = oermod::get_writable_fields($element)) {
+            $info = $OUTPUT->render_from_template('local_oer/info', [
+                    'text' => $writablefields,
+                    'type' => 'warning',
+            ]);
+            $mform->addElement('html', $info);
+        }
+
         $mform->disable_form_change_checker();
         $this->set_data($data);
     }
@@ -184,7 +193,7 @@ class fileinfo_form extends \moodleform {
             $mform->addRule('context', get_string('required'), 'required', '', 'client');
         }
 
-        $mform->addElement('select', 'license', get_string('license', 'local_oer'),
+        $mform->addElement('select', 'license', get_string('license'),
                 license::get_licenses_select_data($addnopref));
         $mform->setDefault('license', $addnopref ? 'nopref' : 'unknown');
         $mform->addHelpButton('license', 'license', 'local_oer');
@@ -330,16 +339,11 @@ class fileinfo_form extends \moodleform {
      */
     public function update_metadata(array $fromform) {
         global $DB;
-        $files = filelist::get_single_file($fromform['courseid'], $fromform['identifier']);
         $fromdb = $DB->get_record('local_oer_elements', [
                 'courseid' => $fromform['courseid'], // Only update if the course is the editor.
                 'identifier' => $fromform['identifier'],
         ]);
-        // License is stored back to file.
-        // When file is used more than once in a course, the license will be stored as the same for all files.
-        foreach ($files as $file) {
-            $file['file']->set_license($fromform['license']);
-        }
+
         $timestamp = time();
         if ($fromdb) {
             $record = $this->add_values_from_form($fromdb, $fromform, $timestamp);
@@ -352,7 +356,7 @@ class fileinfo_form extends \moodleform {
             $record->timecreated = $timestamp;
             // Update 15.11.2022: File in multiple courses https://github.com/llttugraz/moodle-local_oer/issues/14 .
             // Check if the identifier is not already stored with another courseid.
-            if ($duplicate = $DB->get_record('local_oer_elements', ['identifier' => $record->identifier])) {
+            if ($DB->get_record('local_oer_elements', ['identifier' => $record->identifier])) {
                 logger::add($record->courseid, logger::LOGERROR,
                         'Tried to create duplicate file entry for file ' . $record->identifier . '.' .
                         'This code should not be reachable');
@@ -360,6 +364,10 @@ class fileinfo_form extends \moodleform {
             }
             $DB->insert_record('local_oer_elements', $record);
         }
+        // Update metadata in external sources if necessary.
+        $elements = filelist::get_course_files($fromform['courseid']);
+        $element = $elements->find_element('identifier', $fromform['identifier']);
+        oermod::write_external_metadata($element);
     }
 
     /**

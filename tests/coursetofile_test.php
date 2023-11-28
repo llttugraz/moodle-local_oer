@@ -59,8 +59,7 @@ class coursetofile_test extends \advanced_testcase {
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (' . $unusedfile->get_contenthash() .
                 ') has been searched that is not used anywhere');
-        $element = new element();
-        $element->set_type(element::OERTYPE_MOODLEFILE);
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $element->set_identifier($identifier);
         coursetofile::get_courses_metadata_for_file($element, 1);
     }
@@ -82,8 +81,7 @@ class coursetofile_test extends \advanced_testcase {
         $helper = new testcourse();
         [$draftid, $sharedfile] = $helper->generate_file('shared', null, 'Shared file in multiple courses');
         $identifier = $helper->generate_identifier($sharedfile->get_contenthash());
-        $element = new element();
-        $element->set_type(element::OERTYPE_MOODLEFILE);
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $element->set_identifier($identifier);
 
         // Create a course and add the file to it (with a resource module).

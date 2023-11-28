@@ -48,12 +48,12 @@ class module implements \local_oer\modules\module {
         $elements = new elements();
         $fs = get_file_storage();
         $cms = get_fast_modinfo($courseid);
+        $creator = "oermod_resource\module";
 
         foreach ($cms->cms as $cm) {
             $files = $fs->get_area_files($cm->context->id, 'mod_resource', 'content', false, 'id ASC', false);
             foreach ($files as $file) {
-                $element = new element();
-                $element->set_type(element::OERTYPE_MOODLEFILE);
+                $element = new element($creator, element::OERTYPE_MOODLEFILE);
                 $element->set_origin('mod_resource');
                 $element->set_title($file->get_filename());
                 $identifier = \local_oer\identifier::compose(
@@ -93,6 +93,8 @@ class module implements \local_oer\modules\module {
      * @return void
      */
     public function write_to_source(\local_oer\modules\element $element): void {
-        // TODO: Implement write_element() method.
+        foreach ($element->get_storedfiles() as $file) {
+            $file->set_license($element->get_license());
+        }
     }
 }

@@ -46,8 +46,18 @@ class element {
     public const OERTYPE_EXTERNAL = 2;
 
     /**
+     * Full namespace and classname of the subplugin creating this element.
+     *
+     * Will be set in constructor.
+     *
+     * @var string
+     */
+    private string $creator = '';
+
+    /**
      * OERTYPE of this element. Use a defined type above.
-     * Set by module subplugin when creating elements.
+     *
+     * Set in constructor.
      *
      * @var int
      */
@@ -148,9 +158,9 @@ class element {
     /**
      * If the element is a file stored in moodle, set the stored file object.
      *
-     * @var \stored_file
+     * @var \stored_file[]
      */
-    private \stored_file $storedfile;
+    private array $storedfiles;
 
     /**
      * If the element is from a moodle activity, add the module info here.
@@ -162,15 +172,15 @@ class element {
     private array $moduleinfo = [];
 
     /**
-     * Set the type for the element.
-     *
-     * Only defined types can be used.
-     *
-     * @param int $type
-     * @return void
+     * @param string $creator namespace/classname of module class in subplugin.
+     * @param int $type OERTYPE of this element, only defined types can be used.
      * @throws \coding_exception
      */
-    public function set_type(int $type): void {
+    public function __construct(string $creator, int $type) {
+        if (!class_exists($creator) || !in_array("local_oer\modules\module", class_implements($creator))) {
+            throw new \coding_exception("Creator of the element has to be the module class of subplugin.");
+        }
+        $this->creator = $creator;
         $this->wrong_type($type);
         $this->type = $type;
     }
@@ -402,7 +412,7 @@ class element {
         unset($metadata->title);
         unset($metadata->license);
         $this->storedmetadata = $metadata;
-        [, $releasable, ] = requirements::metadata_fulfills_all_requirements($this);
+        [, $releasable,] = requirements::metadata_fulfills_all_requirements($this);
         $metadata->requirementsmet = $releasable;
         $this->storedmetadata = $metadata;
     }
@@ -500,22 +510,25 @@ class element {
     }
 
     /**
-     * Set the stored file.
+     * Set stored file of the element.
+     *
+     * Internally an array is kept as there can be more than one stored
+     * file if the element is used in different locations.
      *
      * @param \stored_file $file
      * @return void
      */
     public function set_storedfile(\stored_file $file): void {
-        $this->storedfile = $file;
+        $this->storedfiles[] = $file;
     }
 
     /**
-     * Return the stored file of this element.
+     * Return an array of stored files associated with this element.
      *
-     * @return \stored_file|null
+     * @return \stored_file[]
      */
-    public function get_storedfile(): ?\stored_file {
-        return $this->storedfile ?? null;
+    public function get_storedfiles(): array {
+        return $this->storedfiles;
     }
 
     /**
@@ -576,5 +589,14 @@ class element {
         if (!in_array($type, [self::OERTYPE_MOODLEFILE, self::OERTYPE_EXTERNAL])) {
             throw new \coding_exception('Wrong type defined for element, use either OERTYPE_MOODLEFILE or OERTYPE_EXTERNAL.');
         }
+    }
+
+    /**
+     * String of the classname of the subplugin created this element.
+     *
+     * @return string
+     */
+    public function get_subplugin(): string {
+        return $this->creator;
     }
 }

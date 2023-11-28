@@ -103,8 +103,7 @@ class testcourse {
      * @throws \coding_exception
      */
     public function get_element_for_file(\stored_file $file): element {
-        $element = new element();
-        $element->set_type(element::OERTYPE_MOODLEFILE);
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $element->set_identifier($this->generate_identifier($file->get_contenthash()));
         $element->set_title($file->get_filename());
         $element->set_license($file->get_license());

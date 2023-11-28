@@ -230,7 +230,7 @@ class filestate {
                         'value' => $context[$data->context],
                 ],
                 [
-                        'name' => get_string('license', 'local_oer'),
+                        'name' => get_string('license'),
                         'value' => license::get_license_fullname($data->license),
                 ],
                 [

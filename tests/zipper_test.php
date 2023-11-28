@@ -45,7 +45,6 @@ class zipper_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::separate_files_to_packages
-     * @covers ::__construct
      */
     public function test_separate_files_to_packages() {
         $this->resetAfterTest(true);

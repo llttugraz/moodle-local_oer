@@ -167,8 +167,7 @@ class requirement_test extends \advanced_testcase {
             int $state
     ): element {
         global $CFG;
-        $element = new element();
-        $element->set_type(element::OERTYPE_MOODLEFILE);
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $identifer = identifier::compose('moodle', $CFG->wwwroot, 'file', 'contenthash', 'abcdefgh123456789');
         $element->set_identifier($identifer);
         $metadata = new \stdClass();
@@ -322,14 +321,16 @@ class requirement_test extends \advanced_testcase {
         $elements = filelist::get_course_files($course1->id);
         $this->assertNotEmpty($elements);
         foreach ($elements as $element) {
-            $file = $element->get_storedfile();
-            $file->delete();
+            foreach ($element->get_storedfiles() as $file) {
+                $file->delete();
+            }
         }
         $elements = filelist::get_course_files($course2->id);
         $this->assertNotEmpty($elements);
         foreach ($elements as $element) {
-            $file = $element->get_storedfile();
-            $file->delete();
+            foreach ($element->get_storedfiles() as $file) {
+                $file->delete();
+            }
         }
         $coursefiles = filelist::get_course_files($course1->id);
         $this->assertEmpty($coursefiles);

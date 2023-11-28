@@ -128,7 +128,7 @@ class zipper {
         foreach ($package as $key => $item) {
             $metafile = $this->create_metadata_json_temp($key, $item['metadata']);
             $element = $item['file'];
-            $file = $element->get_storedfile();
+            $file = $element->get_storedfiles()[0]; // Only one file is needed here.
             $tempfile = $file->copy_content_to_temp($this->tempfolder);
             $filearray = explode('/', $tempfile);
             $filearray[count($filearray) - 1] = hash('sha1', $key);
@@ -185,7 +185,7 @@ class zipper {
      * @throws \moodle_exception
      */
     public function download_zip_file(int $courseid): void {
-        [$packages, ] = $this->separate_files_to_packages($courseid, true);
+        [$packages,] = $this->separate_files_to_packages($courseid, true);
         $file = $this->compress_file_package($courseid, $packages[0]);
         if (is_null($file)) {
             throw new \Exception("Failed to zip elements for course $courseid");

@@ -27,6 +27,7 @@
 
 namespace local_oer\helper;
 
+use local_oer\filelist;
 use local_oer\modules\element;
 
 /**
@@ -107,21 +108,19 @@ class requirements {
      * @throws \moodle_exception
      */
     public static function reset_releasestate_if_necessary(): void {
-        global $DB, $USER;
+        global $DB;
         $records = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
         $courses = [];
         foreach ($records as $record) {
-            $element = new element();
-            $element->set_type($record->type);
-            $element->set_identifier($record->identifier);
-            $element->set_stored_metadata($record);
+            $element = filelist::get_single_file($record->courseid, $record->identifier);
+            if (is_null($element)) {
+                self::reset_release_state($record, $courses);
+                continue;
+            }
+            $element->set_stored_metadata(clone($record));
             [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($element);
             if (!$release) {
-                $courses[$record->courseid][$element->get_identifier()] = $element->get_title();
-                $record->releasestate = 0;
-                $record->usermodified = $USER->id;
-                $record->timemodified = time();
-                $DB->update_record('local_oer_elements', $record);
+                self::reset_release_state($record, $courses);
             }
         }
         if (!empty($courses)) {
@@ -152,5 +151,20 @@ class requirements {
                 }
             }
         }
+    }
+
+    /**
+     * @param \stdClass $record Record of local_oer_elements table.
+     * @param array $courses List of courses where releasestate has been resetted.
+     * @return void
+     * @throws \dml_exception
+     */
+    private static function reset_release_state(\stdClass $record, array &$courses): void {
+        global $USER, $DB;
+        $courses[$record->courseid][$record->identifier] = $record->title;
+        $record->releasestate = 0;
+        $record->usermodified = $USER->id;
+        $record->timemodified = time();
+        $DB->update_record('local_oer_elements', $record);
     }
 }
