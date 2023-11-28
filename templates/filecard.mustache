@@ -35,7 +35,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     <div class="card shadow-sm mb-4">
         <div class="card-header container">
             <div class="row">
-              {{> local_oer/file-action-menu }}
+                {{> local_oer/file-action-menu }}
             </div>
             <div class="row">
                 <div class="col-3">
@@ -48,6 +48,9 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 <div class="col-sm pl-0 pt-1">
                     <p class="card-title text-wrap d-block m-0">{{{title}}}</p>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-2"><span class="badge badge-info">{{subplugin}}</span></div>
             </div>
         </div>
         <div class="card-body p-0 d-flex flex-column">
@@ -62,7 +65,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                         <li class="list-group-item border-0 p-0">
                             <small>{{#str}} section {{/str}}:
                                 {{#sections}}
-                                    {{{sectionname}}},
+                                    <a href="{{sectionurl}}">{{{sectionname}}}</a>,
                                 {{/sections}}
                             </small>
                         </li>

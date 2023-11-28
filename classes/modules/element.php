@@ -165,7 +165,7 @@ class element {
     /**
      * If the element is from a moodle activity, add the module info here.
      *
-     * A file can be used in multiple coursemodules, so this is an array of moduleinfo.
+     * A file can be used in multiple course modules, so this is an array of moduleinfo.
      *
      * @var \stdClass[]
      */

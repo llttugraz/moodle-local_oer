@@ -72,6 +72,11 @@ class filelist {
                 // This element is multiple times in this course, only show it once.
                 $primary = $elements->get_element_by_key($visited[$element->get_identifier()]);
                 $primary->add_to_sections($element->get_section());
+                if ($modules = $element->get_moduleinfo()) {
+                    foreach ($modules as $module) {
+                        $primary->set_moduleinfo($module->cmid, $module->name, $module->url);
+                    }
+                }
                 if ($primary->get_type() == element::OERTYPE_MOODLEFILE && !empty($element->get_storedfiles())) {
                     $primary->set_storedfile($element->get_storedfiles()[0]);
                 }
@@ -129,9 +134,11 @@ class filelist {
             $modules = [];
 
             foreach ($element->get_sections() as $section) {
+                $url = new \moodle_url('/course/view.php', ['id' => $courseid], "section-$section");
                 $sec = [
                         'sectionnum' => $section,
                         'sectionname' => get_section_name($courseid, $section),
+                        'sectionurl' => $url->out(),
                 ];
                 $filesections[] = $sec;
                 $sections[$section] = $sec;

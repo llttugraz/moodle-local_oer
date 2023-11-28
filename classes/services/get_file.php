@@ -130,6 +130,8 @@ class get_file extends \external_api {
                                                         'Number of section in course'),
                                                 'sectionname' => new \external_value(PARAM_TEXT,
                                                         'Name of section in course'),
+                                                'sectionurl' => new \external_value(PARAM_URL,
+                                                        'Link to course section'),
                                         ]
                                 )),
                         'requirementsmet' => new \external_value(PARAM_BOOL,
@@ -151,6 +153,7 @@ class get_file extends \external_api {
                         'writable' => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                         'coursetofile' => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
                         'wwwroot' => new \external_value(PARAM_URL, 'wwwroot of moodle'),
+                        'subplugin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of the element'),
                 ]);
     }
 }

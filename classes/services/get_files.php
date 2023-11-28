@@ -67,6 +67,7 @@ class get_files extends \external_api {
                                         [
                                                 'sectionnum' => new \external_value(PARAM_INT, 'Number of section in course'),
                                                 'sectionname' => new \external_value(PARAM_TEXT, 'Name of section in course'),
+                                                'sectionurl' => new \external_value(PARAM_URL, 'Link to course section'),
                                         ])
                         ),
                         'files' => new \external_multiple_structure(get_file::external_file_return_value()),
