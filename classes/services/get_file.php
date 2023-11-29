@@ -104,6 +104,7 @@ class get_file extends \external_api {
                         'id' => new \external_value(PARAM_INT, 'DB id of oer file entry'),
                         'contenthash' => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
                         'identifier' => new \external_value(PARAM_TEXT, 'Unique identifier for element'),
+                        'idhash' => new \external_value(PARAM_ALPHANUM, 'SHA1 hash of identifier for html ids'),
                         'title' => new \external_value(PARAM_TEXT, 'Title or filename'),
                         'mimetype' => new \external_value(PARAM_TEXT, 'Mimetype'),
                         'icon' => new \external_value(PARAM_RAW, 'File icon'),
@@ -153,7 +154,13 @@ class get_file extends \external_api {
                         'writable' => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                         'coursetofile' => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
                         'wwwroot' => new \external_value(PARAM_URL, 'wwwroot of moodle'),
-                        'subplugin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of the element'),
+                        'origins' => new \external_multiple_structure(
+                                new \external_single_structure(
+                                        [
+                                                'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of element'),
+                                        ]
+                                )
+                        ),
                 ]);
     }
 }

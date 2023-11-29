@@ -126,16 +126,17 @@ class zipper {
     private function prepare_files_to_zip(array $package): array {
         $ziplist = [];
         foreach ($package as $key => $item) {
+            $hash = hash('sha1', $key); // Slashes are not allowed in filenames, that leads to unexpected folders.
             $metafile = $this->create_metadata_json_temp($key, $item['metadata']);
             $element = $item['file'];
             $file = $element->get_storedfiles()[0]; // Only one file is needed here.
             $tempfile = $file->copy_content_to_temp($this->tempfolder);
             $filearray = explode('/', $tempfile);
-            $filearray[count($filearray) - 1] = hash('sha1', $key);
+            $filearray[count($filearray) - 1] = $hash;
             $renamedfile = implode('/', $filearray);
             rename($tempfile, $renamedfile);
-            $ziplist[$key . '.json'] = $metafile;
-            $ziplist[$key] = $renamedfile;
+            $ziplist[$hash . '.json'] = $metafile;
+            $ziplist[$hash] = $renamedfile;
         }
         return $ziplist;
     }

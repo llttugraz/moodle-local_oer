@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023281500;
+$plugin->version = 2023112800;
 $plugin->requires = 2022112806;
 $plugin->component = 'oermod_folder';

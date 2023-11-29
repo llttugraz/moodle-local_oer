@@ -71,6 +71,11 @@ class filelist {
             if (isset($visited[$element->get_identifier()])) {
                 // This element is multiple times in this course, only show it once.
                 $primary = $elements->get_element_by_key($visited[$element->get_identifier()]);
+                $primarytool = $primary->get_origin();
+                $tool = $element->get_origin();
+                if (strpos($primarytool, $tool) === false) {
+                    $primary->set_origin($primary->get_origin() . '___' . $element->get_origin());
+                }
                 $primary->add_to_sections($element->get_section());
                 if ($modules = $element->get_moduleinfo()) {
                     foreach ($modules as $module) {
@@ -155,10 +160,16 @@ class filelist {
             $ignore = $preference && $preference->state == 2 ? 1 : 0;
             $decomposed = identifier::decompose($element->get_identifier());
             $metadata = $element->get_stored_metadata();
+            $origins = explode('___', $element->get_origin());
+            $originlist = [];
+            foreach ($origins as $origin) {
+                $originlist[] = ['origin' => $origin];
+            }
             $entry = [
                     'id' => $metadata->id ?? 0,
                     'contenthash' => $decomposed->valuetype == 'contenthash' ? $decomposed->value : '',
                     'identifier' => htmlentities($element->get_identifier()),
+                    'idhash' => hash('SHA1', $element->get_identifier()),
                     'title' => $element->get_title(),
                     'mimetype' => $element->get_mimetype(),
                     'icon' => $icon,
@@ -178,7 +189,7 @@ class filelist {
                     'writable' => $element->get_elementstate()->writable,
                     'coursetofile' => $overwritemetadata == 1 && $element->get_elementstate()->editor == $courseid,
                     'wwwroot' => $CFG->wwwroot, // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
-                    'subplugin' => $element->get_origin(),
+                    'origins' => $originlist,
             ];
 
             if (!empty($identifier) && $element->get_identifier() == $identifier) {

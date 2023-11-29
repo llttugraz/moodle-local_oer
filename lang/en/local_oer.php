@@ -402,8 +402,8 @@ $string['customfield_help'] = 'Course custom fields can be added in a similar wa
         'Also they can be ignored, to not add them to the course metadata ' .
         'of the released OER objects . ';
 $string['nofieldsincat'] = 'This customfield category does not have any fields to show.';
-$string['multiplecourses'] = 'Multiple courses use this file';
-$string['multiplecoursestofile'] = 'Multiple courses use this file. You can also add course metadata ' .
+$string['multiplecourses'] = 'File is used in multiple courses';
+$string['multiplecoursestofile'] = 'File is used in multiple courses. You can also add course metadata ' .
         'that belongs to an other course than where the file is edited.';
 $string['metadatanotwritable'] = 'The metadata of this file cannot be edited.';
 $string['reason'] = 'Reason';
@@ -435,3 +435,4 @@ $string['editor'] = 'Editor';
 $string['oneeditorselectederror'] = 'At least one of the editor courses metadata ' .
         'options has to be selected.';
 $string['writablefields'] = 'The metadata for the fields: "{$a->fields}" will be stored back to the original source.';
+$string['moreinformation'] = 'More information';

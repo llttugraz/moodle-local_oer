@@ -50,36 +50,40 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
             <div class="row">
-                <div class="col-2"><span class="badge badge-info">{{subplugin}}</span></div>
+                {{> local_oer/badges }}
             </div>
         </div>
         <div class="card-body p-0 d-flex flex-column">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <ul class="list-group">
-                        <li class="list-group-item border-0 p-0">
-                            <div class="text-truncate d-block">
-                                <small>{{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span></small>
-                            </div>
-                        </li>
-                        <li class="list-group-item border-0 p-0">
-                            <small>{{#str}} section {{/str}}:
-                                {{#sections}}
-                                    <a href="{{sectionurl}}">{{{sectionname}}}</a>,
-                                {{/sections}}
-                            </small>
-                        </li>
-                        <li class="list-group-item border-0 p-0">
-                            <small>{{#str}} activity {{/str}}:
-                                {{#modules}}
-                                    <a href="{{moduleurl}}">{{{modulename}}}</a>,
-                                {{/modules}}
-                            </small>
-                        </li>
-                    </ul>
+                    <a class="" data-toggle="collapse" href="#collapse{{idhash}}" role="button" aria-expanded="false" aria-controls="collapse{{idhash}}">
+                        <i class="icon fa fa-chevron-down" aria-hidden="true" aria-selected="true"></i>{{#str}} moreinformation, local_oer {{/str}}
+                    </a>
+                    <div class="collapse" id="collapse{{idhash}}">
+                        <ul class="list-group">
+                            <li class="list-group-item border-0 p-0">
+                                <div class="text-truncate d-block">
+                                    <small>{{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span></small>
+                                </div>
+                            </li>
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#str}} section {{/str}}:
+                                    {{#sections}}
+                                        <a href="{{sectionurl}}">{{{sectionname}}}</a>,
+                                    {{/sections}}
+                                </small>
+                            </li>
+                            <li class="list-group-item border-0 p-0">
+                                <small>{{#str}} activity {{/str}}:
+                                    {{#modules}}
+                                        <a href="{{moduleurl}}">{{{modulename}}}</a>,
+                                    {{/modules}}
+                                </small>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
                 <li class="list-group-item">
-                    <h5>{{#str}} readyforupload, local_oer{{/str}}</h5>
                     <ul class="list-group">
                         {{#requirementsmet}}
                             <li class="list-group-item border-0 p-0">
