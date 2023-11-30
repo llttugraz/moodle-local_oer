@@ -61,25 +61,23 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                     </a>
                     <div class="collapse" id="collapse{{idhash}}">
                         <ul class="list-group">
-                            <li class="list-group-item border-0 p-0">
-                                <div class="text-truncate d-block">
-                                    <small>{{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span></small>
-                                </div>
-                            </li>
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#str}} section {{/str}}:
-                                    {{#sections}}
-                                        <a href="{{sectionurl}}">{{{sectionname}}}</a>,
-                                    {{/sections}}
-                                </small>
-                            </li>
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#str}} activity {{/str}}:
-                                    {{#modules}}
-                                        <a href="{{moduleurl}}">{{{modulename}}}</a>,
-                                    {{/modules}}
-                                </small>
-                            </li>
+                            {{#information}}
+                                <li class="list-group-item border-0 p-0">
+                                    <small>{{area}}:
+                                        {{#fields}}
+                                            {{#infohasurl}}
+                                               <a href="{{infourl}}">{{{infoname}}}</a>,
+                                            {{/infohasurl}}
+                                            {{^infohasurl}}
+                                                {{{infoname}}}
+                                            {{/infohasurl}}
+                                        {{/fields}}
+                                    </small>
+                                </li>
+                            {{/information}}
+                            {{^information}}
+                                {{#str}} noinfo, local_oer {{/str}}
+                            {{/information}}
                         </ul>
                     </div>
                 </li>

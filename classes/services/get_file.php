@@ -115,24 +115,22 @@ class get_file extends \external_api {
                         'ignore' => new \external_value(PARAM_BOOL, 'File ignored'),
                         'deleted' => new \external_value(PARAM_BOOL,
                                 'File deleted, orphaned metadata'),
-                        'modules' => new \external_multiple_structure(
+                        'information' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'moduleurl' => new \external_value(PARAM_URL,
-                                                        'Url to moodle activity'),
-                                                'modulename' => new \external_value(PARAM_TEXT,
-                                                        'Name of course module'),
-                                        ]
-                                )),
-                        'sections' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
-                                                'sectionnum' => new \external_value(PARAM_INT,
-                                                        'Number of section in course'),
-                                                'sectionname' => new \external_value(PARAM_TEXT,
-                                                        'Name of section in course'),
-                                                'sectionurl' => new \external_value(PARAM_URL,
-                                                        'Link to course section'),
+                                                'area' => new \external_value(PARAM_TEXT,
+                                                        'Area of the information'),
+                                                'fields' => new \external_multiple_structure(
+                                                        new \external_single_structure(
+                                                                [
+                                                                        'infoname' => new \external_value(PARAM_TEXT,
+                                                                                'Name of information'),
+                                                                        'infourl' => new \external_value(PARAM_URL,
+                                                                                'Url to information'),
+                                                                        'infohasurl' => new \external_value(PARAM_BOOL,
+                                                                                'Boolean if url is available'),
+                                                                ]
+                                                        )),
                                         ]
                                 )),
                         'requirementsmet' => new \external_value(PARAM_BOOL,

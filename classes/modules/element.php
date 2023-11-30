@@ -138,22 +138,11 @@ class element {
     private ?\stdClass $storedmetadata = null;
 
     /**
-     * Relative id of course section. Not the database id, but the position in section order.
+     * Store additional information that will be shown in frontend.
      *
-     * Set to -1 if the element is not from an activity from a section.
-     *
-     * @var int
+     * @var information[]
      */
-    private int $section = -1;
-
-    /**
-     * Array of sections if this element is used more often in the same course.
-     *
-     * This will be calculated in base plugin during element collection.
-     *
-     * @var int[]
-     */
-    private array $sections = [];
+    private array $information = [];
 
     /**
      * If the element is a file stored in moodle, set the stored file object.
@@ -161,15 +150,6 @@ class element {
      * @var \stored_file[]
      */
     private array $storedfiles;
-
-    /**
-     * If the element is from a moodle activity, add the module info here.
-     *
-     * A file can be used in multiple course modules, so this is an array of moduleinfo.
-     *
-     * @var \stdClass[]
-     */
-    private array $moduleinfo = [];
 
     /**
      * @param string $creator namespace/classname of module class in subplugin.
@@ -478,38 +458,6 @@ class element {
     }
 
     /**
-     * Add a section where this element is used.
-     *
-     * @param int $section
-     * @return void
-     */
-    public function add_to_sections(int $section) {
-        if ($section < 0 || in_array($section, $this->sections)) {
-            // Do not add if negative value or if already set.
-            return;
-        }
-        $this->sections[] = $section;
-    }
-
-    /**
-     * Return relative section id.
-     *
-     * @return int
-     */
-    public function get_section(): int {
-        return $this->section;
-    }
-
-    /**
-     * Return list of sections this element is used.
-     *
-     * @return int[]
-     */
-    public function get_sections(): array {
-        return $this->sections;
-    }
-
-    /**
      * Set stored file of the element.
      *
      * Internally an array is kept as there can be more than one stored
@@ -529,39 +477,6 @@ class element {
      */
     public function get_storedfiles(): array {
         return $this->storedfiles;
-    }
-
-    /**
-     * Set the module info
-     *
-     * @param int $cmid Moodle course module id
-     * @param string $name Name of coursemodule
-     * @param \moodle_url $url Url to the module
-     * @return void
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     */
-    public function set_moduleinfo(int $cmid, string $name, \moodle_url $url): void {
-        if (!\context_module::instance($cmid)) {
-            throw new \moodle_exception("Context unknown or not a course module id: $cmid");
-        }
-        if (empty($name)) {
-            throw new \coding_exception("Name cannot be empty");
-        }
-        $moduleinfo = new \stdClass();
-        $moduleinfo->cmid = $cmid;
-        $moduleinfo->name = $name;
-        $moduleinfo->url = $url;
-        $this->moduleinfo[$cmid] = $moduleinfo;
-    }
-
-    /**
-     * Get the module info
-     *
-     * @return array
-     */
-    public function get_moduleinfo(): array {
-        return $this->moduleinfo;
     }
 
     /**
@@ -598,5 +513,48 @@ class element {
      */
     public function get_subplugin(): string {
         return $this->creator;
+    }
+
+    /**
+     * Add information, overwrite duplicates. Only fully set information will be stored (area,name).
+     *
+     * @param string $areastring Language string identifier
+     * @param string $component Component where to find language string
+     * @param string $name Name of the information
+     * @param string|null $url Url to the information
+     * @return void
+     * @throws \coding_exception
+     * @throws \invalid_parameter_exception
+     */
+    public function add_information(string $areastring, string $component, string $name, ?string $url = null): void {
+        if (empty($areastring) || empty($component) || empty($name)) {
+            throw new \coding_exception('Not all fields for information set.');
+        }
+        $information = new information();
+        $information->set_area($areastring, $component);
+        $information->set_name($name);
+        $information->set_url($url);
+        $this->information[$information->get_id()] = $information;
+    }
+
+    /**
+     * Merge two sets of information, duplicates will be overwritten.
+     *
+     * @param information[] $information
+     * @return void
+     */
+    public function merge_information(array $information): void {
+        foreach ($information as $info) {
+            $this->information[$info->get_id()] = $info;
+        }
+    }
+
+    /**
+     * Return list of information objects.
+     *
+     * @return information[]
+     */
+    public function get_information(): array {
+        return $this->information;
     }
 }

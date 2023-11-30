@@ -28,6 +28,7 @@ namespace oermod_folder;
 use local_oer\helper\filehelper;
 use local_oer\modules\elements;
 use local_oer\modules\element;
+use local_oer\modules\information;
 
 /**
  * Class module
@@ -61,13 +62,18 @@ class module implements \local_oer\modules\module {
                         'contenthash', $file->get_contenthash()
                 );
                 $element->set_identifier($identifier);
-                $element->set_license($file->get_license());
                 $element->set_source(filehelper::get_file_url($file, true));
+                $element->set_license($file->get_license());
                 $element->set_filesize($file->get_filesize());
                 $element->set_mimetype($file->get_mimetype());
-                $element->set_section($cm->sectionnum);
                 $element->set_storedfile($file);
-                $element->set_moduleinfo($cm->id, $cm->name, $cm->url);
+
+                $element->add_information('type', 'local_oer', $file->get_mimetype());
+                $sectionname = get_section_name($courseid, $cm->sectionnum);
+                $sectionurl = new \moodle_url('/course/view.php', ['id' => $courseid], "section-$cm->sectionnum");
+                $element->add_information('section', 'moodle', $sectionname, $sectionurl);
+                $element->add_information('folder', 'moodle', $cm->name, $cm->url);
+
                 $elements->add_element($element);
             }
         }

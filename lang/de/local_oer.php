@@ -361,8 +361,8 @@ $string['prefresettext'] = 'Felder, welche in Voreinstellungen gesetzt sind, zur
         'Formular muss gespeichert werden um diese Änderungen zu übernehmen.';
 $string['prefresetbtn'] = 'Zurücksetzen';
 $string['addpersonbtn'] = 'Person hinzufügen';
-$string['amount'] = 'Dateien pro Seite';
-$string['filecount'] = 'Dateien werden angezeigt';
+$string['amount'] = 'Elemente pro Seite';
+$string['filecount'] = 'Elemente werden angezeigt';
 $string['uploadignoreerror'] = 'Zur Freigabe markieren und Ignorieren können nicht ' .
         'gleichzeitig eingeschaltet sein!';
 $string['requiredfields'] = 'Notwendige Felder';
@@ -465,3 +465,4 @@ $string['oneeditorselectederror'] = 'Mindestens eine der Optionen für die Metad
         'editierenden Kurses muss ausgewählt sein.';
 $string['writablefields'] = 'Die Metadaten für die Felder: "{$a->fields}" werden wieder in der ursprünglichen Quelle gespeichert.';
 $string['moreinformation'] = 'Weitere informationen';
+$string['noinfo'] = 'Keine zusätzlichen Informationen';

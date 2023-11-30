@@ -76,12 +76,7 @@ class filelist {
                 if (strpos($primarytool, $tool) === false) {
                     $primary->set_origin($primary->get_origin() . '___' . $element->get_origin());
                 }
-                $primary->add_to_sections($element->get_section());
-                if ($modules = $element->get_moduleinfo()) {
-                    foreach ($modules as $module) {
-                        $primary->set_moduleinfo($module->cmid, $module->name, $module->url);
-                    }
-                }
+                $primary->merge_information($element->get_information());
                 if ($primary->get_type() == element::OERTYPE_MOODLEFILE && !empty($element->get_storedfiles())) {
                     $primary->set_storedfile($element->get_storedfiles()[0]);
                 }
@@ -128,30 +123,27 @@ class filelist {
         [$icons, $renderer] = icon::prepare_file_icon_renderer($courseid);
         $elements = self::get_course_files($courseid);
         $list = [];
-        $sections = [];
 
         foreach ($elements as $element) {
             if (!empty($identifier) && $element->get_identifier() != $identifier) {
                 continue;
             }
 
-            $filesections = [];
-            $modules = [];
+            $info = [];
+            $inforesult = [];
 
-            foreach ($element->get_sections() as $section) {
-                $url = new \moodle_url('/course/view.php', ['id' => $courseid], "section-$section");
-                $sec = [
-                        'sectionnum' => $section,
-                        'sectionname' => get_section_name($courseid, $section),
-                        'sectionurl' => $url->out(),
+            foreach ($element->get_information() as $information) {
+                $info[$information->get_area()][] = [
+                        'infoname' => $information->get_name(),
+                        'infourl' => $information->get_url() ?? '',
+                        'infohasurl' => $information->get_hasurl(),
                 ];
-                $filesections[] = $sec;
-                $sections[$section] = $sec;
             }
-            foreach ($element->get_moduleinfo() as $module) {
-                $modules[] = [
-                        'moduleurl' => !is_null($module->url) ? $module->url->out() : '#',
-                        'modulename' => $module->name ?? 'Module not found',
+            foreach ($info as $key => $information) {
+                // No dynamic keys for webservice.
+                $inforesult[] = [
+                        'area' => $key,
+                        'fields' => $information,
                 ];
             }
 
@@ -179,8 +171,7 @@ class filelist {
                     'upload' => $metadata->upload ?? 0,
                     'ignore' => $metadata->ignore ?? $ignore,
                     'deleted' => 0,
-                    'modules' => $modules,
-                    'sections' => $filesections,
+                    'information' => $inforesult,
                     'requirementsmet' => $metadata->requirementsmet ?? false,
                     'state' => $element->get_elementstate()->state,
                     'multiple' => count($element->get_elementstate()->courses) > 1,
@@ -198,7 +189,7 @@ class filelist {
             $list[] = $entry;
         }
         // TODO: orphaned metadata is missing and has to be added..
-        return [$list, $sections];
+        return $list;
     }
 
     /**

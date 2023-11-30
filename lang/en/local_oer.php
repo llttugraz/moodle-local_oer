@@ -343,8 +343,8 @@ $string['prefresettext'] = 'Reset fields set in preferences to preference values
         'Other fields are not changed. Changes needs to be saved after reset.';
 $string['prefresetbtn'] = 'Reset';
 $string['addpersonbtn'] = 'Add person';
-$string['amount'] = 'Files per page';
-$string['filecount'] = 'files are shown';
+$string['amount'] = 'Elements per page';
+$string['filecount'] = 'elements are shown';
 $string['uploadignoreerror'] = 'Mark for release and ignore cannot be set at the same time!';
 $string['requiredfields'] = 'Required fields';
 $string['requiredfields_desc'] = 'Select the formular fields that are required for metadata/release.' .
@@ -436,3 +436,4 @@ $string['oneeditorselectederror'] = 'At least one of the editor courses metadata
         'options has to be selected.';
 $string['writablefields'] = 'The metadata for the fields: "{$a->fields}" will be stored back to the original source.';
 $string['moreinformation'] = 'More information';
+$string['noinfo'] = 'No additional information';

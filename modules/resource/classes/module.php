@@ -65,9 +65,14 @@ class module implements \local_oer\modules\module {
                 $element->set_source(filehelper::get_file_url($file, true));
                 $element->set_filesize($file->get_filesize());
                 $element->set_mimetype($file->get_mimetype());
-                $element->set_section($cm->sectionnum);
                 $element->set_storedfile($file);
-                $element->set_moduleinfo($cm->id, $cm->name, $cm->url);
+
+                $sectionname = get_section_name($courseid, $cm->sectionnum);
+                $sectionurl = new \moodle_url('/course/view.php', ['id' => $courseid], "section-$cm->sectionnum");
+                $element->add_information('type', 'local_oer', $file->get_mimetype());
+                $element->add_information('section', 'moodle', $sectionname, $sectionurl);
+                $element->add_information('resource', 'moodle', $cm->name, $cm->url);
+
                 $elements->add_element($element);
             }
         }
