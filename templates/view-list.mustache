@@ -80,22 +80,7 @@
                         </ul>
                     </div>
                     <div class="col-3">
-                        <ul class="list-group">
-                            {{#information}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small>{{area}}:
-                                        {{#fields}}
-                                            {{#infohasurl}}
-                                                <a href="{{infourl}}">{{{infoname}}}</a>,
-                                            {{/infohasurl}}
-                                            {{^infohasurl}}
-                                                {{{infoname}}}
-                                            {{/infohasurl}}
-                                        {{/fields}}
-                                    </small>
-                                </li>
-                            {{/information}}
-                        </ul>
+                        {{> local_oer/information }}
                     </div>
                     <div class="col-3">
                         <ul class="list-group">

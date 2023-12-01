@@ -182,9 +182,9 @@ $string['preferenceset_help'] = 'This field is controlled by the preference sett
         'preference for this file, or edit the preference ' .
         'to not handle this field.';
 $string['state'] = 'Status of file';
-$string['markedforupload'] = 'File has been marked for release';
-$string['notmarkedforupload'] = 'File has not been marked for release';
-$string['isignored'] = 'File is ignored';
+$string['markedforupload'] = 'Marked for release';
+$string['notmarkedforupload'] = 'Not marked for release';
+$string['isignored'] = 'Ignored';
 $string['preferenceactive'] = 'Preferences are enabled';
 $string['preferencenotactive'] = 'Preferences are disabled';
 $string['selectcc'] = 'CC license type has to be set';
@@ -355,8 +355,8 @@ $string['error_upload_classification'] = 'At least one value is necessary for re
 $string['error_upload_language'] = 'A language has to be selected for release.';
 $string['error_upload_description'] = 'An abstract is necessary for release.';
 $string['error_upload_tags'] = 'At least one tag is necessary for release.';
-$string['requirementsmet'] = 'All requirements for release are met.';
-$string['requirementsnotmet'] = 'Not all requirements for release are met.';
+$string['requirementsmet'] = 'All requirements are met.';
+$string['requirementsnotmet'] = 'Not all requirements are met.';
 $string['oer_settings'] = 'Plugin settings';
 $string['messageprovider:requirementschanged'] = 'OER Metadata requirements have changed';
 $string['requirementschanged_subject'] = 'Open Educational Resources metadata requirements have changed';

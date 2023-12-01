@@ -184,9 +184,9 @@ $string['preferenceset_help'] = 'Dieses Feld wird durch die Voreinstellungen ges
         'die Voreinstellung für diese Datei deaktivieren oder die ' .
         'Voreinstellung so bearbeiten, dass dieses Feld nicht erfasst wird.';
 $string['state'] = 'Status der Datei';
-$string['markedforupload'] = 'Datei wurde zum Veröffentlichen vorgemerkt';
-$string['notmarkedforupload'] = 'Datei wurde nicht zum Veröffentlichen vorgemerkt';
-$string['isignored'] = 'Datei wird ignoriert';
+$string['markedforupload'] = 'Wurde zum Veröffentlichen vorgemerkt';
+$string['notmarkedforupload'] = 'Wurde nicht zum Veröffentlichen vorgemerkt';
+$string['isignored'] = 'Ignoriert';
 $string['preferenceactive'] = 'Voreinstellungen sind aktiviert';
 $string['preferencenotactive'] = 'Voreinstellungen sind deaktiviert';
 $string['selectcc'] = 'CC-Lizenztyp muss ausgewählt werden';
@@ -375,7 +375,7 @@ $string['error_upload_classification'] = 'Mindestens ein Element muss für die V
 $string['error_upload_language'] = 'Für die Veröffentlichung ist eine Sprache erforderlich.';
 $string['error_upload_description'] = 'Ein Abstrakt ist für die Veröffentlichung erforderlich.';
 $string['error_upload_tags'] = 'Mindestens ein Tag ist für die Veröffentlichung erforderlich.';
-$string['requirementsmet'] = 'Alle Voraussetzungen für die Freigabe sind erfüllt.';
+$string['requirementsmet'] = 'Alle Voraussetzungen sind erfüllt.';
 $string['requirementsnotmet'] = 'Nicht alle Voraussetzungen sind erfüllt.';
 $string['oer_settings'] = 'Plugin Einstellungen';
 $string['messageprovider:requirementschanged'] = 'OER Metadaten Anforderungen haben sich geändert';

@@ -28,25 +28,37 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
     Example context (json):
     {
-        "timeuploadts": 0,
-        "origins": [
+        "information": [
             {
-                "origin": "mod_resource",
-                "originname": "File",
-            },
-            {
-                "origin": "mod_folder",
-                "originname": "Folder",
-            },
+                "area": "mod_resource",
+                "fields": [
+                    {
+                        "infourl": "example"
+                        "infoname": https://example.com
+                        "infohasurl": true
+                    }
+                ]
+            }
         ],
     }
   }}
 
-<div class="d-inline-block">
-    {{#timeuploadedts}}
-        <span class="ml-1 badge badge-success">{{#str}} released, local_oer {{/str}}</span>
-    {{/timeuploadedts}}
-    {{#origins}}
-        <span class="ml-1 badge badge-info" data-origin="{{origin}}">{{{originname}}}</span>
-    {{/origins}}
-</div>
+<ul class="list-group">
+    {{#information}}
+        <li class="list-group-item border-0 p-0">
+            <small>{{area}}:
+                {{#fields}}
+                    {{#infohasurl}}
+                        <a href="{{infourl}}" target="_blank">{{{infoname}}}</a>,
+                    {{/infohasurl}}
+                    {{^infohasurl}}
+                        {{{infoname}}}
+                    {{/infohasurl}}
+                {{/fields}}
+            </small>
+        </li>
+    {{/information}}
+    {{^information}}
+        {{#str}} noinfo, local_oer {{/str}}
+    {{/information}}
+</ul>

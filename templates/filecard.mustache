@@ -60,25 +60,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                         <i class="icon fa fa-chevron-down" aria-hidden="true" aria-selected="true"></i>{{#str}} moreinformation, local_oer {{/str}}
                     </a>
                     <div class="collapse" id="collapse{{idhash}}">
-                        <ul class="list-group">
-                            {{#information}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small>{{area}}:
-                                        {{#fields}}
-                                            {{#infohasurl}}
-                                               <a href="{{infourl}}">{{{infoname}}}</a>,
-                                            {{/infohasurl}}
-                                            {{^infohasurl}}
-                                                {{{infoname}}}
-                                            {{/infohasurl}}
-                                        {{/fields}}
-                                    </small>
-                                </li>
-                            {{/information}}
-                            {{^information}}
-                                {{#str}} noinfo, local_oer {{/str}}
-                            {{/information}}
-                        </ul>
+                        {{> local_oer/information }}
                     </div>
                 </li>
                 <li class="list-group-item">

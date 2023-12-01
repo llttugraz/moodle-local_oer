@@ -72,7 +72,7 @@ class module implements \local_oer\modules\module {
                 $sectionname = get_section_name($courseid, $cm->sectionnum);
                 $sectionurl = new \moodle_url('/course/view.php', ['id' => $courseid], "section-$cm->sectionnum");
                 $element->add_information('section', 'moodle', $sectionname, $sectionurl);
-                $element->add_information('folder', 'moodle', $cm->name, $cm->url);
+                $element->add_information('pluginname', 'mod_folder', $cm->name, $cm->url);
 
                 $elements->add_element($element);
             }
