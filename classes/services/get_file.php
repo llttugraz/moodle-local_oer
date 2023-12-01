@@ -156,6 +156,7 @@ class get_file extends \external_api {
                                 new \external_single_structure(
                                         [
                                                 'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of element'),
+                                                'originname' => new \external_value(PARAM_TEXT, 'Language string of origin'),
                                         ]
                                 )
                         ),

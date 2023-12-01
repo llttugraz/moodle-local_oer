@@ -437,3 +437,4 @@ $string['oneeditorselectederror'] = 'At least one of the editor courses metadata
 $string['writablefields'] = 'The metadata for the fields: "{$a->fields}" will be stored back to the original source.';
 $string['moreinformation'] = 'More information';
 $string['noinfo'] = 'No additional information';
+$string['origin'] = 'Origin';

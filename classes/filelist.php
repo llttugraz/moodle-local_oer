@@ -71,10 +71,8 @@ class filelist {
             if (isset($visited[$element->get_identifier()])) {
                 // This element is multiple times in this course, only show it once.
                 $primary = $elements->get_element_by_key($visited[$element->get_identifier()]);
-                $primarytool = $primary->get_origin();
-                $tool = $element->get_origin();
-                if (strpos($primarytool, $tool) === false) {
-                    $primary->set_origin($primary->get_origin() . '___' . $element->get_origin());
+                foreach ($element->get_origin() as $origin => $languagestring) {
+                    $primary->set_origin($origin, $languagestring[0], $languagestring[1]);
                 }
                 $primary->merge_information($element->get_information());
                 if ($primary->get_type() == element::OERTYPE_MOODLEFILE && !empty($element->get_storedfiles())) {
@@ -123,6 +121,7 @@ class filelist {
         [$icons, $renderer] = icon::prepare_file_icon_renderer($courseid);
         $elements = self::get_course_files($courseid);
         $list = [];
+        $originfilter = [];
 
         foreach ($elements as $element) {
             if (!empty($identifier) && $element->get_identifier() != $identifier) {
@@ -152,10 +151,14 @@ class filelist {
             $ignore = $preference && $preference->state == 2 ? 1 : 0;
             $decomposed = identifier::decompose($element->get_identifier());
             $metadata = $element->get_stored_metadata();
-            $origins = explode('___', $element->get_origin());
             $originlist = [];
-            foreach ($origins as $origin) {
-                $originlist[] = ['origin' => $origin];
+            foreach ($element->get_origin() as $origin => $languagestring) {
+                $name = get_string($languagestring[0], $languagestring[1]);
+                $originlist[] = [
+                        'origin' => $origin,
+                        'originname' => $name,
+                ];
+                $originfilter[$origin] = $name;
             }
             $entry = [
                     'id' => $metadata->id ?? 0,
@@ -189,7 +192,14 @@ class filelist {
             $list[] = $entry;
         }
         // TODO: orphaned metadata is missing and has to be added..
-        return $list;
+        $originresult = [];
+        foreach ($originfilter as $key => $entry) {
+            $originresult[] = [
+                    'origin' => $key,
+                    'originname' => $entry,
+            ];
+        }
+        return [$list, $originresult];
     }
 
     /**

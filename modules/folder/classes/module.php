@@ -55,7 +55,7 @@ class module implements \local_oer\modules\module {
             $files = $fs->get_area_files($cm->context->id, 'mod_folder', 'content', false, 'id ASC', false);
             foreach ($files as $file) {
                 $element = new element($creator, element::OERTYPE_MOODLEFILE);
-                $element->set_origin('mod_folder');
+                $element->set_origin('mod_folder', 'pluginname', 'mod_folder');
                 $element->set_title($file->get_filename());
                 $identifier = \local_oer\identifier::compose(
                         'moodle', $CFG->wwwroot, 'file',

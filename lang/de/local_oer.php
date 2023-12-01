@@ -466,3 +466,4 @@ $string['oneeditorselectederror'] = 'Mindestens eine der Optionen für die Metad
 $string['writablefields'] = 'Die Metadaten für die Felder: "{$a->fields}" werden wieder in der ursprünglichen Quelle gespeichert.';
 $string['moreinformation'] = 'Weitere informationen';
 $string['noinfo'] = 'Keine zusätzlichen Informationen';
+$string['origin'] = 'Quelle';

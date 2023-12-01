@@ -90,10 +90,16 @@ class element {
      *
      * For Moodle plugins just type in the frankenstyle plugin name (e.g. mod_resource). For external sources take the name of the
      * source (e.g. opencast).
+     * Also, a language string is stored to show users on the GUI.
      *
-     * @var string
+     * As for duplicated elements there can be different origins, this is an array.
+     * [
+     *   origin => [identifier, component]
+     * ]
+     *
+     * @var array
      */
-    private string $origin = '';
+    private array $origin = [];
 
     /**
      * Source url to the element. Direct link to file or external source.
@@ -251,22 +257,27 @@ class element {
      * Set the origin of this element.
      *
      * @param string $value
+     * @param string $identifier Language string identifier
+     * @param string $component Component where language string is stored
      * @return void
      * @throws \coding_exception
+     * @throws \invalid_parameter_exception
      */
-    public function set_origin(string $value): void {
+    public function set_origin(string $value, string $identifier, string $component): void {
         $this->not_empty('origin', $value);
-        $this->origin = $value;
+        validate_param($value, PARAM_ALPHANUMEXT);
+        $this->not_empty('originstring', $identifier);
+        $this->not_empty('originstring', $component);
+        $this->origin[$value] = [$identifier, $component];
     }
 
     /**
      * Get the origin of this element.
      *
-     * @return string
+     * @return array
      * @throws \coding_exception
      */
-    public function get_origin(): string {
-        $this->not_empty('origin', $this->origin);
+    public function get_origin(): array {
         return $this->origin;
     }
 

@@ -62,6 +62,13 @@ class get_files extends \external_api {
                 [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
                         'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
+                        'origin' => new \external_multiple_structure(
+                                new \external_single_structure(
+                                        [
+                                                'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Shortname of origin'),
+                                                'originname' => new \external_value(PARAM_TEXT, 'Language string of origin'),
+                                        ]
+                                )),
                         'files' => new \external_multiple_structure(get_file::external_file_return_value()),
                 ]);
     }
@@ -78,11 +85,12 @@ class get_files extends \external_api {
      * @throws \moodle_exception
      */
     public static function service(int $courseid) {
-        $files = filelist::get_simple_filelist($courseid);
+        [$files, $origin] = filelist::get_simple_filelist($courseid);
         $context = \context_course::instance($courseid);
         return [
                 'courseid' => $courseid,
                 'context' => $context->id,
+                'origin' => $origin,
                 'files' => $files,
         ];
     }

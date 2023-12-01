@@ -38,7 +38,7 @@ export const getOutputValues = (init) => {
     output.init = init === undefined ? false : init;
     output.shownavigation = output.files.length > 0;
     // Filter options.
-    let filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_section', 'f_released'];
+    let filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_origin', 'f_released'];
 
     output.founddeleted = false;
     output.files.forEach(function(file) {
@@ -92,9 +92,9 @@ export const getOutputValues = (init) => {
                         filteredFiles.push(file);
                     }
                     break;
-                case 'f_section':
-                    file.sections.forEach(function(section) {
-                        if (section.sectionname === additionalvalue) {
+                case 'f_origin':
+                    file.origins.forEach(function(origin) {
+                        if (origin.origin === additionalvalue) {
                             filteredFiles.push(file);
                         }
                     });

@@ -51,7 +51,7 @@
             {{#founddeleted}}
                 {{#f_deleted}}{{#str}} deleted, local_oer {{/str}}{{/f_deleted}}
             {{/founddeleted}}
-            {{#f_section}}{{#str}} section {{/str}}{{/f_section}}
+            {{#f_origin}}{{#str}} origin, local_oer {{/str}}{{/f_origin}}
         </span>
     </button>
     <ul id="local_oer-select-grouping" class="dropdown-menu" role="menu" data-show-active-item data-skip-active-class="true" data-active-item-text
@@ -106,15 +106,15 @@
         <li class="dropdown-divider" role="presentation">
             <span class="filler">&nbsp;</span>
         </li>
-        {{#sections}}
+        {{#origin}}
             <li>
-                <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_section" data-filtervalue="{{sectionname}}" data-pref="f_section"
-                   aria-label="Section: {{sectionname}}"
+                <a class="dropdown-item" href="#" data-filter="grouping" data-value="f_origin" data-filtervalue="{{origin}}" data-pref="f_origin"
+                   aria-label="Origin: {{{originname}}}"
                    aria-controls="files-view-{{uniqid}}" role="menuitem">
-                    {{sectionname}}
+                    {{{originname}}}
                 </a>
             </li>
-        {{/sections}}
+        {{/origin}}
     </ul>
 </div>
 <div class="mb-1 mr-auto">
