@@ -79,8 +79,27 @@ class filestate {
                 // Step 2: Extract courseids from contexts.
                 $decomposed = identifier::decompose($element->get_identifier());
                 $courses = self::find_courses_that_use_this_element($decomposed->value);
-            case element::OERTYPE_EXTERNAL: // There is intentionally no break, as step 3 is needed.
                 // Step 3: Determine OER element state. Is element being edited or already released?
+                [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
+                break;
+            case element::OERTYPE_EXTERNAL:
+                // TODO: is there a performant way to find all courses for an external object?
+                // Maybe this should be implemented in module subplugin as every subplugin has an other way for this information?
+                global $DB;
+                $course = get_course($currentcourseid);
+                $courses[$currentcourseid] = [
+                        'id' => $currentcourseid,
+                        'name' => $course->fullname,
+                        'editor' => false,
+                ];
+                if ($edited = $DB->get_record('local_oer_elements', ['identifier' => $element->get_identifier()])) {
+                    $course = get_course($edited->courseid);
+                    $courses[$edited->courseid] = [
+                            'id' => $edited->courseid,
+                            'name' => $course->fullname,
+                            'editor' => true,
+                    ];
+                }
                 [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
                 break;
             default:
@@ -120,7 +139,7 @@ class filestate {
 
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            [, $course, ] = get_context_info_array($contextid);
+            [, $course,] = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id' => $course->id,
                     'name' => format_string($course->fullname),

@@ -25,10 +25,9 @@
 
 namespace local_oer;
 
-use local_oer\helper\formhelper;
-use local_oer\helper\license;
 use local_oer\modules\element;
-use local_oer\plugininfo\oerclassification;
+use local_oer\release\externaldata;
+use local_oer\release\filedata;
 
 /**
  * Class release
@@ -102,123 +101,17 @@ class release {
      * @throws \dml_exception
      */
     private function get_file_release_metadata_json(element $element, \stdClass $elementinfo): array {
-        global $CFG;
-        $contexts = formhelper::lom_context_list(false);
-        $resourcetypes = formhelper::lom_resource_types(false);
-        $classification = self::prepare_classification_fields($elementinfo->classification);
-        $licenseobject = license::get_license_by_shortname($elementinfo->license);
-        $license = $elementinfo->license;
-        if (get_config('local_oer', 'uselicensereplacement') == 1) {
-            $replacement = get_config('local_oer', 'licensereplacement');
-            $replacement = explode("\r\n", $replacement);
-            $list = [];
-            foreach ($replacement as $line) {
-                $entry = explode('=>', $line);
-                if (empty($entry[1])) {
-                    continue; // Skip false or empty entries.
-                }
-                $list[$entry[0]] = $entry[1];
-            }
-            if (isset($list[$elementinfo->license])) {
-                $license = $list[$elementinfo->license];
-            }
+        switch ($element->get_type()) {
+            case element::OERTYPE_MOODLEFILE:
+                $metadata = new filedata($this->courseid, $element, $elementinfo);
+                break;
+            case element::OERTYPE_EXTERNAL:
+                $metadata = new externaldata($this->courseid, $element, $elementinfo);
+                break;
+            default:
+                throw new \coding_exception('Element type not set');
         }
 
-        $fulllicense = [
-                'shortname' => $license,
-                'fullname' => $licenseobject->fullname,
-                'source' => $licenseobject->source,
-        ];
-
-        $coursecontext = \context_course::instance($this->courseid);
-        $decomposed = identifier::decompose($element->get_identifier());
-        $contenthash = '';
-        if ($element->get_type() == element::OERTYPE_MOODLEFILE && $decomposed->valuetype == 'contenthash') {
-            $contenthash = $decomposed->value;
-        }
-        $metadata = [
-                'title' => $elementinfo->title,
-                'identifier' => $element->get_identifier(),
-                'contenthash' => $contenthash, // Deprecated, only for backwards compatibility.
-                'fileurl' => $CFG->wwwroot . '/pluginfile.php/' .
-                        $coursecontext->id . '/local_oer/public/' .
-                        $elementinfo->id . '/' . $contenthash,
-                'abstract' => $elementinfo->description ?? '',
-                'license' => $fulllicense,
-                'context' => $contexts[$elementinfo->context],
-                'resourcetype' => $resourcetypes[$elementinfo->resourcetype],
-                'language' => $elementinfo->language,
-                'persons' => json_decode($elementinfo->persons)->persons,
-                'tags' => empty($elementinfo->tags) ? [] : explode(',', $elementinfo->tags),
-                'mimetype' => $element->get_mimetype(),
-                'filesize' => $element->get_filesize(),
-            // TODO: Same as timereleased? Where did the timestamp before was read?
-                'filecreationtime' => $elementinfo->timecreated,
-                'timereleased' => $elementinfo->timecreated,
-                'classification' => $classification,
-                'courses' => json_decode($elementinfo->coursemetadata),
-        ];
-
-        if ($elementinfo->additionaldata) {
-            $additionaldata = json_decode($elementinfo->additionaldata);
-            foreach ($additionaldata as $key => $value) {
-                // Do not overwrite existing data.
-                if (!isset($metadata[$key])) {
-                    $metadata[$key] = $value;
-                }
-            }
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Prepare the json_encoded classification field.
-     *
-     * @param string|null $fileinfo
-     * @return array
-     */
-    private function prepare_classification_fields(?string $fileinfo): array {
-        if (is_null($fileinfo)) {
-            return [];
-        }
-        $classification = oerclassification::get_enabled_plugins();
-        $info = ($fileinfo && $fileinfo != '') ? json_decode($fileinfo) : false;
-        if (!$fileinfo) {
-            return [];
-        }
-        $result = [];
-
-        // @codeCoverageIgnoreStart
-        // This code is not reachable without subplugins installed.
-        foreach ($classification as $key => $pluginname) {
-            $frankenstyle = 'oerclassification_' . $key;
-            $plugin = '\\' . $frankenstyle . '\plugin';
-            $url = $plugin::url_to_external_resource();
-            $selectdata = $plugin::get_select_data(false);
-
-            if (isset($info->$key)) {
-                if (!isset($result[$key])) {
-                    $result[$key] = [
-                            'type' => $key,
-                            'url' => $url,
-                            'values' => [],
-                    ];
-                }
-                foreach ($info->$key as $identifier) {
-                    if (empty($identifier)) {
-                        continue;
-                    }
-                    $result[$key]['values'][] = [
-                            'identifier' => $identifier,
-                            'name' => $selectdata[$identifier],
-                    ];
-                }
-            }
-        }
-
-        $result = array_values($result);
-        return $result;
-        // @codeCoverageIgnoreEnd
+        return $metadata->get_array();
     }
 }
