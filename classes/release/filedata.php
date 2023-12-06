@@ -29,7 +29,7 @@ use local_oer\modules\element;
 use local_oer\identifier;
 
 class filedata extends \releasedata {
-    public function __construct(int $courseid, \local_oer\modules\element $element, \stdClass $elementinfo) {
+    public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
         parent::__construct($courseid, $element, $elementinfo);
         global $CFG;
 
@@ -41,5 +41,8 @@ class filedata extends \releasedata {
         $this->metadata['contenthash'] = $contenthash; // Field for backwards compatibility.
         $this->metadata['fileurl'] = $publicurl; // Field for backwards compatibility.
         $this->metadata['source'] = $publicurl; // Overwrite parent field source.
+        $this->metadata['mimetype'] = $element->get_mimetype();
+        $this->metadata['filesize'] = $element->get_filesize();
+        $this->metadata['filecreationtime'] = $elementinfo->timecreated;
     }
 }

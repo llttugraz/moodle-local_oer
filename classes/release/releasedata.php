@@ -88,10 +88,6 @@ abstract class releasedata {
                 'language' => $elementinfo->language,
                 'persons' => json_decode($elementinfo->persons)->persons,
                 'tags' => empty($elementinfo->tags) ? [] : explode(',', $elementinfo->tags),
-                'mimetype' => $element->get_mimetype(),
-                'filesize' => $element->get_filesize(),
-            // TODO: Same as timereleased? Where did the timestamp before was read?
-                'filecreationtime' => $elementinfo->timecreated,
                 'timereleased' => $elementinfo->timecreated,
                 'classification' => self::prepare_classification_fields($elementinfo->classification),
                 'courses' => json_decode($elementinfo->coursemetadata),

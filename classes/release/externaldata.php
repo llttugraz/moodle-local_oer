@@ -25,14 +25,12 @@
 
 namespace local_oer\release;
 
-use element;
+use local_oer\modules\element;
 
 class externaldata extends \releasedata {
+    public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
+        parent::__construct($courseid, $element, $elementinfo);
 
-    public function set_metadata(element $element): void {
-    }
-
-    public function get_metadata(): array {
-        return [];
+        // TODO
     }
 }
