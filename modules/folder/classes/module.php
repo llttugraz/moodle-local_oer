@@ -103,4 +103,27 @@ class module implements \local_oer\modules\module {
             $file->set_license($element->get_license());
         }
     }
+
+    /**
+     * Return the list of active licences in Moodle.
+     *
+     * @return array
+     */
+    public function supported_licences(): array {
+        $licences = \license_manager::get_active_licenses_as_array();
+        $result = [];
+        foreach ($licences as $key => $licence) {
+            $result[] = $key;
+        }
+        return $result;
+    }
+
+    /**
+     * Set element to release.
+     *
+     * @return bool
+     */
+    public function set_element_to_release(): bool {
+        return true; // Nothing special to do here.
+    }
 }

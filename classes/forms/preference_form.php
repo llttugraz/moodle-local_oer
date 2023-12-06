@@ -90,7 +90,7 @@ class preference_form extends \moodleform {
             }
         }
 
-        fileinfo_form::add_shared_fields_to_form($mform, true);
+        fileinfo_form::add_shared_fields_to_form($mform, true, []);
         $classificationdata = $entry && !is_null($entry->classification) ? json_decode($entry->classification) : null;
         fileinfo_form::prepare_classification_values_for_form($mform, $classificationdata, $data);
 

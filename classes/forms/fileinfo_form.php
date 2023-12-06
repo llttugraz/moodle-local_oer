@@ -128,7 +128,8 @@ class fileinfo_form extends \moodleform {
             $this->set_state($data, $preference->releasestate);
         }
 
-        self::add_shared_fields_to_form($mform, false);
+        $supportedlicences = oermod::get_supported_licences($element);
+        self::add_shared_fields_to_form($mform, false, $supportedlicences);
         $classificationdata = $alreadystored ? $metadata->classification : null;
         $classificationdata = !$alreadystored && $preference && !is_null($preference->classification)
                 ? $preference->classification : $classificationdata;
@@ -183,7 +184,7 @@ class fileinfo_form extends \moodleform {
      * @return void
      * @throws \coding_exception
      */
-    public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref = false) {
+    public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref, array $supportedlicences) {
         $reqfields = static::get_required_fields();
         $mform->addElement('select', 'context', get_string('context', 'local_oer'),
                 formhelper::lom_context_list(true, $addnopref));
@@ -194,7 +195,7 @@ class fileinfo_form extends \moodleform {
         }
 
         $mform->addElement('select', 'license', get_string('license'),
-                license::get_licenses_select_data($addnopref));
+                license::get_licenses_select_data($addnopref, $supportedlicences));
         $mform->setDefault('license', $addnopref ? 'nopref' : 'unknown');
         $mform->addHelpButton('license', 'license', 'local_oer');
         $mform->addRule('license', get_string('required'), 'required', '', 'client');

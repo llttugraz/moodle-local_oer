@@ -63,4 +63,21 @@ interface module {
      * @return void
      */
     public function write_to_source(\local_oer\modules\element $element): void;
+
+    /**
+     * Return an array of (Moodle compatible) shortnames the platform from the sub-plugin supports.
+     *
+     * Array should contain the Moodle shortnames of the supported licences.
+     *
+     * @return string[]
+     */
+    public function supported_licences(): array;
+
+    /**
+     * When an element is released there may be some necessary steps in an external system.
+     * Change ownership or make element public accessible or something similar.
+     *
+     * @return bool
+     */
+    public function set_element_to_release(): bool;
 }

@@ -116,4 +116,16 @@ class oermod extends plugininfo {
         }
         return new $subplugin();
     }
+
+    /**
+     * Return a list of supported licences for this object.
+     *
+     * @param element $element
+     * @return array
+     * @throws \coding_exception
+     */
+    public static function get_supported_licences(element $element): array {
+        $module = self::get_module($element);
+        return $module->supported_licences();
+    }
 }
