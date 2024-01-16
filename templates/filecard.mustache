@@ -56,12 +56,10 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
         <div class="card-body p-0 d-flex flex-column">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <a class="" data-toggle="collapse" href="#collapse{{idhash}}" role="button" aria-expanded="false" aria-controls="collapse{{idhash}}">
-                        <i class="icon fa fa-chevron-down" aria-hidden="true" aria-selected="true"></i>{{#str}} moreinformation, local_oer {{/str}}
-                    </a>
-                    <div class="collapse" id="collapse{{idhash}}">
+                    <details>
+                        <summary>{{#str}} moreinformation, local_oer {{/str}}</summary>
                         {{> local_oer/information }}
-                    </div>
+                    </details>
                 </li>
                 <li class="list-group-item">
                     <ul class="list-group">

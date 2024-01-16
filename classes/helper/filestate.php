@@ -232,6 +232,8 @@ class filestate {
         $linebreak = str_replace("\r\n", '<br>', $data->description);
         $firstbreak = strpos($linebreak, '<br>');
         $firstline = $firstbreak && $firstbreak < 80 ? $firstbreak : 80;
+        $heading = substr($linebreak, 0, $firstline);
+        $body = substr($linebreak, $firstline, strlen($linebreak));
         $simplemetadata = [
                 [
                         'name' => get_string('title', 'local_oer'),
@@ -239,10 +241,11 @@ class filestate {
                 ],
                 [
                         'name' => get_string('description', 'local_oer'),
-                        'heading' => substr($linebreak, 0, $firstline),
-                        'body' => substr($linebreak, $firstline, strlen($linebreak)),
+                        'heading' => $heading,
+                        'body' => $body,
                         'value' => $data->description,
-                        'collapse' => true,
+                        'emptybody' => empty($body),
+                        'collapse' => true, // Used for different state in mustache than other values here.
                 ],
                 [
                         'name' => get_string('context', 'local_oer'),

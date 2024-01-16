@@ -42,11 +42,13 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
   }}
 
 
-{{#courses}}
-    <a class="dropdown-item" href="{{wwwroot}}/course/view.php?id={{id}}" target="_blank">
-    {{#editor}}
-        <span class="badge badge-info">Editor</span>
-    {{/editor}}
-    {{name}}</a>
-{{/courses}}
+<ul>
+    {{#courses}}
+        <li><a class="dropdown-item" href="{{wwwroot}}/course/view.php?id={{id}}" target="_blank">
+            {{#editor}}<span class="badge badge-info">Editor</span>{{/editor}}
+            {{name}}
+            </a>
+        </li>
+    {{/courses}}
+</ul>
 
