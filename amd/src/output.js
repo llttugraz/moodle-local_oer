@@ -35,8 +35,8 @@ import * as Str from 'core/str';
  * @param {boolean} init
  */
 export const showFiles = (init) => {
-    let output = Config.getOutputValues(init);
-    let oldSearchInput = document.getElementById('local_oer_searchFilecardsInput');
+    const output = Config.getOutputValues(init);
+    const oldSearchInput = document.getElementById('local_oer_searchFilecardsInput');
     let oldSearchValue = '';
     if (oldSearchInput !== null) {
         oldSearchValue = oldSearchInput.value;
@@ -44,7 +44,7 @@ export const showFiles = (init) => {
     Templates.render('local_oer/files', output)
         .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-overview', html, js);
-            let searchInput = document.getElementById('local_oer_searchFilecardsInput');
+            const searchInput = document.getElementById('local_oer_searchFilecardsInput');
             if (searchInput !== null) {
                 // Workaround to fix losing focus of search after Template.replaceNodeContents.
                 // The navigation controls are inside the template and replaced after every search.
@@ -66,15 +66,15 @@ export const showFiles = (init) => {
  * @param {object} options
  */
 export const showForm = (type, title, options) => {
-    let params = JSON.stringify(options);
-    let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
-    let context = document.getElementById("local_oer_files_main_area").dataset.context;
-    let args = {
+    const params = JSON.stringify(options);
+    const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    const context = document.getElementById("local_oer_files_main_area").dataset.context;
+    const args = {
         courseid: courseid,
         formtype: type,
         params: params,
     };
-    let form = Fragment.loadFragment('local_oer', 'formdata', context, args);
+    const form = Fragment.loadFragment('local_oer', 'formdata', context, args);
     form.done(function(data) {
         // TODO: Better way to do this?
         let nosave = data.includes('<input name="nosave" type="hidden" value="1" />');
@@ -87,8 +87,8 @@ export const showForm = (type, title, options) => {
 
 
 const showFormModal = (form, type, title, options) => {
-    let element = document.getElementById("local_oer_files_main_area");
-    let modaltype = type === 'nosave' ? ModalFactory.types.CANCEL : ModalFactory.types.SAVE_CANCEL;
+    const element = document.getElementById("local_oer_files_main_area");
+    const modaltype = type === 'nosave' ? ModalFactory.types.CANCEL : ModalFactory.types.SAVE_CANCEL;
     ModalFactory.create({
         type: modaltype,
         title: title,
@@ -125,14 +125,14 @@ const showFormModal = (form, type, title, options) => {
 };
 
 const saveForm = (modal, element, options, type, title) => {
-    var formData = modal.getRoot().find('form').serialize();
-    let saveargs = {
+    const formData = modal.getRoot().find('form').serialize();
+    const saveargs = {
         courseid: element.dataset.courseid,
         formtype: type + 'Save',
         params: JSON.stringify(Object.assign(options, {settings: formData}))
     };
-    let context = element.dataset.context;
-    var formSubmit = Fragment.loadFragment('local_oer', 'formdata', context, saveargs);
+    const context = element.dataset.context;
+    const formSubmit = Fragment.loadFragment('local_oer', 'formdata', context, saveargs);
     formSubmit.done(function(response) {
         if (response.indexOf('<form') !== -1) {
             modal.destroy();
@@ -144,7 +144,7 @@ const saveForm = (modal, element, options, type, title) => {
         } else if (type === 'FileinfoForm') {
             replaceFileInfo(Service.loadFile(options.identifier));
         } else if (type === 'PreferenceForm') {
-            prepareFiles(Service.loadFiles());
+            prepareFiles(Service.loadFiles(), true);
         }
     }).catch(function(error) {
         window.console.debug('Form submission failed', error);
@@ -153,15 +153,15 @@ const saveForm = (modal, element, options, type, title) => {
 
 const replaceFileInfo = (promises) => {
     promises[0].done(function(response) {
-        let filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
-        let output = JSON.parse(filelist);
+        const filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
+        const output = JSON.parse(filelist);
         output.files.forEach(function(file, index) {
             if (file.identifier === response.file.identifier) {
                 output.files[index] = response.file;
             }
         });
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(output);
-        showFiles();
+        showFiles(false);
     });
 };
 
@@ -191,10 +191,10 @@ const addInputFieldInputListener = (prefix, area) => {
 };
 
 const addStoredTag = (prefix, tagarea) => {
-    let select = document.getElementById('id_' + tagarea);
+    const select = document.getElementById('id_' + tagarea);
     let tag = select.value;
     tag = tag.replace(',', ' ').trim();
-    let tags = document.querySelector('[name="' + prefix + tagarea + '"]').value;
+    const tags = document.querySelector('[name="' + prefix + tagarea + '"]').value;
     document.getElementById('id_' + tagarea).value = '';
     if (!tags.includes(tag)) {
         if (tags === '') {
@@ -250,7 +250,7 @@ const showTags = (tagarea) => {
 };
 
 const initSetPreferenceListener = (modal) => {
-    let button = document.getElementById("local_oer_preferenceResetButton");
+    const button = document.getElementById("local_oer_preferenceResetButton");
     if (button === null) {
         return;
     }
@@ -267,7 +267,7 @@ const initSetPreferenceListener = (modal) => {
 };
 
 const initPersonButtonListener = () => {
-    let button = document.getElementById("local_oer_addPersonButton");
+    const button = document.getElementById("local_oer_addPersonButton");
     if (button === null) {
         return;
     }
@@ -284,8 +284,8 @@ const showPersonForm = (setInvalid) => {
     if (typeof setInvalid === 'undefined') {
         setInvalid = false;
     }
-    let context = document.getElementById("local_oer_files_main_area").dataset.context;
-    let form = Fragment.loadFragment('local_oer', 'personform', context, []);
+    const context = document.getElementById("local_oer_files_main_area").dataset.context;
+    const form = Fragment.loadFragment('local_oer', 'personform', context, []);
     form.done(function() {
         let title = Str.get_string('addpersonbtn', 'local_oer');
         title.done(function(localizedTitle) {
@@ -299,8 +299,8 @@ const showPersonForm = (setInvalid) => {
                     modal.destroy();
                 });
                 modal.getRoot().on(ModalEvents.save, function() {
-                    let formData = modal.getRoot().find('form').serialize();
-                    let fields = formData.split('&');
+                    const formData = modal.getRoot().find('form').serialize();
+                    const fields = formData.split('&');
                     let role = '';
                     let firstname = '';
                     let lastname = '';
@@ -320,7 +320,7 @@ const showPersonForm = (setInvalid) => {
                                 break;
                         }
                     });
-                    let name = {
+                    const name = {
                         role: role,
                         firstname: firstname,
                         lastname: lastname,
@@ -330,7 +330,7 @@ const showPersonForm = (setInvalid) => {
                 });
                 modal.show();
                 if (setInvalid) {
-                    let element = document.getElementById("id_firstname");
+                    const element = document.getElementById("id_firstname");
                     element.classList.add("is-invalid");
                     element = document.getElementById("id_lastname");
                     element.classList.add("is-invalid");
@@ -375,7 +375,7 @@ const removePerson = (person) => {
         return;
     }
     entries = JSON.parse(entries);
-    let persons = {persons: []};
+    const persons = {persons: []};
     entries.persons.forEach(function(storedperson) {
         if (person.role === storedperson.role
             && person.firstname === storedperson.firstname
@@ -445,25 +445,26 @@ const renderPersonsTemplate = (persons) => {
 };
 
 const showPagination = () => {
-    let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    // Filecount is the number of elements currently available due to filter restrictions.
     let filecount = parseInt(localStorage.getItem('local-oer-pagination-filecount-' + courseid), 10);
-    let filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
-    let output = JSON.parse(filelist);
-    let filemax = output.files.length;
-    if (isNaN(filecount)) {
-        filecount = filemax;
-    }
+    const filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
+    const output = JSON.parse(filelist);
+    const filemax = output.files.length;
     let selected = localStorage.getItem('local-oer-pagination-selected-' + courseid);
     let page = parseInt(localStorage.getItem('local-oer-pagination-current-' + courseid), 10);
     let pages = 1;
+    if (isNaN(filecount)) {
+        filecount = filemax;
+    }
     if (selected !== "all") {
         if (selected === null) {
             selected = "8";
         }
-        let amount = parseInt(selected, 10);
+        const amount = parseInt(selected, 10);
         pages = Math.ceil(filecount / amount);
     }
-    let result = [];
+    const result = [];
     if (isNaN(page)) {
         page = 1;
     }
@@ -511,7 +512,7 @@ const showPagination = () => {
             result.push({page: pages, active: false, disabled: false});
         }
     }
-    let data = {
+    const data = {
         selectoptions: paginationSelectOptions(selected),
         control: pages !== 1,
         previous: page > 1,

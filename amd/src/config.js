@@ -33,12 +33,12 @@ import * as UserPreference from 'local_oer/userpreferences';
  * @returns {any}
  */
 export const getOutputValues = (init) => {
-    let filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
-    let output = JSON.parse(filelist);
+    const filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
+    const output = JSON.parse(filelist);
     output.init = init === undefined ? false : init;
     output.shownavigation = output.files.length > 0;
     // Filter options.
-    let filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_origin', 'f_released'];
+    const filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_origin', 'f_released'];
 
     output.founddeleted = false;
     output.files.forEach(function(file) {
@@ -47,9 +47,9 @@ export const getOutputValues = (init) => {
         }
     });
 
-    let chosenfilterobject = UserPreference.getFilter();
-    let chosenfilter = chosenfilterobject.filter;
-    let additionalvalue = chosenfilterobject.value;
+    const chosenfilterobject = UserPreference.getFilter();
+    const chosenfilter = chosenfilterobject.filter;
+    const additionalvalue = chosenfilterobject.value;
     filters.forEach(function(filter) {
         output[filter] = false;
         if (filter === chosenfilter) {
@@ -57,7 +57,7 @@ export const getOutputValues = (init) => {
         }
     });
 
-    let filteredFiles = [];
+    const filteredFiles = [];
     if (chosenfilter !== 'f_all') {
         output.init = false;
         output.files.forEach(function(file) {
@@ -104,10 +104,10 @@ export const getOutputValues = (init) => {
         output.files = filteredFiles;
     }
 
-    let search = document.getElementById('local_oer_searchFilecardsInput');
+    const search = document.getElementById('local_oer_searchFilecardsInput');
     if (search) {
-        let searchValue = search.value;
-        let searchOutput = [];
+        const searchValue = search.value;
+        const searchOutput = [];
         if (searchValue !== '') {
             output.files.forEach(function(file) {
                 if (file.title.toLowerCase().includes(searchValue.toLowerCase())) {
@@ -118,8 +118,8 @@ export const getOutputValues = (init) => {
         }
     }
 
-    let sortOptions = ['s_default', 's_title_asc', 's_title_desc', 's_mimetype', 's_released'];
-    let chosensort = UserPreference.getSort();
+    const sortOptions = ['s_default', 's_title_asc', 's_title_desc', 's_mimetype', 's_released'];
+    const chosensort = UserPreference.getSort();
     sortOptions.forEach(function(option) {
         output[option] = false;
         if (option === chosensort) {
@@ -145,7 +145,7 @@ export const getOutputValues = (init) => {
     }
 
     // After sorting and filtering the files, the pagination will be applied.
-    let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
     let selected = localStorage.getItem('local-oer-pagination-selected-' + courseid);
     let page = parseInt(localStorage.getItem('local-oer-pagination-current-' + courseid), 10);
     if (isNaN(page)) {
@@ -153,20 +153,20 @@ export const getOutputValues = (init) => {
         localStorage.setItem('local-oer-pagination-current-' + courseid, "1");
     }
     // Now it gets weird. Reset the page to 1 if oldfiles differ from the current amount of files.
-    let oldfiles = parseInt(localStorage.getItem('local-oer-pagination-filecount-' + courseid), 10);
+    const oldfiles = parseInt(localStorage.getItem('local-oer-pagination-filecount-' + courseid), 10);
     localStorage.setItem('local-oer-pagination-filecount-' + courseid, output.files.length.toString());
     if (!isNaN(oldfiles) && oldfiles !== output.files.length && page !== 1) {
         page = 1;
         localStorage.setItem('local-oer-pagination-current-' + courseid, "1");
     }
-    let shownFiles = [];
+    const shownFiles = [];
     if (selected !== "all") {
         if (selected === null) {
             selected = "8";
         }
-        let amount = parseInt(selected, 10);
-        let firstelement = (page - 1) * amount;
-        let lastelement = (page * amount) - 1;
+        const amount = parseInt(selected, 10);
+        const firstelement = (page - 1) * amount;
+        const lastelement = (page * amount) - 1;
         output.files.forEach(function(file, index) {
             if (index >= firstelement && index <= lastelement) {
                 shownFiles.push(file);

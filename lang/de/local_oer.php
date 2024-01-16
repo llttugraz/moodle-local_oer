@@ -362,7 +362,8 @@ $string['prefresettext'] = 'Felder, welche in Voreinstellungen gesetzt sind, zur
 $string['prefresetbtn'] = 'Zurücksetzen';
 $string['addpersonbtn'] = 'Person hinzufügen';
 $string['amount'] = 'Elemente pro Seite';
-$string['filecount'] = 'Elemente werden angezeigt';
+$string['filecount'] = 'Elemente sind verfügbar';
+$string['filecount_info'] = 'Die Anzahl der verfügbaren Elemente hängt von den Filtereinstellungen ab';
 $string['uploadignoreerror'] = 'Zur Freigabe markieren und Ignorieren können nicht ' .
         'gleichzeitig eingeschaltet sein!';
 $string['requiredfields'] = 'Notwendige Felder';

@@ -78,8 +78,8 @@ export const setFilter = (value, filtervalue) => {
  * @returns {{filter: string, value: string}}
  */
 export const getFilter = () => {
-    let filter = getValue('local-oer-filter-' + getCourseid(), 'f_all');
-    let filtervalue = getValue('local-oer-filtervalue-' + getCourseid(), undefined);
+    const filter = getValue('local-oer-filter-' + getCourseid(), 'f_all');
+    const filtervalue = getValue('local-oer-filtervalue-' + getCourseid(), undefined);
     return {filter: filter, value: filtervalue};
 };
 

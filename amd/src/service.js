@@ -29,7 +29,7 @@ import * as Ajax from 'core/ajax';
  * @returns {*}
  */
 export const loadFiles = () => {
-    let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
     return Ajax.call([
         {
             methodname: 'local_oer_get_files',
@@ -45,7 +45,7 @@ export const loadFiles = () => {
  * @returns {*}
  */
 export const loadFile = (identifier) => {
-    let courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
+    const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
     return Ajax.call([
         {
             methodname: 'local_oer_get_file',

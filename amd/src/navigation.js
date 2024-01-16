@@ -29,7 +29,7 @@ import * as Str from 'core/str';
  * Add listener for layout menu.
  */
 export const initLayoutListener = () => {
-    var element = document.getElementById("local_oer-select-layout");
+    const element = document.getElementById("local_oer-select-layout");
     if (element === null) {
         return;
     }
@@ -45,7 +45,7 @@ export const initLayoutListener = () => {
  * Add listener for sort menu.
  */
 export const initSortListener = () => {
-    var element = document.getElementById("local_oer-sort-files");
+    const element = document.getElementById("local_oer-sort-files");
     if (element === null) {
         return;
     }
@@ -61,7 +61,7 @@ export const initSortListener = () => {
  * Add listener for filter menu.
  */
 export const initGroupingListener = () => {
-    var element = document.getElementById("local_oer-select-grouping");
+    const element = document.getElementById("local_oer-select-grouping");
     if (element === null) {
         return;
     }
@@ -81,14 +81,14 @@ export const initGroupingListener = () => {
  * Add listener for courseinfo button.
  */
 export const initCourseinfoListener = () => {
-    var element = document.getElementById("local_oer_courseinfo_button");
+    const element = document.getElementById("local_oer_courseinfo_button");
     if (element === null) {
         return;
     }
 
     element.addEventListener("click", function(action) {
         action.preventDefault();
-        let title = Str.get_string('courseinfobutton', 'local_oer');
+        const title = Str.get_string('courseinfobutton', 'local_oer');
         title.done(function(localizedTitle) {
             Output.showForm('CourseinfoForm', localizedTitle, {});
         });
@@ -99,14 +99,14 @@ export const initCourseinfoListener = () => {
  * Add listener for preference button.
  */
 export const initPreferenceListener = () => {
-    var element = document.getElementById("local_oer_preference_button");
+    const element = document.getElementById("local_oer_preference_button");
     if (element === null) {
         return;
     }
 
     element.addEventListener("click", function(action) {
         action.preventDefault();
-        let title = Str.get_string('preferencebutton', 'local_oer');
+        const title = Str.get_string('preferencebutton', 'local_oer');
         title.done(function(localizedTitle) {
             Output.showForm('PreferenceForm', localizedTitle, {});
         });
@@ -117,11 +117,11 @@ export const initPreferenceListener = () => {
  * Add listener for text search field.
  */
 export const initSearchListener = () => {
-    let searchInput = document.getElementById('local_oer_searchFilecardsInput');
+    const searchInput = document.getElementById('local_oer_searchFilecardsInput');
     if (searchInput === null) {
         return;
     }
-    let searchFiles = debounce(function() {
+    const searchFiles = debounce(function() {
         Output.showFiles();
     }, 500, false);
 
@@ -146,15 +146,15 @@ export const initSearchListener = () => {
 const debounce = (func, wait, immediate) => {
     let timeout;
     return function() {
-        let context = this;
-        let args = arguments;
-        let later = function() {
+        const context = this;
+        const args = arguments;
+        const later = function() {
             timeout = null;
             if (!immediate) {
                 func.apply(context, args);
             }
         };
-        let callNow = immediate && !timeout;
+        const callNow = immediate && !timeout;
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
         if (callNow) {
