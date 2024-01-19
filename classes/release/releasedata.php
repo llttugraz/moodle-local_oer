@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_oer\release;
+
 use local_oer\helper\license;
 use local_oer\modules\element;
 use local_oer\helper\formhelper;
@@ -59,23 +61,23 @@ abstract class releasedata {
     /**
      * Course context of the current element.
      *
-     * @var context_course
+     * @var \context_course
      */
-    protected context_course $context;
+    protected \context_course $context;
 
     /**
      * Constructor. Prepares the default release data. Fields can be overwritten or extended by derived classes.
      *
      * @param int $courseid Moodle courseid
      * @param element $element Datastructure element
-     * @param stdClass $elementinfo Record of local_oer_snapshot table
-     * @throws coding_exception
-     * @throws dml_exception
+     * @param \stdClass $elementinfo Record of local_oer_snapshot table
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
         $this->contexts = formhelper::lom_context_list(false);
         $this->resourcetypes = formhelper::lom_resource_types(false);
-        $this->coursecontext = \context_course::instance($courseid);
+        $this->context = \context_course::instance($courseid);
 
         $this->metadata = [
                 'title' => $elementinfo->title,
@@ -97,8 +99,8 @@ abstract class releasedata {
             $additionaldata = json_decode($elementinfo->additionaldata);
             foreach ($additionaldata as $key => $value) {
                 // Do not overwrite existing data.
-                if (!isset($metadata[$key])) {
-                    $metadata[$key] = $value;
+                if (!isset($this->metadata[$key])) {
+                    $this->metadata[$key] = $value;
                 }
             }
         }
@@ -116,11 +118,11 @@ abstract class releasedata {
     /**
      * Prepare the license for the release.
      *
-     * @param stdClass $elementinfo
+     * @param \stdClass $elementinfo
      * @return array
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    protected function prepare_license(stdClass $elementinfo): array {
+    protected function prepare_license(\stdClass $elementinfo): array {
         $licenseobject = license::get_license_by_shortname($elementinfo->license);
         $license = $elementinfo->license;
         if (get_config('local_oer', 'uselicensereplacement') == 1) {
@@ -151,8 +153,8 @@ abstract class releasedata {
      *
      * @param string|null $fileinfo
      * @return array
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     private function prepare_classification_fields(?string $fileinfo): array {
         if (is_null($fileinfo)) {

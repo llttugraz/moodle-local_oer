@@ -28,7 +28,7 @@ namespace local_oer\release;
 use local_oer\modules\element;
 use local_oer\identifier;
 
-class filedata extends \releasedata {
+class filedata extends releasedata {
     public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
         parent::__construct($courseid, $element, $elementinfo);
         global $CFG;

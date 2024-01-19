@@ -145,25 +145,36 @@ class get_file_test extends \advanced_testcase {
         $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['deleted']));
         $this->assertEquals(PARAM_BOOL, $returnvalue->keys['file']->keys['deleted']->type);
 
-        $this->assertArrayHasKey('modules', $returnvalue->keys['file']->keys);
-        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['modules']));
-        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['modules']->content));
-        $this->assertArrayHasKey('moduleurl', $returnvalue->keys['file']->keys['modules']->content->keys);
-        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['modules']->content->keys['moduleurl']));
-        $this->assertEquals(PARAM_URL, $returnvalue->keys['file']->keys['modules']->content->keys['moduleurl']->type);
-        $this->assertArrayHasKey('modulename', $returnvalue->keys['file']->keys['modules']->content->keys);
-        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['modules']->content->keys['modulename']));
-        $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['modules']->content->keys['modulename']->type);
-
-        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['sections']));
-        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['sections']->content));
-        $this->assertArrayHasKey('sectionnum', $returnvalue->keys['file']->keys['sections']->content->keys);
-        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['sections']->content->keys['sectionnum']));
-        $this->assertEquals(PARAM_INT, $returnvalue->keys['file']->keys['sections']->content->keys['sectionnum']->type);
-        $this->assertArrayHasKey('sectionname', $returnvalue->keys['file']->keys['sections']->content->keys);
+        // Update 2024-01-17 Modules and sections have been removed due to the subplugin structure.
+        // A more general approach has been implemented which result in the information key and subkeys.
+        $this->assertArrayHasKey('information', $returnvalue->keys['file']->keys);
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['information']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['file']->keys['information']->content));
+        $this->assertArrayHasKey('area', $returnvalue->keys['file']->keys['information']->content->keys);
+        $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['information']->content->keys['area']));
+        $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['information']->content->keys['area']->type);
+        $this->assertArrayHasKey('fields', $returnvalue->keys['file']->keys['information']->content->keys);
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']));
+        $this->assertEquals($this->single,
+                get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content));
+        $this->assertArrayHasKey('infoname',
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys);
         $this->assertEquals($this->value,
-                get_class($returnvalue->keys['file']->keys['sections']->content->keys['sectionname']));
-        $this->assertEquals(PARAM_TEXT, $returnvalue->keys['file']->keys['sections']->content->keys['sectionname']->type);
+                get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infoname']));
+        $this->assertEquals(PARAM_TEXT,
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infoname']->type);
+        $this->assertArrayHasKey('infourl',
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys);
+        $this->assertEquals($this->value,
+                get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infourl']));
+        $this->assertEquals(PARAM_URL,
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infourl']->type);
+        $this->assertArrayHasKey('infohasurl',
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys);
+        $this->assertEquals($this->value,
+                get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infohasurl']));
+        $this->assertEquals(PARAM_BOOL,
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infohasurl']->type);
 
         $this->assertArrayHasKey('requirementsmet', $returnvalue->keys['file']->keys);
         $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['requirementsmet']));

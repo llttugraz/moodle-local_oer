@@ -109,7 +109,7 @@ class testcourse {
         $element->set_license($file->get_license());
         $element->set_mimetype($file->get_mimetype());
         $element->set_filesize($file->get_filesize());
-        $element->set_origin('mod_resource');
+        $element->set_origin('mod_resource', 'pluginname', 'mod_resource');
         $element->set_source(filehelper::get_file_url($file, true));
         return $element;
     }
@@ -256,7 +256,7 @@ class testcourse {
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function generate_file(string $filename = '', ?int $draftid = null, string $content = '') {
+    public function generate_file(string $filename = '', ?int $draftid = null, string $content = ''): array {
         global $USER;
         if ($filename == '') {
             $filename = 'Testfile' . rand(1000000, 1000000000);

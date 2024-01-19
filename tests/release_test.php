@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\metadata\coursetofile;
+use local_oer\release\filedata;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -130,8 +131,11 @@ class release_test extends \advanced_testcase {
         $keys = array_keys($snapshots);
         $this->assertEquals($identifier, reset($keys));
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        // 2024-01-19 Update in snapshot table.
+        // The field contenthash has been replaced with the field identifier, also a new field source has been introduced.
+        // Hence, there are now 18 fields in the table.
         $expectedcounts = [
-                'general' => 17,
+                'general' => 18,
                 'persons' => 2,
                 'tags' => 0,
                 'courses' => 1,
@@ -159,7 +163,7 @@ class release_test extends \advanced_testcase {
         $license = $metadata['license'];
         $this->assertEquals('replacedtextintest', $license['shortname']);
 
-        // Test multiple course metadata in same moodle course.
+        // Test multiple course metadata in the same moodle course.
         $courseinfo = new \stdClass();
         $courseinfo->courseid = $course->id;
         $courseinfo->coursecode = 'ADD1COURSE';
@@ -208,10 +212,11 @@ class release_test extends \advanced_testcase {
                 'semester' => 'WS',
                 'hoursperunit' => 10,
                 'data' => 5,
-                'persons' => 'Conflict', // This conflicts with existing array, should not do anything.
+                'persons' => 'Conflict', // This conflicts with existing array should not do anything.
         ];
         $modifiedsnapshot->additionaldata = json_encode($additionaldata);
         $DB->update_record('local_oer_snapshot', $modifiedsnapshot);
+        $snapshots = $snapshot->get_latest_course_snapshot(); // Update snapshots to contain additional data.
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['general'] = $expectedcounts['general'] + 3; // Three new fields have been added.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -245,7 +250,7 @@ class release_test extends \advanced_testcase {
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
-        $expectedcounts['general'] = 17; // New release should not have injected additional fields.
+        $expectedcounts['general'] = 18; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 1;
         $expectedcounts['course'] = [11]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -257,9 +262,9 @@ class release_test extends \advanced_testcase {
         $snapshot->create_snapshot_of_course_files();
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
-        $expectedcounts['general'] = 17; // New release should not have injected additional fields.
+        $expectedcounts['general'] = 18; // The new release should not have injected additional fields.
         $expectedcounts['courses'] = 2;
-        $expectedcounts['course'] = [10, true, 1]; // Moodle course now has additional customfield.
+        $expectedcounts['course'] = [10, true, 1]; // Moodle course now has additional custom field.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
         $moodlecourse = null;
@@ -401,28 +406,54 @@ class release_test extends \advanced_testcase {
     }
 
     /**
+     * TODO: method has been moved from release to releasedata class, move test to testclass for new filedata class.
+     *
      * The base plugin does not add any classification data by itself. There is a subplugin type that can be implemented to add
      * this kind of information to the metadata. So this test only focuses on the base plugin and the expected result without
      * additional classification plugins.
      *
      * To test if the data of any classification plugin is processed correctly, the subplugin has to implement a test for it.
      *
+     * @covers ::prepare_classification_fields
+     *
      * @return void
      * @throws \ReflectionException
-     * @covers ::prepare_classification_fields
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
      */
     public function test_prepare_classification_fields() {
         $this->resetAfterTest();
-        $course = $this->getDataGenerator()->create_course();
-        $release = new release($course->id);
-        $prepareclassification = new \ReflectionMethod($release, 'prepare_classification_fields');
+        $this->setAdminUser();
+        global $USER;
+        $helper = new testcourse();
+        $course = $helper->generate_testcourse($this->getDataGenerator());
+        $file = $helper->generate_file();
+        $element = $helper->get_element_for_file($file[1]);
+        $elementinfo = new \stdClass();
+        $elementinfo->title = $file[1]->get_filename();
+        $elementinfo->license = $file[1]->get_license();
+        $elementinfo->context = 1;
+        $elementinfo->resourcetype = 2;
+        $elementinfo->language = 'de';
+        $elementinfo->persons = '{"persons": [{"role": "author", "firstname": "Christian", "lastname": "Ortner"}]}';
+        $elementinfo->timecreated = time();
+        $elementinfo->timemodified = time();
+        $elementinfo->usermodified = $USER->id;
+        $elementinfo->classification = null;
+        $elementinfo->coursemetadata = null;
+        $elementinfo->additionaldata = null;
+        $elementinfo->id = $file[1]->get_id();
+        $filedata = new filedata($course->id, $element, $elementinfo);
+        $prepareclassification = new \ReflectionMethod($filedata, 'prepare_classification_fields');
         $prepareclassification->setAccessible(true);
         // The default case for the classification field data in snapshot table is 'null'.
-        $this->assertIsArray($prepareclassification->invoke($release, null));
-        $this->assertEmpty($prepareclassification->invoke($release, null));
+        $this->assertIsArray($prepareclassification->invoke($filedata, null));
+        $this->assertEmpty($prepareclassification->invoke($filedata, null));
         // Also when it is an empty string, an empty array should be returned.
-        $this->assertIsArray($prepareclassification->invoke($release, ''));
-        $this->assertEmpty($prepareclassification->invoke($release, ''));
+        $this->assertIsArray($prepareclassification->invoke($filedata, ''));
+        $this->assertEmpty($prepareclassification->invoke($filedata, ''));
         // As there exist no subplugin to run the next lines of code in the base plugin, this test remains incomplete.
     }
 }

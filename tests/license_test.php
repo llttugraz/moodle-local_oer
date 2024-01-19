@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\helper\license;
+use local_oer\plugininfo\oermod;
 
 /**
  * Class license_test
@@ -90,12 +91,19 @@ class license_test extends \advanced_testcase {
      */
     public function test_get_license_select_data() {
         $this->resetAfterTest();
-        $list = license::get_licenses_select_data(false);
+        global $CFG;
+        require_once($CFG->libdir . '/licenselib.php');
+        $licences = \license_manager::get_active_licenses_as_array();
+        $supported = [];
+        foreach ($licences as $key => $licence) {
+            $supported[] = $key;
+        }
+        $list = license::get_licenses_select_data(false, $supported);
         $this->assertCount(9, $list, 'Test with the moodle default licenses');
         $this->assertArrayHasKey('cc-4.0', $list, '2023-11-02 Updated because of license change');
         $this->assertArrayHasKey('public', $list);
         $this->assertArrayHasKey('unknown', $list);
-        $list = license::get_licenses_select_data(true);
+        $list = license::get_licenses_select_data(true, $supported);
         $this->assertCount(10, $list, 'Test with the moodle default licenses');
         $this->assertArrayHasKey('nopref', $list);
         $this->assertArrayHasKey('cc-nc-4.0', $list, '2023-11-02 Updated because of license change');
