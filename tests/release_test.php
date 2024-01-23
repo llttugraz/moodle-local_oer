@@ -414,7 +414,7 @@ class release_test extends \advanced_testcase {
      *
      * To test if the data of any classification plugin is processed correctly, the subplugin has to implement a test for it.
      *
-     * @covers ::prepare_classification_fields
+     * @covers \local_oer\release\releasedata::prepare_classification_fields
      *
      * @return void
      * @throws \ReflectionException
