@@ -22,7 +22,7 @@ Feature: The OER plugin is linked and reachable from inside a course
     And the following "system role assigns" exist:
       | user     | course               | role    |
       | manager1 | Acceptance test site | manager |
-    
+
   Scenario: A teacher can see the OER link in course menu.
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
