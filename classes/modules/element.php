@@ -403,7 +403,7 @@ class element {
         unset($metadata->title);
         unset($metadata->license);
         $this->storedmetadata = $metadata;
-        [, $releasable,] = requirements::metadata_fulfills_all_requirements($this);
+        [, $releasable] = requirements::metadata_fulfills_all_requirements($this);
         $metadata->requirementsmet = $releasable;
         $this->storedmetadata = $metadata;
     }

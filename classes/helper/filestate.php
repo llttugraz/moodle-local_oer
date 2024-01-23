@@ -139,7 +139,7 @@ class filestate {
 
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            [, $course,] = get_context_info_array($contextid);
+            [, $course] = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id' => $course->id,
                     'name' => format_string($course->fullname),

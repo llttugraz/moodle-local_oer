@@ -45,7 +45,7 @@ class behat_local_oer extends behat_base {
         switch (strtolower($type)) {
             case 'main page':
                 $courseid = $this->get_course_id($identifier);
-                return new moodle_url('/local/oer/views/main.php', ['id' => $courseid,]);
+                return new moodle_url('/local/oer/views/main.php', ['id' => $courseid]);
             default:
                 throw new Exception("Unrecognised page type '{$type}'");
         }

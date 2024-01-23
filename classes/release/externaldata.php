@@ -31,6 +31,8 @@ class externaldata extends \releasedata {
     public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
         parent::__construct($courseid, $element, $elementinfo);
 
-        // TODO
+        // TODO: define metadata for general case of external elements.
+        // Following line is a placeholder for codechecker.
+        $this->metadata['source'] = $element->get_source();
     }
 }

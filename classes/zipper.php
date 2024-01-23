@@ -186,7 +186,7 @@ class zipper {
      * @throws \moodle_exception
      */
     public function download_zip_file(int $courseid): void {
-        [$packages,] = $this->separate_files_to_packages($courseid, true);
+        [$packages] = $this->separate_files_to_packages($courseid, true);
         $file = $this->compress_file_package($courseid, $packages[0]);
         if (is_null($file)) {
             throw new \Exception("Failed to zip elements for course $courseid");
