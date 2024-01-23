@@ -84,6 +84,8 @@ class oermod extends plugininfo {
     }
 
     /**
+     * Return a language string of the writable fields the subplugin writes back to its source.
+     *
      * @param element $element
      * @return ?string
      * @throws \coding_exception

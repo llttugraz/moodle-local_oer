@@ -38,10 +38,11 @@ class requirements {
      * Test for the needed requirements of the metadata.
      * Some requirements are fixed (title, license, persons).
      * All other requirements can be set in the plugin settings.
-     * Also the classification subplugins can be set as required.
+     * Also, the classification subplugins can be set as required.
      *
      * @param element $element
      * @return array
+     * @throws \coding_exception
      * @throws \dml_exception
      */
     public static function metadata_fulfills_all_requirements(element $element): array {
@@ -154,6 +155,8 @@ class requirements {
     }
 
     /**
+     * Set the release state to 0, so the element is neither marked for release, nor ignored.
+     *
      * @param \stdClass $record Record of local_oer_elements table.
      * @param array $courses List of courses where releasestate has been resetted.
      * @return void

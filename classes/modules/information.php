@@ -82,6 +82,10 @@ class information {
     }
 
     /**
+     * Set the name of an element.
+     *
+     * The name is shown to the users in frontend, it will also be added as name/title to the release data.
+     *
      * @param string $name Name of the element.
      * @return void
      */

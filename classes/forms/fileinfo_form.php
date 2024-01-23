@@ -181,8 +181,10 @@ class fileinfo_form extends \moodleform {
      *
      * @param \MoodleQuickForm $mform
      * @param bool $addnopref True when an additional nopref field should be added to select fields.
+     * @param array $supportedlicences A list of licenses supported for this element.
      * @return void
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref, array $supportedlicences) {
         $reqfields = static::get_required_fields();

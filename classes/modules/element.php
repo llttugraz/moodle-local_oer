@@ -158,6 +158,8 @@ class element {
     private array $storedfiles;
 
     /**
+     * Constructor for element.
+     *
      * @param string $creator namespace/classname of module class in subplugin.
      * @param int $type OERTYPE of this element, only defined types can be used.
      * @throws \coding_exception

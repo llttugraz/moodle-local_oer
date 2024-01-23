@@ -28,7 +28,21 @@ namespace local_oer\release;
 use local_oer\modules\element;
 use local_oer\identifier;
 
+/**
+ * Metadata definition for moodle file elements.
+ *
+ * This class also adds some fields for backwards compatibility of older versions from this plugin.
+ */
 class filedata extends releasedata {
+    /**
+     *  Constructor, overwrites and extend the fields from the parent definition.
+     *
+     * @param int $courseid
+     * @param element $element
+     * @param \stdClass $elementinfo
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
         parent::__construct($courseid, $element, $elementinfo);
         global $CFG;
