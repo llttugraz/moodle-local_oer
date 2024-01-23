@@ -33,13 +33,13 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 "area": "mod_resource",
                 "fields": [
                     {
-                        "infourl": "example"
-                        "infoname": https://example.com
+                        "infourl": "example",
+                        "infoname": "https://example.com",
                         "infohasurl": true
                     }
                 ]
             }
-        ],
+        ]
     }
   }}
 
@@ -59,6 +59,8 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
         </li>
     {{/information}}
     {{^information}}
-        {{#str}} noinfo, local_oer {{/str}}
+        <li class="list-group-item border-0 p-0">
+            {{#str}} noinfo, local_oer {{/str}}
+        </li>
     {{/information}}
 </ul>
