@@ -120,9 +120,10 @@ class module implements \local_oer\modules\module {
     /**
      * Set element to release.
      *
+     * @param element $element
      * @return bool
      */
-    public function set_element_to_release(): bool {
+    public function set_element_to_release(\local_oer\modules\element $element): bool {
         return true; // Nothing special to do here.
     }
 }

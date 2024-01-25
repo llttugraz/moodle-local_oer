@@ -31,6 +31,7 @@ use local_oer\metadata\courseinfo;
 use local_oer\metadata\coursetofile;
 use local_oer\modules\element;
 use local_oer\plugininfo\oercourseinfo;
+use local_oer\plugininfo\oermod;
 
 /**
  * Class snapshot
@@ -175,6 +176,9 @@ class snapshot {
                 'timecreated DESC', '*', 0, 1);
         if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);
+            // When a snapshot is created, this element is released and available through webservice.
+            // So at this point it is also necessary to call the set_to_release method in subplugins.
+            oermod::set_element_to_release($snapshot->courseid, $element);
         }
     }
 

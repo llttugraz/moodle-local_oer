@@ -77,7 +77,8 @@ interface module {
      * When an element is released there may be some necessary steps in an external system.
      * Change ownership or make element public accessible or something similar.
      *
+     * @param \local_oer\modules\element $element
      * @return bool
      */
-    public function set_element_to_release(): bool;
+    public function set_element_to_release(\local_oer\modules\element $element): bool;
 }

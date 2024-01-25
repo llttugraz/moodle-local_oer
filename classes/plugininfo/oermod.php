@@ -25,6 +25,7 @@
 
 namespace local_oer\plugininfo;
 
+use local_oer\logger;
 use local_oer\modules\element;
 use local_oer\modules\module;
 
@@ -81,6 +82,26 @@ class oermod extends plugininfo {
     public static function write_external_metadata(element $element): void {
         $module = self::get_module($element);
         $module->write_to_source($element);
+    }
+
+    /**
+     * When a snapshot is created, the element is released.
+     * Some sub-plugins may need to set the elements to be publicly accessible,
+     * or have to do other steps.
+     *
+     * @param int $courseid Moodle course id
+     * @param element $element
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function set_element_to_release(int $courseid, element $element): void {
+        $module = self::get_module($element);
+        $released = $module->set_element_to_release($element);
+        if (!$released) {
+            logger::add($courseid, logger::LOGERROR,
+                    $element->get_identifier() . ' set to release did not work', get_class($module));
+        }
     }
 
     /**
