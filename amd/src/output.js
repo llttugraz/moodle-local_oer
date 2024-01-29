@@ -41,6 +41,7 @@ export const showFiles = (init) => {
     if (oldSearchInput !== null) {
         oldSearchValue = oldSearchInput.value;
     }
+    window.console.log(output);
     Templates.render('local_oer/files', output)
         .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-overview', html, js);
