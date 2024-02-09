@@ -41,7 +41,7 @@ export const getOutputValues = (init) => {
     const filters = ['f_all', 'f_upload', 'f_norelease', 'f_ignore', 'f_noignore', 'f_deleted', 'f_origin', 'f_released'];
 
     output.founddeleted = false;
-    output.files.forEach(function (file) {
+    output.files.forEach(function(file) {
         if (file.deleted === 1) {
             output.founddeleted = true;
         }
@@ -50,7 +50,7 @@ export const getOutputValues = (init) => {
     const chosenfilterobject = UserPreference.getFilter();
     const chosenfilter = chosenfilterobject.filter;
     const additionalvalue = chosenfilterobject.value;
-    filters.forEach(function (filter) {
+    filters.forEach(function(filter) {
         output[filter] = false;
         if (filter === chosenfilter) {
             output[filter] = true;
@@ -68,7 +68,7 @@ export const getOutputValues = (init) => {
         // Origins are counted in the origin property.
     };
     // TODO: there has to be a better way to calculate this?
-    output.files.forEach(function (file) {
+    output.files.forEach(function(file) {
         if (file.upload === true) {
             countelements.f_upload++;
         }
@@ -87,10 +87,10 @@ export const getOutputValues = (init) => {
         if (file.deleted === true) {
             countelements.f_deleted++;
         }
-        file.origins.forEach(function (origin) {
-            output.origin.forEach(function (globalorigin, key) {
+        file.origins.forEach(function(origin) {
+            output.origin.forEach(function(globalorigin, key) {
                 if (globalorigin.origin === origin.origin) {
-                    if (typeof output.origin[key]["count"] !== "undefined") {
+                    if (typeof output.origin[key].count !== "undefined") {
                         output.origin[key].count++;
                     } else {
                         output.origin[key].count = 1;
@@ -104,7 +104,7 @@ export const getOutputValues = (init) => {
     const filteredFiles = [];
     if (chosenfilter !== 'f_all') {
         output.init = false;
-        output.files.forEach(function (file) {
+        output.files.forEach(function(file) {
             switch (chosenfilter) {
                 case 'f_upload':
                     if (file.upload === true) {
@@ -137,7 +137,7 @@ export const getOutputValues = (init) => {
                     }
                     break;
                 case 'f_origin':
-                    file.origins.forEach(function (origin) {
+                    file.origins.forEach(function(origin) {
                         if (origin.origin === additionalvalue) {
                             filteredFiles.push(file);
                         }
@@ -153,7 +153,7 @@ export const getOutputValues = (init) => {
         const searchValue = search.value;
         const searchOutput = [];
         if (searchValue !== '') {
-            output.files.forEach(function (file) {
+            output.files.forEach(function(file) {
                 if (file.title.toLowerCase().includes(searchValue.toLowerCase())) {
                     searchOutput.push(file);
                 }
@@ -164,7 +164,7 @@ export const getOutputValues = (init) => {
 
     const sortOptions = ['s_default', 's_title_asc', 's_title_desc', 's_mimetype', 's_released'];
     const chosensort = UserPreference.getSort();
-    sortOptions.forEach(function (option) {
+    sortOptions.forEach(function(option) {
         output[option] = false;
         if (option === chosensort) {
             output[option] = true;
@@ -211,7 +211,7 @@ export const getOutputValues = (init) => {
         const amount = parseInt(selected, 10);
         const firstelement = (page - 1) * amount;
         const lastelement = (page * amount) - 1;
-        output.files.forEach(function (file, index) {
+        output.files.forEach(function(file, index) {
             if (index >= firstelement && index <= lastelement) {
                 shownFiles.push(file);
             }
@@ -231,7 +231,7 @@ export const getOutputValues = (init) => {
     }
 
     if (chosenfilter === 'f_origin') {
-        output.origin.forEach(function (origin) {
+        output.origin.forEach(function(origin) {
             if (additionalvalue === origin.origin) {
                 output.oname = origin.originname;
             }

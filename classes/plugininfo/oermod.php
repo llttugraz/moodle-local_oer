@@ -141,7 +141,7 @@ class oermod extends plugininfo {
     }
 
     /**
-     * Return a list of supported licences for this object.
+     * Return a list of supported licences for this element.
      *
      * @param element $element
      * @return array
@@ -150,5 +150,17 @@ class oermod extends plugininfo {
     public static function get_supported_licences(element $element): array {
         $module = self::get_module($element);
         return $module->supported_licences();
+    }
+
+    /**
+     * Return a list of supported roles for this element.
+     *
+     * @param string $subplugin Name of the subplugin, created the element.
+     * @return array
+     * @throws \coding_exception
+     */
+    public static function get_supported_roles(string $subplugin): array {
+        $module = new $subplugin();
+        return $module->supported_roles();
     }
 }

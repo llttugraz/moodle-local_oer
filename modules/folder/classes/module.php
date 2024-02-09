@@ -119,6 +119,18 @@ class module implements \local_oer\modules\module {
     }
 
     /**
+     * Return supported roles.
+     *
+     * @return array[]
+     */
+    public function supported_roles(): array {
+        return [
+                ['Author', 'author', 'local_oer'],
+                ['Publisher', 'publisher', 'local_oer'],
+        ];
+    }
+
+    /**
      * Set element to release.
      *
      * @param element $element

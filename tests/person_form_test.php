@@ -43,7 +43,7 @@ class person_form_test extends \advanced_testcase {
      */
     public function test_validation() {
         $this->resetAfterTest();
-        $mform = new person_form();
+        $mform = new person_form(null, ['creator' => 'preference']);
         $result = $mform->validation([], []);
         $this->assertEmpty($result);
     }

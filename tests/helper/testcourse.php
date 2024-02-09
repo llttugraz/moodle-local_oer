@@ -130,7 +130,7 @@ class testcourse {
         $metadata->context = 1;
         $metadata->license = 'cc-4.0'; // Updated 2023-11-02 due to Moodle licence change.
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}, ' .
-                '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}';
+                '{"role":"publisher","lastname":"Other","firstname":"Name"}]}';
         $metadata->releasestate = 1;
         $this->update_db($metadata);
         return $file->get_filesize();

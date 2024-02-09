@@ -74,6 +74,18 @@ interface module {
     public function supported_licences(): array;
 
     /**
+     * Return an array of roles the sub-plugin supports.
+     * When adding a person to the metadata, a role has to be selected.
+     * Not for every resource are the same roles useful.
+     *
+     * Array contains the role shortname and the name and component of a language string.
+     * [shortname, language string, component]
+     *
+     * @return array
+     */
+    public function supported_roles(): array;
+
+    /**
      * When an element is released there may be some necessary steps in an external system.
      * Change ownership or make element public accessible or something similar.
      *

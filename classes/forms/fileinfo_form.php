@@ -55,6 +55,7 @@ class fileinfo_form extends \moodleform {
         $element = filelist::get_single_file($course['courseid'], $course['identifier']);
         $metadata = $element->get_stored_metadata();
         $alreadystored = $element->already_stored();
+        $roles = oermod::get_supported_roles($element->get_subplugin());
 
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
@@ -89,10 +90,10 @@ class fileinfo_form extends \moodleform {
         $data['identifier'] = $course['identifier'];
         $data['title'] = $element->get_title();
         $data['description'] = $metadata->description ?? '';
-        // For some fields there are three posibilities.
+        // For some fields, there are three possibilities.
         // Either default defined for form is used.
         // Or it has stored already then the fromdb value is used.
-        // Or it has not been stored and a preference value is present for that field.
+        // Or it has not been stored, and a preference value is present for that field.
         if ($alreadystored) {
             $data['context'] = $metadata->context;
         } else if ($preference && !is_null($preference->context)) {
@@ -105,9 +106,30 @@ class fileinfo_form extends \moodleform {
         } else {
             $data['license'] = $element->get_license();
         }
+
+        // In preferences, all roles from all activated sub-plugins can be prepared.
+        // Only add persons with roles that are usable for the current used sub-plugin.
+        $persons = [];
+        if ($preference && !is_null($preference->persons)) {
+            $prefpersons = json_decode($preference->persons);
+            foreach ($prefpersons->persons as $person) {
+                $found = false;
+                foreach ($roles as $role) {
+                    if ($person->role == $role[0]) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $persons[] = $person;
+                }
+            }
+        }
+        $preferencepersons = new \stdClass();
+        $preferencepersons->persons = $persons;
         $data['storedperson'] = $metadata->persons ?? '';
         $data['storedperson'] = !$alreadystored && $preference && !is_null($preference->persons)
-                ? $preference->persons : $data['storedperson'];
+                ? json_encode($preferencepersons) : $data['storedperson'];
         $data['storedtags'] = $metadata->tags ?? '';
         $data['storedtags'] = !$alreadystored && $preference && !is_null($preference->tags)
                 ? $preference->tags : $data['storedtags'];
@@ -160,6 +182,9 @@ class fileinfo_form extends \moodleform {
             $mform->addElement('html', $info);
         }
 
+        $data['creator'] = $element->get_subplugin();
+        $data['personroletypes'] = json_encode($roles);
+
         $mform->disable_form_change_checker();
         $this->set_data($data);
     }
@@ -206,6 +231,12 @@ class fileinfo_form extends \moodleform {
         $mform->addElement('hidden', 'storedperson', '');
         $mform->setType('storedperson', PARAM_TEXT);
         $mform->addElement('static', 'storedperson_tagarea', '', '<div id="local_oer_storedperson_tagarea"></div>');
+        // Update 2024-02-09 Roles are now handled by subplugins, and these fields extend the dynamic behavior of it.
+        // The values for these fields are set in the individual setup of the form for elements and preferences.
+        $mform->addElement('hidden', 'creator', null);
+        $mform->setType('creator', PARAM_TEXT);
+        $mform->addElement('hidden', 'personroletypes', null);
+        $mform->setType('personroletypes', PARAM_TEXT);
 
         global $OUTPUT;
         $prefhtml = $OUTPUT->render_from_template('local_oer/personbutton', []);
@@ -245,9 +276,9 @@ class fileinfo_form extends \moodleform {
 
     /**
      * Set the checkboxes according to the stored state 0, 1 or 2
-     * 0 .. no checkbox selected
-     * 1 .. upload selected
-     * 2 .. ignore selected
+     * 0 ... no checkbox selected
+     * 1 ... upload selected
+     * 2 ... ignore selected
      *
      * @param array $data Formular data to set
      * @param int $state State of upload/ignore 0,1 or 2

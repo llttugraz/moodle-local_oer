@@ -26,6 +26,7 @@
 namespace local_oer\forms;
 
 use local_oer\helper\formhelper;
+use local_oer\plugininfo\oermod;
 
 /**
  * Formular to define all necessary metadata fields.
@@ -35,11 +36,25 @@ class person_form extends \moodleform {
      * Mform definition function, required by moodleform.
      *
      * @return void
+     * @throws \coding_exception
      */
     protected function definition() {
         $mform = $this->_form;
+        $args = $this->_customdata;
+        if ($args['creator'] == 'preference') {
+            $plugins = oermod::get_enabled_plugins();
+            $roles = [];
+            foreach ($plugins as $plugin => $name) {
+                $subplugin = array_merge($roles, oermod::get_supported_roles("oermod_" . $plugin . "\\module"));
+                foreach ($subplugin as $role) {
+                    $roles[$role[0]] = $role;
+                }
+            }
+        } else {
+            $roles = oermod::get_supported_roles($args['creator']);
+        }
 
-        $mform->addElement('select', 'role', get_string('role', 'local_oer'), formhelper::lom_role_types());
+        $mform->addElement('select', 'role', get_string('role', 'local_oer'), formhelper::lom_role_types($roles));
         $mform->setDefault('role', 'Author');
 
         $mform->addElement('text', 'firstname', get_string('firstname'));

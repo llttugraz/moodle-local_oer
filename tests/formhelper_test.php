@@ -113,13 +113,17 @@ class formhelper_test extends \advanced_testcase {
      */
     public function test_lom_roles_types() {
         $this->resetAfterTest();
-        $types = formhelper::lom_role_types(false);
+        $roles = [
+                ['Author', 'author', 'local_oer'],
+                ['Publisher', 'publisher', 'local_oer'],
+        ];
+        $types = formhelper::lom_role_types($roles);
         $this->assertCount(2, $types);
         $this->assertArrayHasKey('Author', $types);
         $this->assertArrayHasKey('Publisher', $types);
         $this->assertEquals(get_string('author', 'local_oer'), $types['Author']);
         $this->assertEquals(get_string('publisher', 'local_oer'), $types['Publisher']);
-        $types = formhelper::lom_role_types(true);
+        $types = formhelper::lom_role_types($roles, true);
         $this->assertCount(3, $types);
         $this->assertArrayHasKey('Author', $types);
         $this->assertArrayHasKey('Publisher', $types);

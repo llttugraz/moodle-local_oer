@@ -204,7 +204,7 @@ function local_oer_output_fragment_formdata(array $args): string {
  * @return string
  */
 function local_oer_output_fragment_personform(array $args): string {
-    $form = new \local_oer\forms\person_form();
+    $form = new \local_oer\forms\person_form(null, $args);
     return $form->render();
 }
 

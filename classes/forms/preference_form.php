@@ -27,6 +27,7 @@ namespace local_oer\forms;
 
 use local_oer\helper\formhelper;
 use local_oer\plugininfo\oerclassification;
+use local_oer\plugininfo\oermod;
 
 /**
  * Formular to define all necessary metadata fields.
@@ -53,6 +54,18 @@ class preference_form extends \moodleform {
         $data['courseid'] = $course['courseid'];
         $mform->addElement('hidden', 'courseid', null);
         $mform->setType('courseid', PARAM_INT);
+
+        // For preferences, all available roles are shown. Only the roles supported will be added to the elements.
+        $plugins = oermod::get_enabled_plugins();
+        $roles = [];
+        foreach ($plugins as $plugin => $name) {
+            $subplugin = array_merge($roles, oermod::get_supported_roles("oermod_" . $plugin . "\\module"));
+            foreach ($subplugin as $role) {
+                $roles[$role[0]] = $role;
+            }
+        }
+        $data['personroletypes'] = json_encode(array_values($roles));
+        $data['creator'] = 'preference';
 
         if ($entry) {
             if (!is_null($entry->context)) {

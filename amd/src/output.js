@@ -284,8 +284,9 @@ const showPersonForm = (setInvalid) => {
     if (typeof setInvalid === 'undefined') {
         setInvalid = false;
     }
+    const creator = document.querySelector('[name="creator"]').value;
     const context = document.getElementById("local_oer_files_main_area").dataset.context;
-    const form = Fragment.loadFragment('local_oer', 'personform', context, []);
+    const form = Fragment.loadFragment('local_oer', 'personform', context, {'creator': creator});
     form.done(function() {
         let title = Str.get_string('addpersonbtn', 'local_oer');
         title.done(function(localizedTitle) {
@@ -394,29 +395,24 @@ const showPersons = () => {
     if (entries === '') {
         return;
     }
-    let strings = [
-        {
-            key: 'author',
-            component: 'local_oer'
-        },
-        {
-            key: 'publisher',
-            component: 'local_oer',
-        }
-    ];
+    const roles = JSON.parse(document.querySelector('[name="personroletypes"]').value);
+    let strings = [];
+    roles.forEach(function(role) {
+        strings.push({
+            key: role[1],
+            component: role[2],
+        });
+    });
     Str.get_strings(strings).then(function(results) {
         entries = JSON.parse(entries);
         let persons = {persons: []};
         entries.persons.forEach(function(person) {
             let localizedrole = results[0];
-            switch (person.role) {
-                case 'Author':
-                    localizedrole = results[0];
-                    break;
-                case 'Publisher':
-                    localizedrole = results[1];
-                    break;
-            }
+            roles.forEach(function(role, index) {
+                if (role[0] === person.role) {
+                    localizedrole = results[index];
+                }
+            });
 
             persons.persons.push({
                 role: person.role,
