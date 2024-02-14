@@ -25,6 +25,7 @@
 
 namespace local_oer\forms;
 
+use core_course\content_item_readonly_repository_test;
 use local_oer\filelist;
 use local_oer\helper\filestate;
 use local_oer\helper\formhelper;
@@ -112,19 +113,15 @@ class fileinfo_form extends \moodleform {
         $persons = [];
         if ($preference && !is_null($preference->persons)) {
             $prefpersons = json_decode($preference->persons);
-            foreach ($prefpersons->persons as $person) {
-                $found = false;
-                foreach ($roles as $role) {
-                    if ($person->role == $role[0]) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if ($found) {
-                    $persons[] = $person;
-                }
-            }
+            $persons = array_merge($persons, $this->add_people($prefpersons->persons, $roles));
         }
+        // Add people from the element if the element has not been stored already.
+        if (!$alreadystored) {
+            $persons = array_merge($persons, $this->add_people($element->get_people(), $roles));
+        }
+
+        $this->try_to_remove_duplicates($persons);
+
         $preferencepersons = new \stdClass();
         $preferencepersons->persons = $persons;
         $data['storedperson'] = $metadata->persons ?? '';
@@ -187,6 +184,61 @@ class fileinfo_form extends \moodleform {
 
         $mform->disable_form_change_checker();
         $this->set_data($data);
+    }
+
+    /**
+     * Add people to the form from a given source.
+     *
+     * @param array $people
+     * @param array $roles
+     * @return array
+     */
+    private function add_people(array $people, array $roles): array {
+        $persons = [];
+        foreach ($people as $person) {
+            $found = false;
+            foreach ($roles as $role) {
+                if ($person->role == $role[0]) {
+                    $found = true;
+                    break;
+                }
+            }
+            if ($found) {
+                $persons[] = $person;
+            }
+        }
+        return $persons;
+    }
+
+    /**
+     * Basic test to find duplicates.
+     *
+     * Names can be set as first- and lastname, or as full name.
+     * This leads to the assumption that full names also are in the order firstname lastname.
+     *
+     * @param $people
+     * @return void
+     */
+    private function try_to_remove_duplicates(&$people) {
+        foreach ($people as $key => $person) {
+            foreach ($people as $innerkey => $compare) {
+                if ($innerkey == $key) {
+                    continue;
+                }
+                $compare1 = $person->role . ($person->fullname ?? $person->firstname . $person->lastname);
+                $compare2 = $compare->role . ($compare->fullname ?? $compare->firstname . $compare->lastname);
+                if ($compare1 == $compare2) {
+                    // Found a duplicate, remove the full name version if any.
+                    if (isset($person->fullname)) {
+                        unset($people[$key]);
+                    } else if (isset($compare->fullname)) {
+                        unset($people[$innerkey]);
+                    } else {
+                        unset($people[$innerkey]);
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -26,7 +26,6 @@
 namespace local_oer\modules;
 
 use local_oer\helper\requirements;
-use local_oer\requirement_test;
 
 /**
  * Class element
@@ -36,7 +35,8 @@ use local_oer\requirement_test;
  */
 class element {
     /**
-     * Elements with this type are files that are stored inside Moodle where the sha1 contenthash can be used as main identifier.
+     * Elements with this type are files that are stored inside Moodle where the sha1 contenthash can be used as the main
+     * identifier.
      */
     public const OERTYPE_MOODLEFILE = 1;
 
@@ -46,7 +46,7 @@ class element {
     public const OERTYPE_EXTERNAL = 2;
 
     /**
-     * Full namespace and classname of the subplugin creating this element.
+     * Full namespace and classname of the sub-plugin creating this element.
      *
      * Will be set in constructor.
      *
@@ -65,7 +65,7 @@ class element {
 
     /**
      * Title of the element.
-     * Set by module subplugin when creating elements.
+     * Set by module sub-plugin when creating elements.
      *
      * @var string
      */
@@ -88,11 +88,11 @@ class element {
     /**
      * Where does the element come from?
      *
-     * For Moodle plugins just type in the frankenstyle plugin name (e.g. mod_resource). For external sources take the name of the
-     * source (e.g. opencast).
+     * For Moodle plugins, just type in the frankenstyle plugin name (e.g., mod_resource).
+     * For external sources, take the name of the source (e.g., opencast).
      * Also, a language string is stored to show users on the GUI.
      *
-     * As for duplicated elements there can be different origins, this is an array.
+     * As for duplicated elements, there can be different origins; this is an array.
      * [
      *   origin => [identifier, component]
      * ]
@@ -156,6 +156,13 @@ class element {
      * @var \stored_file[]
      */
     private array $storedfiles;
+
+    /**
+     * Array of people associated with this element.
+     *
+     * @var person[]
+     */
+    private array $people = [];
 
     /**
      * Constructor for element.
@@ -277,7 +284,6 @@ class element {
      * Get the origin of this element.
      *
      * @return array
-     * @throws \coding_exception
      */
     public function get_origin(): array {
         return $this->origin;
@@ -471,9 +477,35 @@ class element {
     }
 
     /**
+     * Add a person to the element.
+     *
+     * @param person $person
+     * @return void
+     * @throws \coding_exception
+     */
+    public function add_person(person $person) {
+        $person->get_person_array(); // Validates if person object has set all necessary members.
+        $this->people[] = $person;
+    }
+
+    /**
+     * Return all people added to the element;
+     *
+     * @return array
+     * @throws \coding_exception
+     */
+    public function get_people(): array {
+        $result = [];
+        foreach ($this->people as $person) {
+            $result[] = $person->get_person_array();
+        }
+        return $result;
+    }
+
+    /**
      * Set stored file of the element.
      *
-     * Internally an array is kept as there can be more than one stored
+     * Internally, an array is kept as there can be more than one stored
      * file if the element is used in different locations.
      *
      * @param \stored_file $file
