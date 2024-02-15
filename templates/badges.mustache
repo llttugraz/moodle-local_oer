@@ -46,6 +46,11 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     {{#timeuploadedts}}
         <span class="ml-1 badge badge-success">{{#str}} released, local_oer {{/str}}</span>
     {{/timeuploadedts}}
+    {{^timeuploadedts}}
+        {{#upload}}
+            <span class="ml-1 badge badge-warning">{{#str}} upload, local_oer {{/str}}</span>
+        {{/upload}}
+    {{/timeuploadedts}}
     {{#origins}}
         <span class="ml-1 badge badge-info" data-origin="{{origin}}">{{{originname}}}</span>
     {{/origins}}

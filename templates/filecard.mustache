@@ -75,16 +75,6 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                                 <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} requirementsnotmet, local_oer{{/str}}</small>
                             </li>
                         {{/requirementsmet}}
-                        {{#upload}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small>
-                            </li>
-                        {{/upload}}
-                        {{^upload}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} notmarkedforupload, local_oer{{/str}}</small>
-                            </li>
-                        {{/upload}}
                     </ul>
                 </li>
             </ul>

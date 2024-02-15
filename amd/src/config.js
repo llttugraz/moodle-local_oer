@@ -69,7 +69,7 @@ export const getOutputValues = (init) => {
     };
     // TODO: there has to be a better way to calculate this?
     output.files.forEach(function(file) {
-        if (file.upload === true) {
+        if (file.upload === true && file.timeuploadedts === 0) {
             countelements.f_upload++;
         }
         if (file.upload === false && file.ignore === false) {
@@ -107,7 +107,7 @@ export const getOutputValues = (init) => {
         output.files.forEach(function(file) {
             switch (chosenfilter) {
                 case 'f_upload':
-                    if (file.upload === true) {
+                    if (file.upload === true && file.timeuploadedts === 0) {
                         filteredFiles.push(file);
                     }
                     break;

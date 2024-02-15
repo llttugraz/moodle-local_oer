@@ -187,6 +187,13 @@ const addInputFieldInputListener = (prefix, area) => {
         addStoredTag(prefix, area);
         showTags(prefix + area);
     });
+    document.getElementById('id_' + area).addEventListener('focusout', function() {
+        if (area.length === 0) {
+            return;
+        }
+        addStoredTag(prefix, area);
+        showTags(prefix + area);
+    });
     addRemoveTagListener(prefix + area);
 };
 
