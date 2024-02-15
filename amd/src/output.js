@@ -344,16 +344,32 @@ const showPersonForm = (setInvalid) => {
     });
 };
 
+/**
+ * People to add always have a first- and lastname and role.
+ *
+ * When already a person is defined with the same role and a full name,
+ * first and lastname is added. This variant will be preferred.
+ *
+ * @param {{role: string, firstname: string, lastname: string}} person
+ */
 const addPerson = (person) => {
     let names = document.querySelector('[name="storedperson"]').value;
     if (names !== '') {
         names = JSON.parse(names);
         let found = false;
-        names.persons.forEach(function(storedname) {
+        let update = false;
+        names.persons.forEach(function(storedname, key) {
             if (person.role === storedname.role
                 && person.firstname === storedname.firstname
                 && person.lastname === storedname.lastname) {
                 found = true;
+            }
+            if (person.role === storedname.role
+                && person.firstname + ' ' + person.lastname === storedname.fullname) {
+                found = true;
+                update = true;
+                names.persons[key].firstname = person.firstname;
+                names.persons[key].lastname = person.lastname;
             }
         });
         // If one of the required fields is empty, reload the form.
@@ -362,6 +378,8 @@ const addPerson = (person) => {
             return;
         } else if (!found) {
             names.persons.push(person);
+            document.querySelector('[name="storedperson"]').value = JSON.stringify(names);
+        } else if (update) {
             document.querySelector('[name="storedperson"]').value = JSON.stringify(names);
         }
     } else {
@@ -379,8 +397,9 @@ const removePerson = (person) => {
     const persons = {persons: []};
     entries.persons.forEach(function(storedperson) {
         if (person.role === storedperson.role
-            && person.firstname === storedperson.firstname
-            && person.lastname === storedperson.lastname) {
+            && ((person.firstname === storedperson.firstname
+                    && person.lastname === storedperson.lastname)
+                || person.fullname === storedperson.fullname)) {
             // Skip this person.
         } else {
             persons.persons.push(storedperson);
@@ -413,12 +432,14 @@ const showPersons = () => {
                     localizedrole = results[index];
                 }
             });
-
             persons.persons.push({
                 role: person.role,
                 firstname: person.firstname,
                 lastname: person.lastname,
-                name: decodeURI(localizedrole + ': ' + person.firstname + ' ' + person.lastname)
+                fullname: person.fullname,
+                name: decodeURI(localizedrole + ': ' +
+                    (person.fullname === undefined ?
+                        person.firstname + ' ' + person.lastname : person.fullname))
             });
         });
         renderPersonsTemplate(persons);
