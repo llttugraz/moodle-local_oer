@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/oer/db" VERSION="20231117" COMMENT="XMLDB file for Moodle local/oer"
+<XMLDB PATH="local/oer/db" VERSION="20240222" COMMENT="XMLDB file for Moodle local/oer"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -111,6 +111,7 @@
         <FIELD NAME="coursemetadata" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Metadata of linked courses added as json object."/>
         <FIELD NAME="additionaldata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional metadata from subplugins stored as json object."/>
         <FIELD NAME="releasehash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="SHA256 of metadata to compare if something has changed"/>
+        <FIELD NAME="releasenumber" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of the release"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

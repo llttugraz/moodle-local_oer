@@ -66,7 +66,7 @@ class snapshot_test extends \advanced_testcase {
         $snapshot = new snapshot($course->id);
         $this->assertEmpty($snapshot->get_latest_course_snapshot());
         $helper->set_files_to($course->id, 3, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $result = $snapshot->get_latest_course_snapshot();
         $this->assertCount(3, $result);
     }
@@ -100,15 +100,15 @@ class snapshot_test extends \advanced_testcase {
                 'There should be at least one courseinfo entry for testcourse');
         $this->assertEmpty($DB->get_records('local_oer_snapshot'));
         $snapshot = new snapshot($course->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $this->assertEmpty($DB->get_records('local_oer_snapshot'), 'No files are set for release yet.');
         $helper->set_files_to($course->id, 1, true);
-        $snapshot->create_snapshot_of_course_files();
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(2);
+        $snapshot->create_snapshot_of_course_files(3);
         $this->assertEquals(1, $DB->count_records('local_oer_snapshot'),
                 'Although the release is called 2 times, only one file should be released because nothing changed');
         $helper->set_files_to($course->id, 2, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(4);
         $this->assertEquals(2, $DB->count_records('local_oer_snapshot'), 'Two files have been released.');
     }
 

@@ -61,7 +61,7 @@ class zipper_test extends \advanced_testcase {
         $this->assertEquals(0, $info['general']['packages']);
         $this->assertEquals(0, $info['general']['fullsize']);
         $size = $helper->set_files_to($course->id, 3, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         [$packages, $info] = $zipper->separate_files_to_packages($course->id, true);
         $this->assertEquals(1, count($packages), 'The amount of packages');
         $this->assertEquals(0, $info['general']['packages'], 'Packages start counting at 0, so 0 should be the correct value');
@@ -93,7 +93,7 @@ class zipper_test extends \advanced_testcase {
         $size = $helper->set_files_to($course->id, 1, true);
         $zipper = new zipper();
         $snapshot = new snapshot($course->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         [$packages, $info] = $zipper->separate_files_to_packages($course->id, true);
         $this->assertEquals(1, count($packages), 'The amount of packages, should be 1');
         $zipfile = $zipper->compress_file_package($course->id, reset($packages));

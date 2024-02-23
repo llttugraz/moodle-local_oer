@@ -34,7 +34,7 @@ use local_oer\plugininfo\oerclassification;
  * Datastructures for release metadata.
  *
  * Different sub-plugins will behave a little bit different in the release metadata. Also, the backwards compatibility to older
- * local_oer versions are taken into account.
+ * local_oer versions is taken into account.
  */
 abstract class releasedata {
     /**

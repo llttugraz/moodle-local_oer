@@ -79,28 +79,15 @@ class snapshot {
     }
 
     /**
-     * Load all snapshots of a single file.
-     *
-     * @param string $contenthash File contenthash
-     * @return void
-     * @throws \dml_exception
-     */
-    public function get_file_history($contenthash) {
-        global $DB;
-        $files = $DB->get_records('local_oer_snapshot', ['courseid' => $this->courseid, 'contenthash' => $contenthash],
-                'timecreated DESC');
-        // TODO.
-    }
-
-    /**
      * Create snapshots of all course files that are marked as ready for release.
      *
+     * @param int $releasenumber Number of this release.
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function create_snapshot_of_course_files() {
+    public function create_snapshot_of_course_files(int $releasenumber) {
         $elements = filelist::get_course_files($this->courseid);
         [$courses, $courseinfo] = $this->get_active_courseinfo_metadata();
         if (!$courseinfo) {
@@ -109,7 +96,7 @@ class snapshot {
         }
 
         foreach ($elements as $element) {
-            $this->create_file_snapshot($element, $courseinfo, $courses);
+            $this->create_file_snapshot($element, $courseinfo, $courses, $releasenumber);
         }
     }
 
@@ -123,10 +110,12 @@ class snapshot {
      * @param element $element Datastructure to store all relevant information
      * @param array $courseinfo List of all courses (internal and external) linked to this file
      * @param array $courses Courses from local_oer_courseinfo table for this course
+     * @param int $releasenumber Number of this release.
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function create_file_snapshot(element $element, array $courseinfo, array $courses) {
+    private function create_file_snapshot(element $element, array $courseinfo, array $courses, int $releasenumber) {
         global $DB, $USER;
         if (!$element->already_stored()) {
             // File metadata has not been stored yet or course is not editor, so this element can be skipped.
@@ -168,6 +157,7 @@ class snapshot {
         $snapshot->additionaldata = $this->add_external_metadata();
         $hash = hash('sha256', json_encode($snapshot));
         $snapshot->releasehash = $hash;
+        $snapshot->releasenumber = $release;
         $snapshot->usermodified = $USER->id;
         $snapshot->timemodified = time();
         $snapshot->timecreated = time();
@@ -177,7 +167,7 @@ class snapshot {
         if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);
             // When a snapshot is created, this element is released and available through webservice.
-            // So at this point it is also necessary to call the set_to_release method in subplugins.
+            // So at this point, it is also necessary to call the set_to_release method in sub-plugins.
             oermod::set_element_to_release($snapshot->courseid, $element);
         }
     }

@@ -68,15 +68,15 @@ class release_test extends \advanced_testcase {
         $helper->set_files_to($course->id, 1, true);
         $files = $release->get_released_files();
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $files = $release->get_released_files();
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $helper->set_files_to($course->id, 5, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(2);
         $files = $release->get_released_files();
         $this->assertEquals(5, count($files), 'All five files should be ready to release');
         $helper->set_files_to($course->id, 1, false);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(3);
         $files = $release->get_released_files();
         $this->assertEquals(5, count($files),
                 'One file has been set to non-release, but the files already have been released, so 5 are found');
@@ -125,7 +125,7 @@ class release_test extends \advanced_testcase {
         $releasemetadata->setAccessible(true);
 
         $snapshot = new snapshot($course->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $this->assertCount(1, $snapshots);
         $keys = array_keys($snapshots);
@@ -147,7 +147,7 @@ class release_test extends \advanced_testcase {
         $tags = 'Impressive,UnitTest,Tags';
         $expectedcounts['tags'] = 3;
         $DB->set_field('local_oer_elements', 'tags', $tags, ['courseid' => $course->id, 'identifier' => $identifier]);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -200,7 +200,7 @@ class release_test extends \advanced_testcase {
         $expectedcounts['courses'] = 2;
         $expectedcounts['course'] = [10, 10];
 
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -247,7 +247,7 @@ class release_test extends \advanced_testcase {
         set_config('coursecustomfieldsvisibility', 0, 'local_oer');
         set_config('coursecustomfieldsignored', '', 'local_oer');
         $helper->sync_course_info($course->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['general'] = 18; // New release should not have injected additional fields.
@@ -259,7 +259,7 @@ class release_test extends \advanced_testcase {
         $DB->insert_record('local_oer_courseinfo', $courseinfo);
         $DB->insert_record('local_oer_courseinfo', $courseinfo2);
 
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['general'] = 18; // The new release should not have injected additional fields.
@@ -296,7 +296,7 @@ class release_test extends \advanced_testcase {
         $coursetofile->timecreated = time();
         $coursetofile->timemodified = time();
         $DB->insert_record('local_oer_coursetofile', $coursetofile);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
         $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
         $expectedcounts['courses'] = 3;

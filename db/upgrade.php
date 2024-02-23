@@ -829,6 +829,50 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023111701, 'local', 'oer');
     }
 
+    if ($oldversion < 2024022200) {
+
+        // Define field releasenumber to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('releasenumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'releasehash');
+
+        // Conditionally launch add field releasenumber.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update all existing snapshots to get the releasenumber.
+        $records = $DB->get_records('local_oer_snapshot', null, 'timecreated ASC');
+        $release = 1;
+        $lastdaystart = 0;
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($records as $record) {
+            if ($lastdaystart == 0) {
+                // Init first release.
+                $lastdaystart = strtotime('midnight', $record->timecreated);
+                $lastdayend = strtotime('tomorrow', $record->timecreated);
+            }
+            if ($record->timecreated >= $lastdaystart && $record->timecreated < $lastdayend) {
+                $record->releasenumber = $release;
+                $DB->update_record('local_oer_snapshot', $record);
+            } else if ($record->timecreated >= $lastdayend) {
+                // Next release number.
+                $lastdaystart = strtotime('midnight', $record->timecreated);
+                $lastdayend = strtotime('tomorrow', $record->timecreated);
+                $record->releasenumber = ++$release;
+                $DB->update_record('local_oer_snapshot', $record);
+            } else {
+                // How can it be smaller? The values were sorted by timecreated.
+                echo html_writer::div($record->identifier .
+                        ': "releasenumber" could not be updated, has to be changed manually',
+                        'adminwarning');
+            }
+        }
+        $transaction->allow_commit();
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2024022200, 'local', 'oer');
+    }
+
     return true;
 }
 

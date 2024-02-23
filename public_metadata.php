@@ -38,11 +38,20 @@ if (get_config('local_oer', 'pullservice') != 1) {
     throw new moodle_exception('OER Pull service is deactivated');
 }
 
+$identifier = optional_param('identifier', false, PARAM_TEXT);
+$release = optional_param('release', false, PARAM_INT);
+if ($identifier) {
+    \local_oer\identifier::validate($identifier);
+}
+
 $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
 // Increase application profile when metadata changes.
+// Update 2024-02-22: Metadata has been extended for external elements.
+// Backwards compatible.
 $result = [
-        'applicationprofile' => 'v1.0.0',
+        'applicationprofile' => 'v1.0.1',
 ];
+
 $i = 0;
 $context = context_system::instance();
 global $PAGE;

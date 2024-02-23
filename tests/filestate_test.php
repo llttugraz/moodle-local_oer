@@ -115,7 +115,7 @@ class filestate_test extends \advanced_testcase {
         $sync = new courseinfo_sync();
         $sync->sync_course($course1->id);
         $snapshot = new snapshot($course1->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(3);
         $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
         $this->assertTrue($DB->record_exists('local_oer_snapshot', ['identifier' => $element->get_identifier()]));
