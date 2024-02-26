@@ -89,6 +89,8 @@ class testcourse {
         $metadata->classification = null;
         $metadata->releasestate = 0;
         $metadata->preference = 0;
+        $metadata->type = element::OERTYPE_MOODLEFILE;
+        $metadata->typedata = null;
         $metadata->usermodified = 2;
         $metadata->timemodified = time();
         $metadata->timecreated = time();
@@ -131,6 +133,11 @@ class testcourse {
         $metadata->license = 'cc-4.0'; // Updated 2023-11-02 due to Moodle licence change.
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}, ' .
                 '{"role":"publisher","lastname":"Other","firstname":"Name"}]}';
+        $metadata->typedata = json_encode([
+                'mimetype' => $file->get_mimetype(),
+                'filesize' => $file->get_filesize(),
+                'filecreationtime' => $file->get_timecreated(),
+        ]);
         $metadata->releasestate = 1;
         $this->update_db($metadata);
         return $file->get_filesize();

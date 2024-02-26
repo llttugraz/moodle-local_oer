@@ -25,27 +25,24 @@
 
 namespace local_oer\release;
 
-use local_oer\modules\element;
-
 /**
  * Metadata definition for elements with external origin.
  *
  * The metadata is defined as general as possible to be usable for many different sources.
  */
-class externaldata extends \releasedata {
+class externaldata extends releasedata {
     /**
      * Constructor, overwrites and extend the fields from the parent definition.
      *
-     * @param int $courseid
-     * @param element $element
      * @param \stdClass $elementinfo
      * @throws \coding_exception
      */
-    public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
-        parent::__construct($courseid, $element, $elementinfo);
+    public function __construct(\stdClass $elementinfo) {
+        parent::__construct($elementinfo);
 
-        // TODO: define metadata for general case of external elements.
-        // Following line is a placeholder for codechecker.
-        $this->metadata['source'] = $element->get_source();
+        $typedata = json_decode($elementinfo->typedata);
+        foreach ($typedata as $key => $value) {
+            $this->metadata[$key] = $value;
+        }
     }
 }

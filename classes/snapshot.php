@@ -138,7 +138,7 @@ class snapshot {
         if ($element->get_type() == element::OERTYPE_MOODLEFILE && $decomposed->valuetype == 'contenthash') {
             $coursemetadata = json_encode($this->get_overwritten_courseinfo_metadata($courseinfo, $decomposed->value, $courses));
         } else {
-            $coursemetadata = $courseinfo;
+            $coursemetadata = json_encode($courseinfo);
         }
 
         $snapshot = new \stdClass();
@@ -155,6 +155,8 @@ class snapshot {
         $snapshot->classification = $metadata->classification;
         $snapshot->coursemetadata = $coursemetadata;
         $snapshot->additionaldata = $this->add_external_metadata();
+        $snapshot->type = $element->get_type();
+        $snapshot->typedata = $this->add_type_data($element);
         $hash = hash('sha256', json_encode($snapshot));
         $snapshot->releasehash = $hash;
         $snapshot->releasenumber = $release;
@@ -170,6 +172,32 @@ class snapshot {
             // So at this point, it is also necessary to call the set_to_release method in sub-plugins.
             oermod::set_element_to_release($snapshot->courseid, $element);
         }
+    }
+
+    /**
+     * Prepare the data to be stored in the table field 'typedata'.
+     *
+     * The different subplugin types can have different data added to the metadata.
+     *
+     * @param element $element
+     * @return string
+     * @throws \coding_exception
+     */
+    private function add_type_data(element $element): string {
+        $typedata = [];
+        $typedata['source'] = $element->get_source();
+        switch ($element->get_type()) {
+            case element::OERTYPE_MOODLEFILE:
+                $file = $element->get_storedfiles()[0];
+                $typedata['mimetype'] = $file->get_mimetype();
+                $typedata['filesize'] = $file->get_filesize();
+                $typedata['filecreationtime'] = $file->get_timecreated();
+                break;
+            case element::OERTYPE_EXTERNAL:
+                // TODO;
+                break;
+        }
+        return json_encode($typedata);
     }
 
     /**
@@ -199,10 +227,10 @@ class snapshot {
      *
      * The course metadata of a course is added to the file metadata.
      *
-     * @return array|false
+     * @return array
      * @throws \dml_exception
      */
-    private function get_active_courseinfo_metadata() {
+    private function get_active_courseinfo_metadata(): array {
         global $DB;
         $courses = $DB->get_records('local_oer_courseinfo', ['courseid' => $this->courseid, 'ignored' => 0, 'deleted' => 0]);
         $courseinfo = [];

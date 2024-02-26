@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\metadata\coursetofile;
+use local_oer\modules\element;
 use local_oer\release\filedata;
 
 defined('MOODLE_INTERNAL') || die();
@@ -130,7 +131,7 @@ class release_test extends \advanced_testcase {
         $this->assertCount(1, $snapshots);
         $keys = array_keys($snapshots);
         $this->assertEquals($identifier, reset($keys));
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         // 2024-01-19 Update in snapshot table.
         // The field contenthash has been replaced with the field identifier, also a new field source has been introduced.
         // Hence, there are now 18 fields in the table.
@@ -149,7 +150,7 @@ class release_test extends \advanced_testcase {
         $DB->set_field('local_oer_elements', 'tags', $tags, ['courseid' => $course->id, 'identifier' => $identifier]);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
@@ -159,7 +160,7 @@ class release_test extends \advanced_testcase {
         $replacement = "xx=>replacement\r\nabc=>otherreplacement\r\ncc-4.0=>replacedtextintest\r\nlast=>lastline";
         set_config('uselicensereplacement', 1, 'local_oer');
         set_config('licensereplacement', $replacement, 'local_oer');
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $license = $metadata['license'];
         $this->assertEquals('replacedtextintest', $license['shortname']);
 
@@ -202,7 +203,7 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
@@ -217,7 +218,7 @@ class release_test extends \advanced_testcase {
         $modifiedsnapshot->additionaldata = json_encode($additionaldata);
         $DB->update_record('local_oer_snapshot', $modifiedsnapshot);
         $snapshots = $snapshot->get_latest_course_snapshot(); // Update snapshots to contain additional data.
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $expectedcounts['general'] = $expectedcounts['general'] + 3; // Three new fields have been added.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
@@ -249,7 +250,7 @@ class release_test extends \advanced_testcase {
         $helper->sync_course_info($course->id);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $expectedcounts['general'] = 18; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 1;
         $expectedcounts['course'] = [11]; // Moodle course now has additional customfield.
@@ -261,7 +262,7 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $expectedcounts['general'] = 18; // The new release should not have injected additional fields.
         $expectedcounts['courses'] = 2;
         $expectedcounts['course'] = [10, true, 1]; // Moodle course now has additional custom field.
@@ -298,7 +299,7 @@ class release_test extends \advanced_testcase {
         $DB->insert_record('local_oer_coursetofile', $coursetofile);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $element, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
         $expectedcounts['courses'] = 3;
         $expectedcounts['course'] = [10, true, 1];
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -432,6 +433,8 @@ class release_test extends \advanced_testcase {
         $file = $helper->generate_file();
         $element = $helper->get_element_for_file($file[1]);
         $elementinfo = new \stdClass();
+        $elementinfo->courseid = $course->id;
+        $elementinfo->identifier = $element->get_identifier();
         $elementinfo->title = $file[1]->get_filename();
         $elementinfo->license = $file[1]->get_license();
         $elementinfo->context = 1;
@@ -444,8 +447,15 @@ class release_test extends \advanced_testcase {
         $elementinfo->classification = null;
         $elementinfo->coursemetadata = null;
         $elementinfo->additionaldata = null;
+        $elementinfo->type = element::OERTYPE_MOODLEFILE;
+        $elementinfo->typedata = json_encode([
+                'mimetype' => $file[1]->get_mimetype(),
+                'filesize' => $file[1]->get_filesize(),
+                'filecreationtime' => $file[1]->get_timecreated(),
+                'source' => $element->get_source(),
+        ]);
         $elementinfo->id = $file[1]->get_id();
-        $filedata = new filedata($course->id, $element, $elementinfo);
+        $filedata = new filedata($elementinfo);
         $prepareclassification = new \ReflectionMethod($filedata, 'prepare_classification_fields');
         $prepareclassification->setAccessible(true);
         // The default case for the classification field data in snapshot table is 'null'.

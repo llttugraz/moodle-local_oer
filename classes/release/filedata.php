@@ -25,7 +25,6 @@
 
 namespace local_oer\release;
 
-use local_oer\modules\element;
 use local_oer\identifier;
 
 /**
@@ -37,26 +36,25 @@ class filedata extends releasedata {
     /**
      *  Constructor, overwrites and extend the fields from the parent definition.
      *
-     * @param int $courseid
-     * @param element $element
      * @param \stdClass $elementinfo
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
-        parent::__construct($courseid, $element, $elementinfo);
+    public function __construct(\stdClass $elementinfo) {
+        parent::__construct($elementinfo);
         global $CFG;
 
-        $decomposed = identifier::decompose($element->get_identifier());
+        $decomposed = identifier::decompose($elementinfo->identifier);
         $contenthash = $decomposed->value;
         $publicurl = $CFG->wwwroot . '/pluginfile.php/' .
                 $this->context->id . '/local_oer/public/' .
                 $elementinfo->id . '/' . $contenthash;
+        $typedata = json_decode($elementinfo->typedata);
         $this->metadata['contenthash'] = $contenthash; // Field for backwards compatibility.
         $this->metadata['fileurl'] = $publicurl; // Field for backwards compatibility.
         $this->metadata['source'] = $publicurl; // Overwrite parent field source.
-        $this->metadata['mimetype'] = $element->get_mimetype();
-        $this->metadata['filesize'] = $element->get_filesize();
+        $this->metadata['mimetype'] = $typedata->mimetype ?? '';
+        $this->metadata['filesize'] = $typedata->filesize ?? 0;
         $this->metadata['filecreationtime'] = $elementinfo->timecreated;
     }
 }

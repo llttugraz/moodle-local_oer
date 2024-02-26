@@ -873,6 +873,70 @@ function xmldb_local_oer_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024022200, 'local', 'oer');
     }
 
+    if ($oldversion < 2024022601) {
+
+        // Define field type to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'releasenumber');
+
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field typedata to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('typedata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'type');
+
+        // Conditionally launch add field typedata.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // At the moment, there are only OERMOD_MOODLEFILE elements are stored.
+        // To update the typedata field, all released elements have to be loaded from the courses and the data has to be added.
+        $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
+        foreach ($courses as $course) {
+            $releasedfiles = $DB->get_records('local_oer_snapshot', ['courseid' => $course->courseid]);
+            // Function get_fast_modinfo() not allowed during upgrade. So files have to be loaded manually.
+            foreach ($releasedfiles as $releasedfile) {
+                $decomposed = \local_oer\identifier::decompose($releasedfile->identifier);
+                if ($decomposed->valuetype != 'contenthash') {
+                    echo html_writer::div($releasedfile->identifier .
+                            ': Element is not a Moodle stored file. How is that possible during this update?',
+                            'adminwarning');
+                    continue;
+                }
+                // Contenthash always leads to the same file.
+                $files = $DB->get_records('files', ['contenthash' => $decomposed->value]);
+                foreach ($files as $file) {
+                    if (is_null($file->mimetype)) {
+                        continue;
+                    }
+                    $fs = get_file_storage();
+                    $storedfile = $fs->get_file($file->contextid, $file->component, $file->filearea, $file->itemid, $file->filepath,
+                            $file->filename);
+                    $url = \moodle_url::make_pluginfile_url($storedfile->get_contextid(),
+                            $storedfile->get_component(),
+                            $storedfile->get_filearea(),
+                            $storedfile->get_itemid(),
+                            $storedfile->get_filepath(),
+                            $storedfile->get_filename());
+                    $releasedfile->typedata = json_encode([
+                            'mimetype' => $storedfile->get_mimetype(),
+                            'filesize' => $storedfile->get_filesize(),
+                            'source' => $url->out(),
+                    ]);
+                    $DB->update_record('local_oer_snapshot', $releasedfile);
+                    break;
+                }
+            }
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2024022601, 'local', 'oer');
+    }
+
     return true;
 }
 

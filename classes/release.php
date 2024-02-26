@@ -80,7 +80,7 @@ class release {
                 continue;
             }
             $release[] = [
-                    'metadata' => $this->get_file_release_metadata_json($element, $metadata[$element->get_identifier()]),
+                    'metadata' => $this->get_file_release_metadata_json($metadata[$element->get_identifier()]),
                     'storedfile' => $element,
             ];
         }
@@ -90,23 +90,20 @@ class release {
     /**
      * Prepare the stored metadata of snapshot table for output.
      *
-     * TODO: there is an inconsistency between $element and $elementinfo regarding the license.
-     * $elementinfo is a record from the snapshot table with the released license in it. It is possible that $element has a
-     * different license set at this point.
+     * $elementinfo is a record from the snapshot table with the released license in it.
      *
-     * @param element $element
      * @param \stdClass $elementinfo
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function get_file_release_metadata_json(element $element, \stdClass $elementinfo): array {
-        switch ($element->get_type()) {
+    private function get_file_release_metadata_json(\stdClass $elementinfo): array {
+        switch ($elementinfo->type) {
             case element::OERTYPE_MOODLEFILE:
-                $metadata = new filedata($this->courseid, $element, $elementinfo);
+                $metadata = new filedata($elementinfo);
                 break;
             case element::OERTYPE_EXTERNAL:
-                $metadata = new externaldata($this->courseid, $element, $elementinfo);
+                $metadata = new externaldata($elementinfo);
                 break;
             default:
                 throw new \coding_exception('Element type not set');

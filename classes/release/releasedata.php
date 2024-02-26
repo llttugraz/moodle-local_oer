@@ -26,7 +26,6 @@
 namespace local_oer\release;
 
 use local_oer\helper\license;
-use local_oer\modules\element;
 use local_oer\helper\formhelper;
 use local_oer\plugininfo\oerclassification;
 
@@ -68,21 +67,18 @@ abstract class releasedata {
     /**
      * Constructor. Prepares the default release data. Fields can be overwritten or extended by derived classes.
      *
-     * @param int $courseid Moodle courseid
-     * @param element $element Datastructure element
      * @param \stdClass $elementinfo Record of local_oer_snapshot table
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function __construct(int $courseid, element $element, \stdClass $elementinfo) {
+    public function __construct(\stdClass $elementinfo) {
         $this->contexts = formhelper::lom_context_list(false);
         $this->resourcetypes = formhelper::lom_resource_types(false);
-        $this->context = \context_course::instance($courseid);
+        $this->context = \context_course::instance($elementinfo->courseid);
 
         $this->metadata = [
                 'title' => $elementinfo->title,
-                'identifier' => $element->get_identifier(),
-                'source' => $element->get_source(),
+                'identifier' => $elementinfo->identifier,
                 'abstract' => $elementinfo->description ?? '',
                 'license' => $this->prepare_license($elementinfo),
                 'context' => $this->contexts[$elementinfo->context],
