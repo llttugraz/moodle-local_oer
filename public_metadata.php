@@ -54,6 +54,9 @@ global $PAGE;
 $PAGE->set_context($context);
 if ($identifier) {
     $result = array_merge($result, \local_oer\release::get_release_history_of_identifier($identifier));
+    if (isset($result['error'])) {
+        http_response_code(400);
+    }
 } else if ($release !== false) {
     $result = array_merge($result, \local_oer\release::get_releases_with_number($release));
 } else if ($dates !== false) {
