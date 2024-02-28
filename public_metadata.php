@@ -40,9 +40,7 @@ if (get_config('local_oer', 'pullservice') != 1) {
 
 $identifier = optional_param('identifier', false, PARAM_TEXT);
 $release = optional_param('release', false, PARAM_INT);
-if ($identifier) {
-    \local_oer\identifier::validate($identifier);
-}
+$dates = optional_param('releasedates', false, PARAM_BOOL);
 
 // Increase application profile when metadata changes.
 // Update 2024-02-22: Metadata has been extended for external elements.
@@ -54,7 +52,15 @@ $result = [
 $context = context_system::instance();
 global $PAGE;
 $PAGE->set_context($context);
-$result = array_merge($result, \local_oer\release::get_latest_releases());
+if ($identifier) {
+    $result = array_merge($result, \local_oer\release::get_release_history_of_identifier($identifier));
+} else if ($release !== false) {
+    $result = array_merge($result, \local_oer\release::get_releases_with_number($release));
+} else if ($dates !== false) {
+    $result = array_merge($result, \local_oer\release::get_releasenumber_and_date_of_releases());
+} else {
+    $result = array_merge($result, \local_oer\release::get_latest_releases());
+}
 
 header('Content-Type: application/json');
 echo json_encode($result);

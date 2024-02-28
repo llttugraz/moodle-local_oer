@@ -62,6 +62,91 @@ class release {
     }
 
     /**
+     * Get the release history of an identifier.
+     *
+     * @param string $identifier
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_release_history_of_identifier(string $identifier): array {
+        global $DB;
+        if (!identifier::validate($identifier)) {
+            return ['error' => 'Identifier has wrong format.'];
+        }
+        $history = $DB->get_records('local_oer_snapshot', ['identifier' => $identifier], 'timecreated DESC');
+        $result = static::metadata_by_type($history);
+        return ['elements' => $result];
+    }
+
+    /**
+     * Get the releases of a given release.
+     *
+     * @param int $releasenumber
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_releases_with_number(int $releasenumber): array {
+        global $DB;
+        $releases = $DB->get_records('local_oer_snapshot', ['releasenumber' => $releasenumber]);
+        $result = static::metadata_by_type($releases);
+        return ['release' => $releasenumber, 'elements' => $result];
+    }
+
+    /**
+     * Calculate the release date for each release number.
+     *
+     * There can only be one release per day per configuration.
+     * So this function calculates the date for each releasenumber,
+     * based on the timestamps of the releases.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_releasenumber_and_date_of_releases(): array {
+        global $DB;
+        $records = $DB->get_records('local_oer_snapshot');
+        $releases = [];
+        foreach ($records as $record) {
+            $date = new \DateTime();
+            $date->setTimestamp($record->timecreated);
+            $date->setTime(0, 0);
+            $releases[$record->releasenumber] = [
+                    'release' => (int) $record->releasenumber,
+                    'date' => $date->format('Y-m-d'),
+                    'midnight' => $date->getTimestamp(),
+            ];
+        }
+        return ['releasedates' => array_values($releases)];
+    }
+
+    /**
+     * Get prepared metadata filtered by type.
+     *
+     * @param array $data
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private static function metadata_by_type(array $data): array {
+        $result = [];
+        foreach ($data as $entry) {
+            switch ($entry->type) {
+                case element::OERTYPE_MOODLEFILE:
+                    $metadata = new filedata($entry);
+                    $result[] = $metadata->get_array();
+                    break;
+                case element::OERTYPE_EXTERNAL:
+                    $metadata = new externaldata($entry);
+                    $result[] = $metadata->get_array();
+                    break;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Prepare a filelist that contains all information about the metadata of released files.
      * Only files that exist and are released in snapshot table will be considered.
      *
