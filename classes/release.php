@@ -31,20 +31,34 @@ use local_oer\release\filedata;
 
 /**
  * Class release
+ *
+ * Load metadata of released files.
  */
 class release {
     /**
-     * @var int Moodle courseid
-     */
-    private $courseid = null;
-
-    /**
-     * Constructor.
+     * Load the latest release of all released files.
      *
-     * @param int $courseid Moodle courseid
+     * @return array Metadata of all released files.
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
-    public function __construct(int $courseid) {
-        $this->courseid = $courseid;
+    public static function get_latest_releases(): array {
+        $result = [];
+        $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
+        $i = 0;
+        foreach ($courses as $course) {
+            $data = static::get_released_files_for_course($course->courseid);
+            if (!empty($data)) {
+                $metadata = [];
+                foreach ($data as $entry) {
+                    $metadata[] = $entry['metadata'];
+                }
+                $result['moodlecourses'][$i]['files'] = $metadata;
+            }
+            $i++;
+        }
+        return $result;
     }
 
     /**
@@ -65,14 +79,14 @@ class release {
      * ]
      *
      *
-     * @return array
+     * @return array Metadata of releases of one course.
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function get_released_files(): array {
-        $elements = filelist::get_course_files($this->courseid);
-        $snapshot = new snapshot($this->courseid);
+    public static function get_released_files_for_course(int $courseid): array {
+        $elements = filelist::get_course_files($courseid);
+        $snapshot = new snapshot($courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
         $release = [];
         foreach ($elements as $element) {
@@ -80,7 +94,7 @@ class release {
                 continue;
             }
             $release[] = [
-                    'metadata' => $this->get_file_release_metadata_json($metadata[$element->get_identifier()]),
+                    'metadata' => static::get_file_release_metadata_json($metadata[$element->get_identifier()]),
                     'storedfile' => $element,
             ];
         }
@@ -97,7 +111,7 @@ class release {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function get_file_release_metadata_json(\stdClass $elementinfo): array {
+    private static function get_file_release_metadata_json(\stdClass $elementinfo): array {
         switch ($elementinfo->type) {
             case element::OERTYPE_MOODLEFILE:
                 $metadata = new filedata($elementinfo);

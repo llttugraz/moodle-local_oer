@@ -893,7 +893,7 @@ function xmldb_local_oer_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // At the moment, there are only OERMOD_MOODLEFILE elements are stored.
+        // At the moment, there are only OERMOD_MOODLEFILE elements stored.
         // To update the typedata field, all released elements have to be loaded from the courses and the data has to be added.
         $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
         foreach ($courses as $course) {

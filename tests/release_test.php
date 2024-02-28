@@ -46,7 +46,7 @@ class release_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
-     * @covers ::get_released_files
+     * @covers ::get_released_files_for_course
      * @covers ::__construct
      */
     public function test_get_released_files() {
@@ -63,22 +63,21 @@ class release_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('local_oer_courseinfo', ['courseid' => $course->id]),
                 'There should be at least one courseinfo entry for testcourse');
         $snapshot = new snapshot($course->id);
-        $release = new release($course->id);
-        $files = $release->get_released_files();
+        $files = release::get_released_files_for_course($course->id);
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
         $helper->set_files_to($course->id, 1, true);
-        $files = $release->get_released_files();
+        $files = release::get_released_files_for_course($course->id);
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
         $snapshot->create_snapshot_of_course_files(1);
-        $files = $release->get_released_files();
+        $files = release::get_released_files_for_course($course->id);
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $helper->set_files_to($course->id, 5, true);
         $snapshot->create_snapshot_of_course_files(2);
-        $files = $release->get_released_files();
+        $files = release::get_released_files_for_course($course->id);
         $this->assertEquals(5, count($files), 'All five files should be ready to release');
         $helper->set_files_to($course->id, 1, false);
         $snapshot->create_snapshot_of_course_files(3);
-        $files = $release->get_released_files();
+        $files = release::get_released_files_for_course($course->id);
         $this->assertEquals(5, count($files),
                 'One file has been set to non-release, but the files already have been released, so 5 are found');
     }

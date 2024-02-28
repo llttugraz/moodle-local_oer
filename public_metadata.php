@@ -44,7 +44,6 @@ if ($identifier) {
     \local_oer\identifier::validate($identifier);
 }
 
-$courses = \local_oer\helper\activecourse::get_list_of_courses(true);
 // Increase application profile when metadata changes.
 // Update 2024-02-22: Metadata has been extended for external elements.
 // Backwards compatible.
@@ -52,22 +51,10 @@ $result = [
         'applicationprofile' => 'v1.0.1',
 ];
 
-$i = 0;
 $context = context_system::instance();
 global $PAGE;
 $PAGE->set_context($context);
-foreach ($courses as $course) {
-    $release = new \local_oer\release($course->courseid);
-    $data = $release->get_released_files();
-    if (!empty($data)) {
-        $metadata = [];
-        foreach ($data as $entry) {
-            $metadata[] = $entry['metadata'];
-        }
-        $result['moodlecourses'][$i]['files'] = $metadata;
-    }
-    $i++;
-}
+$result = array_merge($result, \local_oer\release::get_latest_releases());
 
 header('Content-Type: application/json');
 echo json_encode($result);

@@ -58,9 +58,8 @@ class zipper {
         $info['general']['fullsize'] = 0;
         $size = 0;
         $package = 0;
-
-        $release = new release($courseid);
-        $files = $release->get_released_files();
+        
+        $files = release::get_released_files_for_course($courseid);
         foreach ($files as $filearray) {
             $file = $filearray['storedfile'];
             $metadata = $filearray['metadata'];
