@@ -357,4 +357,105 @@ class fileinfo_form_test extends \advanced_testcase {
         $this->assertArrayHasKey('ignore', $newform);
         $this->assertEquals(1, $newform['ignore']);
     }
+
+    /**
+     * Test for private function add_people.
+     *
+     * @covers ::add_people
+     *
+     * @return void
+     * @throws \ReflectionException
+     * @throws \coding_exception
+     */
+    public function test_add_people() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $testcourse = new testcourse();
+        $course = $testcourse->generate_testcourse($this->getDataGenerator());
+        $identifier = $testcourse->get_identifier_of_first_found_file($course);
+        $this->assertNotNull($identifier);
+
+        $fromform = fromform::fileinfoform_submit($course->id, $identifier, 'Unittest',
+                'Test set state method', 1,
+                'cc', 'en', 1, [], 0, 0);
+        $form = new fileinfo_form(null, ['courseid' => $course->id, 'identifier' => $identifier]);
+        $errors = $form->validation($fromform, []);
+        $this->assertEmpty($errors, 'No errors');
+
+        $addpeople = new \ReflectionMethod($form, 'add_people');
+
+        $person1 = new \stdClass();
+        $person1->firstname = $this->get_firstname();
+        $person1->lastname = $this->get_lastname();
+        $person1->role = $this->get_roles(true)[0];
+        $person2 = new \stdClass();
+        $person2->fullname = $this->get_fullname(2, 3);
+        $person2->role = $this->get_roles(true)[0];
+        $people = [$person1, $person2];
+
+        $addpeople->setAccessible(true);
+        $result = $addpeople->invoke($form, $people, $this->get_roles(false));
+        $this->assertCount(2, $result);
+    }
+
+    /**
+     * Get an array of roles for name tests.
+     *
+     * The sub-plugins will deliver an array in the format:
+     * [
+     *   [
+     *     Rolename,
+     *     langstring name,
+     *     component
+     *   ]
+     * ]
+     * For the tests only the first element is necessary.
+     *
+     * @param bool $random
+     * @return array
+     */
+    private function get_roles(bool $random): array {
+        $roles = [
+                ['Author'], ['Publisher'], ['Creator'], ['Contributor'], ['Presenter'],
+        ];
+        return $random ? $roles[rand(1, count($roles) - 1)] : $roles;
+    }
+
+    /**
+     * Get a random firstname from test data generator.
+     *
+     * @return string
+     */
+    private function get_firstname(): string {
+        return $this->getDataGenerator()->firstnames[rand(0, count($this->getDataGenerator()->firstnames) - 1)];
+    }
+
+    /**
+     * Get a random lastname from test data generator.
+     *
+     * @return string
+     */
+    private function get_lastname(): string {
+        return $this->getDataGenerator()->lastnames[rand(0, count($this->getDataGenerator()->lastnames) - 1)];
+    }
+
+    /**
+     * Generate a fullname with names from testdata generator.
+     *
+     * @param int $amountfirstnames Amount of firstnames.
+     * @param int $amountlastnames Amount of lastnames.
+     * @return string
+     */
+    private function get_fullname(int $amountfirstnames = 1, int $amountlastnames = 1): string {
+        $firstnames = [];
+        $lastnames = [];
+        for ($i = 0; $i < $amountfirstnames; $i++) {
+            $firstnames[] = $this->get_firstname();
+        }
+        for ($i = 0; $i < $amountlastnames; $i++) {
+            $lastnames[] = $this->get_lastname();
+        }
+        $name = array_merge($firstnames, $lastnames);
+        return implode(' ', $name);
+    }
 }

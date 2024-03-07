@@ -47,7 +47,6 @@ class release_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::get_released_files_for_course
-     * @covers ::__construct
      */
     public function test_get_released_files() {
         $this->resetAfterTest();

@@ -72,16 +72,6 @@ class snapshot_test extends \advanced_testcase {
     }
 
     /**
-     * Test get file history
-     *
-     * @return void
-     * @covers ::get_file_history
-     */
-    public function test_get_file_history() {
-        // TODO: feature has to be implemented in snapshot.
-    }
-
-    /**
      * Test if file snapshots are correctly taken from a testcourse.
      *
      * @return void

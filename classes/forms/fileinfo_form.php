@@ -25,7 +25,6 @@
 
 namespace local_oer\forms;
 
-use core_course\content_item_readonly_repository_test;
 use local_oer\filelist;
 use local_oer\helper\filestate;
 use local_oer\helper\formhelper;
