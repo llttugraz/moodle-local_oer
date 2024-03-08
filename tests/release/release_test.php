@@ -31,7 +31,7 @@ use local_oer\release\filedata;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/helper/testcourse.php');
+require_once(__DIR__ . '/../helper/testcourse.php');
 
 /**
  * Class release_testcase

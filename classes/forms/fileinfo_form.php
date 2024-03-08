@@ -595,6 +595,7 @@ class fileinfo_form extends \moodleform {
      *
      * @param array $fromform
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
      */
     public static function reset_form_data_to_preference_values(array &$fromform) {

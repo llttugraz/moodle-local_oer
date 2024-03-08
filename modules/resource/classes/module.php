@@ -61,7 +61,7 @@ class module implements \local_oer\modules\module {
                         'contenthash', $file->get_contenthash()
                 );
                 $element->set_identifier($identifier);
-                $element->set_license($file->get_license());
+                $element->set_license($file->get_license() ?? 'unknown');
                 $element->set_source(filehelper::get_file_url($file, true));
                 $element->set_filesize($file->get_filesize());
                 $element->set_mimetype($file->get_mimetype());

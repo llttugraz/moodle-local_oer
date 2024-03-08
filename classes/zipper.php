@@ -61,11 +61,11 @@ class zipper {
         
         $files = release::get_released_files_for_course($courseid);
         foreach ($files as $filearray) {
-            $file = $filearray['storedfile'];
             $metadata = $filearray['metadata'];
             if (!$metadata) {
                 continue;
             }
+            $file = filelist::get_single_file($courseid, $metadata['identifier']);
             $filesize = $file->get_filesize();
             $filetozip = ['metadata' => $metadata, 'file' => $file];
             if ((($filesize + $size) <= $maxpackagesize) || $onlyonepackage) {

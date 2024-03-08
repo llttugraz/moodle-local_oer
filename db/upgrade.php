@@ -916,6 +916,12 @@ function xmldb_local_oer_upgrade($oldversion) {
                     $fs = get_file_storage();
                     $storedfile = $fs->get_file($file->contextid, $file->component, $file->filearea, $file->itemid, $file->filepath,
                             $file->filename);
+                    if (!$storedfile) {
+                        echo html_writer::div($releasedfile->identifier .
+                                ': File does not exist anymore. Entry has to be cleaned up manually',
+                                'adminwarning');
+                        continue;
+                    }
                     $url = \moodle_url::make_pluginfile_url($storedfile->get_contextid(),
                             $storedfile->get_component(),
                             $storedfile->get_filearea(),

@@ -170,17 +170,12 @@ class release {
      * @throws \moodle_exception
      */
     public static function get_released_files_for_course(int $courseid): array {
-        $elements = filelist::get_course_files($courseid);
         $snapshot = new snapshot($courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
         $release = [];
-        foreach ($elements as $element) {
-            if (!isset($metadata[$element->get_identifier()])) {
-                continue;
-            }
+        foreach ($metadata as $element) {
             $release[] = [
-                    'metadata' => static::get_file_release_metadata_json($metadata[$element->get_identifier()]),
-                    'storedfile' => $element,
+                    'metadata' => static::get_file_release_metadata_json($element),
             ];
         }
         return $release;
