@@ -130,7 +130,7 @@ abstract class releasedata {
                 if (empty($entry[1])) {
                     continue; // Skip false or empty entries.
                 }
-                $list[$entry[0]] = $entry[1];
+                $list[trim($entry[0])] = trim($entry[1]);
             }
             if (isset($list[$elementinfo->license])) {
                 $license = $list[$elementinfo->license];

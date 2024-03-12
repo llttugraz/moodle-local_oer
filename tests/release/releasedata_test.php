@@ -50,6 +50,8 @@ class releasedata_test extends \advanced_testcase {
      *
      * @covers ::__construct
      * @covers ::get_array
+     * @covers ::prepare_license
+     * @covers ::prepare_classification_fields
      *
      * @return void
      * @throws \coding_exception
@@ -77,6 +79,51 @@ class releasedata_test extends \advanced_testcase {
         $testdummy = new testdummy($elementinfo);
         $metadata = $testdummy->get_array();
         $this->assertCount(12, $metadata, 'Only basic information in this test.');
-
+        $this->assertArrayHasKey('title', $metadata);
+        $this->assertArrayHasKey('identifier', $metadata);
+        $this->assertArrayHasKey('abstract', $metadata);
+        $this->assertArrayHasKey('license', $metadata);
+        $this->assertArrayHasKey('context', $metadata);
+        $this->assertArrayHasKey('resourcetype', $metadata);
+        $this->assertArrayHasKey('language', $metadata);
+        $this->assertArrayHasKey('persons', $metadata);
+        $this->assertArrayHasKey('tags', $metadata);
+        $this->assertArrayHasKey('timereleased', $metadata);
+        $this->assertArrayHasKey('classification', $metadata);
+        $this->assertArrayHasKey('courses', $metadata);
+        $this->assertEquals($elementinfo->title, $metadata['title']);
+        $this->assertEquals($elementinfo->identifier, $metadata['identifier']);
+        $this->assertEquals($elementinfo->description, $metadata['abstract']);
+        $this->assertCount(3, $metadata['license']);
+        $this->assertEquals($elementinfo->license, $metadata['license']['shortname']);
+        $this->assertEquals('Higher Education', $metadata['context']);
+        $this->assertEquals('No selection', $metadata['resourcetype']);
+        $this->assertEquals($elementinfo->language, $metadata['language']);
+        $persons = json_decode($elementinfo->persons);
+        $this->assertCount(2, $metadata['persons']);
+        $this->assertEquals($persons->persons, $metadata['persons']);
+        $this->assertEquals([], $metadata['tags']);
+        $this->assertEquals($elementinfo->timecreated, $metadata['timereleased']);
+        $this->assertEquals([], $metadata['classification']);
+        $courses = json_decode($elementinfo->coursemetadata);
+        $this->assertEquals($courses, $metadata['courses']);
+        // Add some additional data to the snapshot.
+        $elementinfo->additionaldata = json_encode([
+                'testkey' => 'testdata',
+                'identifier' => 'should not be overwritten', // This will not be added.
+                'additional' => 'additional',
+        ]);
+        set_config('uselicensereplacement', 1, 'local_oer');
+        set_config('licensereplacement', "cc-4.0 =>CC BY 4.0\r\nabc", 'local_oer');
+        $testdummy = new testdummy($elementinfo);
+        $metadata = $testdummy->get_array();
+        $this->assertCount(14, $metadata, 'Two additional fields.');
+        $this->assertArrayHasKey('testkey', $metadata);
+        $this->assertArrayHasKey('additional', $metadata);
+        $this->assertEquals($elementinfo->identifier, $metadata['identifier'], 'Should not be overwritten');
+        $this->assertEquals('testdata', $metadata['testkey']);
+        $this->assertEquals('additional', $metadata['additional']);
+        $this->assertCount(3, $metadata['license']);
+        $this->assertEquals('CC BY 4.0', $metadata['license']['shortname']);
     }
 }
