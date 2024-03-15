@@ -45,14 +45,20 @@ class filedata extends releasedata {
         global $CFG;
 
         $decomposed = identifier::decompose($elementinfo->identifier);
-        $contenthash = $decomposed->value;
-        $publicurl = $CFG->wwwroot . '/pluginfile.php/' .
-                $this->context->id . '/local_oer/public/' .
-                $elementinfo->id . '/' . $contenthash;
+        $urlparts = [
+                $CFG->wwwroot,
+                'pluginfile.php',
+                $this->context->id,
+                'local_oer',
+                'public',
+                $elementinfo->id,
+                $decomposed->value,
+        ];
+        $publicurl = implode('/', $urlparts);
         $typedata = json_decode($elementinfo->typedata);
-        $this->metadata['contenthash'] = $contenthash; // Field for backwards compatibility.
+        $this->metadata['contenthash'] = $decomposed->value; // Field for backwards compatibility.
         $this->metadata['fileurl'] = $publicurl; // Field for backwards compatibility.
-        $this->metadata['source'] = $publicurl; // Overwrite parent field source.
+        $this->metadata['source'] = $publicurl;
         $this->metadata['mimetype'] = $typedata->mimetype ?? '';
         $this->metadata['filesize'] = $typedata->filesize ?? 0;
         $this->metadata['filecreationtime'] = $elementinfo->timecreated;

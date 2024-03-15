@@ -23,18 +23,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_oer;
+namespace release;
 
-use local_oer\release\filedata;
+use local_oer\release;
+use local_oer\release\externaldata;
+use local_oer\snapshot;
+use local_oer\testcourse;
 
 require_once(__DIR__ . '/../helper/testcourse.php');
 
 /**
- * Test filedata class
+ * Test externaldata class
  *
- * @coversDefaultClass  \local_oer\release\filedata
+ * @coversDefaultClass \local_oer\release\externaldata
  */
-class filedata_test extends \advanced_testcase {
+class externaldata_test extends \advanced_testcase {
     /**
      * As the other methods of the abstract class are already tested, only the differences are tested here.
      *
@@ -45,7 +48,7 @@ class filedata_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function test_filedata_constructor() {
+    public function test_externaldata_constructor() {
         $this->resetAfterTest();
 
         // TODO: test is dependent from subplugin.
@@ -63,25 +66,14 @@ class filedata_test extends \advanced_testcase {
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $data = $DB->get_records('local_oer_snapshot', ['releasenumber' => 1]);
         $elementinfo = reset($data);
-        $filedata = new filedata($elementinfo);
-        $metadata = $filedata->get_array();
-        $this->assertCount(18, $metadata, '12 default fields and 6 additional.');
-        $this->assertArrayHasKey('contenthash', $metadata);
-        $this->assertArrayHasKey('fileurl', $metadata);
-        $this->assertArrayHasKey('source', $metadata);
-        $this->assertArrayHasKey('mimetype', $metadata);
-        $this->assertArrayHasKey('filesize', $metadata);
-        $this->assertArrayHasKey('filecreationtime', $metadata);
-        $decomposed = identifier::decompose($elementinfo->identifier);
-        $publicurl = $CFG->wwwroot . '/pluginfile.php/' .
-                \context_course::instance($course->id)->id . '/local_oer/public/' .
-                $elementinfo->id . '/' . $decomposed->value;
+        $externaldata = new externaldata($elementinfo);
+        $metadata = $externaldata->get_array();
+        $this->assertCount(16, $metadata, '12 default fields and 4 additional.');
         $typedata = json_decode($elementinfo->typedata);
-        $this->assertEquals($decomposed->value, $metadata['contenthash']);
-        $this->assertEquals($publicurl, $metadata['fileurl']);
-        $this->assertEquals($publicurl, $metadata['source']);
+        // The fields are from a file because the testcourse only provides files at this point.
         $this->assertEquals($typedata->mimetype, $metadata['mimetype']);
         $this->assertEquals($typedata->filesize, $metadata['filesize']);
-        $this->assertEquals($elementinfo->timecreated, $metadata['filecreationtime']);
+        $this->assertEquals($typedata->filecreationtime, $metadata['filecreationtime']);
+        $this->assertEquals($typedata->source, $metadata['source']);
     }
 }
