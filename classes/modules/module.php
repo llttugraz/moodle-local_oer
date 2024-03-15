@@ -32,6 +32,11 @@ namespace local_oer\modules;
  */
 interface module {
     /**
+     * Add to a role to let the base plugin know that this is the required role.
+     */
+    const ROLE_REQUIRED = 'role_required';
+
+    /**
      * Returns all elements a sub-plugin can deliver.
      *
      * @param int $courseid Moodle courseid

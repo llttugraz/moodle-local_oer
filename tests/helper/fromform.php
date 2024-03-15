@@ -70,6 +70,7 @@ class fromform {
         $retval['tags'] = '';
         $retval['language'] = $language;
         $retval['resourcetype'] = "$resourcetype";
+        $retval['creator'] = 'oermod_resource\module';
         if ($upload == 1) {
             $retval['upload'] = "$upload";
         }

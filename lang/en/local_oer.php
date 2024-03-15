@@ -87,7 +87,7 @@ $string['nopreference'] = 'no preference';
 $string['error_upload_license'] = 'A Creative Commons or Public Domain license is ' .
         'required to release files.' .
         'You must either uncheck "release" or set the appropriate license.';
-$string['error_upload_author'] = 'An author or a publisher is required for releasing files';
+$string['error_upload_author'] = 'A person with the role {$a->roles} is required for releasing files';
 $string['error_license'] = 'Wrong license for release selected';
 $string['no_files_heading'] = 'No files found';
 $string['no_files_filter'] = 'No files are found with this filter setting.';

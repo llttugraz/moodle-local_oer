@@ -30,6 +30,7 @@ use local_oer\helper\filestate;
 use local_oer\helper\formhelper;
 use local_oer\helper\license;
 use local_oer\logger;
+use local_oer\modules\module;
 use local_oer\plugininfo\oerclassification;
 use local_oer\plugininfo\oermod;
 
@@ -373,8 +374,30 @@ class fileinfo_form extends \moodleform {
             }
 
             $persons = json_decode($data['storedperson']);
+            $roles = oermod::get_supported_roles($data['creator']);
+            $requiredroles = [];
+            $supportedroles = [];
+            foreach ($roles as $role) {
+                $supportedroles[$role[0]] = get_string($role[1], $role[2]);
+                if (isset($role[3]) && $role[3] == module::ROLE_REQUIRED) {
+                    $requiredroles[$role[0]] = get_string($role[1], $role[2]);
+                }
+            }
+            $rolesstring = empty($requiredroles)
+                    ? ['roles' => implode(' or ', $supportedroles)]
+                    : ['roles' => implode(' or ', $requiredroles)];
             if (empty($persons->persons)) {
-                $errors['addpersons'] = get_string('error_upload_author', 'local_oer');
+                $errors['addpersons'] = get_string('error_upload_author', 'local_oer', $rolesstring);
+            } else if (!empty($requiredroles)) {
+                $found = false;
+                foreach ($persons->persons as $person) {
+                    if (isset($requiredroles[$person->role])) {
+                        $found = true;
+                    }
+                }
+                if (!$found) {
+                    $errors['addpersons'] = get_string('error_upload_author', 'local_oer', $rolesstring);
+                }
             }
             if (in_array('context', $reqfields) && $data['context'] < 1) {
                 $errors['context'] = get_string('error_upload_context', 'local_oer');

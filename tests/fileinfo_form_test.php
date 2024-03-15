@@ -151,7 +151,8 @@ class fileinfo_form_test extends \advanced_testcase {
                 'cc', 'en', 1, [], 1, 0);
         $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['addpersons']), 'Release cannot be set when no person is added to metadata');
-        $this->assertEquals(get_string('error_upload_author', 'local_oer'), $errors['addpersons'],
+        $this->assertEquals(get_string('error_upload_author', 'local_oer', ['roles' => 'Author or Publisher']),
+                $errors['addpersons'],
                 'Upload cannot be set when no person is added to metadata');
 
         // Upload is activated, but no context is set.
@@ -199,6 +200,7 @@ class fileinfo_form_test extends \advanced_testcase {
                 'context' => 0,
                 'title' => 'Filename',
                 'storedperson' => '{"Author": "Unit tester"}',
+                'creator' => 'oermod_resource\module',
         ];
         $errors = $form->validation($fromform, []);
         $this->assertArrayHasKey('addpersons', $errors);
