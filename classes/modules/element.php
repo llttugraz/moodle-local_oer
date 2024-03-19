@@ -173,7 +173,7 @@ class element {
      */
     public function __construct(string $creator, int $type) {
         if (!class_exists($creator) || !in_array("local_oer\modules\module", class_implements($creator))) {
-            throw new \coding_exception("Creator of the element has to be the module class of subplugin.");
+            throw new \coding_exception("Creator of the element has to be the module class of sub plugin.");
         }
         $this->creator = $creator;
         $this->wrong_type($type);
@@ -181,7 +181,7 @@ class element {
     }
 
     /**
-     * Get type of element.
+     * Get the type of element.
      *
      * @return int
      * @throws \coding_exception
@@ -430,16 +430,18 @@ class element {
         if (is_null($this->storedmetadata)) {
             throw new \coding_exception("Stored metadata has not been set yet, use set_stored_metadata before updating fields");
         }
-        if ($mustexist && !isset($this->storedmetadata->$name)) {
-            throw new \coding_exception("Field $name not yet defined in storedmetadata");
-        }
+
         validate_param($name, PARAM_ALPHA); // Throws invalid parameter exception.
         $reflection = new \ReflectionClass($this);
         $notallowed = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
-        if (in_array($name, $notallowed)) {
-            throw new \coding_exception("Field $name not allowed to be added to storedmetadata, use element->set_$name instead");
+        foreach ($notallowed as $reflection) {
+            if ($reflection->name == $name) {
+                throw new \coding_exception("Field $name not allowed to be added to storedmetadata, use element->set_$name instead");
+            }
         }
-
+        if ($mustexist && !isset($this->storedmetadata->$name)) {
+            throw new \coding_exception("Field $name not yet defined in storedmetadata");
+        }
         $this->storedmetadata->$name = $value;
     }
 
@@ -459,21 +461,6 @@ class element {
      */
     public function get_stored_metadata(): ?\stdClass {
         return $this->storedmetadata;
-    }
-
-    /**
-     * Set the relative course section number.
-     *
-     * Also add the section to the sections array.
-     *
-     * @param int $section
-     * @return void
-     */
-    public function set_section(int $section) {
-        $this->section = $section;
-        if ($section >= 0 && !in_array($section, $this->sections)) {
-            $this->sections[] = $section;
-        }
     }
 
     /**

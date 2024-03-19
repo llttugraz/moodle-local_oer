@@ -40,6 +40,53 @@ require_once(__DIR__ . '/../helper/testcourse.php');
  */
 class release_test extends \advanced_testcase {
     /**
+     * Test the function get latest releases.
+     *
+     * @covers ::get_latest_releases
+     *
+     * @return void
+     */
+    public function test_get_latest_releases() {
+        $this->resetAfterTest();
+
+    }
+
+    /**
+     * Test the history function for a single element.
+     *
+     * @covers ::get_release_history_of_identifier
+     *
+     * @return void
+     */
+    public function test_get_release_history_of_identifier() {
+
+    }
+
+    /**
+     * Test if all elements of the same release are loaded.
+     *
+     * @covers ::get_releases_with_number
+     *
+     * @return void
+     */
+    public function test_get_releases_with_number() {
+
+    }
+
+    /**
+     * Test if the list of releases is build correctly.
+     *
+     * @covers ::get_releasenumber_and_date_of_releases
+     *
+     * @return void
+     */
+    public function test_get_releasenumber_and_date_of_releases() {
+
+    }
+
+
+
+    /**
      * Test if the snapshot and release classes are working together.
      *
      * @return void
