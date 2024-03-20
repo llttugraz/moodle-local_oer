@@ -103,6 +103,7 @@ class information {
      */
     public function set_url(?string $url): void {
         if (is_null($url)) {
+            $this->url = '';
             $this->hasurl = false;
             return;
         }
