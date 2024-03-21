@@ -75,5 +75,19 @@ class externaldata_test extends \advanced_testcase {
         $this->assertEquals($typedata->filesize, $metadata['filesize']);
         $this->assertEquals($typedata->filecreationtime, $metadata['filecreationtime']);
         $this->assertEquals($typedata->source, $metadata['source']);
+
+        $elementinfo = reset($data);
+        $elementinfo->typedata = null;
+        $externaldata = new externaldata($elementinfo);
+        $metadata = $externaldata->get_array();
+        $this->assertCount(12, $metadata, '12 default fields as no extra fields are set.');
+        $this->assertArrayHasKey('identifier', $metadata);
+        $this->assertArrayHasKey('title', $metadata);
+        $this->assertArrayHasKey('license', $metadata);
+        $this->assertArrayNotHasKey('mimetype', $metadata);
+        $this->assertArrayNotHasKey('filesize', $metadata);
+        $this->assertArrayNotHasKey('filecreationtime', $metadata);
+        $this->assertArrayNotHasKey('source', $metadata);
+
     }
 }

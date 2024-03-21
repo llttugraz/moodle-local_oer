@@ -40,37 +40,193 @@ require_once(__DIR__ . '/../helper/testcourse.php');
  */
 class release_test extends \advanced_testcase {
     /**
+     * Releases with timestamps.
+     *
+     * @var array
+     */
+    private array $releases = [
+        // Release => Day start, Day end
+            1 => [1584662400, 1584748800,],
+            2 => [1654560000, 1654646400,],
+            3 => [1708128000, 1708214400,],
+    ];
+
+    /**
+     * Associative array of test identifiers.
+     *
+     * @var array
+     */
+    private array $identifiers;
+
+    /**
+     * Set up test environment.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+        $this->prepare_releases_in_snapshot_table();
+    }
+
+    /**
+     * Create entries in the snapshot table.
+     * For reading releases no other information is necessary.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private function prepare_releases_in_snapshot_table() {
+        global $DB;
+        $this->releases = [
+            // Release => Day start, Day end
+                1 => [usergetmidnight(1584662400), usergetmidnight(1584748800),],
+                2 => [usergetmidnight(1654560000), usergetmidnight(1654646400),],
+                3 => [usergetmidnight(1708128000), usergetmidnight(1708214400),],
+        ];
+
+        $courses = [
+                $this->getDataGenerator()->create_course(),
+                $this->getDataGenerator()->create_course(),
+                $this->getDataGenerator()->create_course(),
+        ];
+
+        $file = 1;
+        $filereleasematrix = [
+            // Courseid, Filenumber, Releasenumber
+                [$courses[0]->id, $file, 1,], [$courses[0]->id, $file, 2,], [$courses[0]->id, $file, 3,],
+                [$courses[0]->id, ++$file, 2,],
+                [$courses[0]->id, ++$file, 1,],
+                [$courses[1]->id, ++$file, 1,], [$courses[1]->id, $file, 2,],
+                [$courses[1]->id, ++$file, 3,],
+                [$courses[2]->id, ++$file, 2],
+        ];
+
+        foreach ($filereleasematrix as $filerelease) {
+            $record = new \stdClass();
+            $record->courseid = $filerelease[0];
+            $record->identifier = identifier::compose('phpunit', 'localhost',
+                    'testdata', 'number', $filerelease[1]);
+            $record->title = $this->getDataGenerator()->lastnames[rand(0, count($this->getDataGenerator()->lastnames) - 1)];
+            $record->description = $this->getDataGenerator()->loremipsum;
+            $record->context = 1;
+            $record->license = 'cc-4.0';
+            $record->persons = json_encode(['persons' => ['role' => 'Author', 'firstname' => 'unit', 'lastname' => 'test']]);
+            $record->language = 'en';
+            $record->resourcetype = rand(1, 14);
+            $record->coursemetadata = json_encode([[
+                    'identifier' => 'moodlecourse-' . $filerelease[0],
+                    'courseid' => $filerelease[0],
+                    'sourceid' => 0,
+                    'coursename' => 'moodlecourse-' . $filerelease[0],
+                    'structure' => '',
+                    'description' => '',
+                    'objective' => '',
+                    'organisation' => '',
+                    'courselanguage' => 'en',
+                    'lecturer' => 'unit test',
+            ]]);
+            $record->releasehash = hash('sha256', json_encode($record));
+            $record->releasenumber = $filerelease[2];
+            $record->type = [element::OERTYPE_MOODLEFILE, element::OERTYPE_EXTERNAL][rand(0, 1)];
+            $record->usermodified = 2;
+            $record->timecreated = rand($this->releases[$filerelease[2]][0], $this->releases[$filerelease[2]][1]);
+            $record->timemodified = $record->timecreated;
+            $DB->insert_record('local_oer_snapshot', $record);
+            $this->identifiers[$record->identifier] = $record->identifier;
+        }
+    }
+
+    /**
      * Test the function get latest releases.
      *
      * @covers ::get_latest_releases
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
-    public function test_get_latest_releases() {
-        $this->resetAfterTest();
-
+    public function test_get_latest_releases(): void {
+        $releases = release::get_latest_releases();
+        $this->assertArrayHasKey('moodlecourses', $releases);
+        $moodlecourses = $releases['moodlecourses'];
+        $this->assertCount(3, $moodlecourses);
+        $course1 = $moodlecourses[0];
+        $course2 = $moodlecourses[1];
+        $course3 = $moodlecourses[2];
+        $this->assertCount(3, $course1['files']);
+        $this->assertGreaterThan($this->releases[3][0], $course1['files'][0]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $course1['files'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[2][0], $course1['files'][1]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course1['files'][1]['timereleased']);
+        $this->assertGreaterThan($this->releases[1][0], $course1['files'][2]['timereleased']);
+        $this->assertLessThan($this->releases[1][1], $course1['files'][2]['timereleased']);
+        $this->assertCount(2, $course2['files']);
+        $this->assertGreaterThan($this->releases[2][0], $course2['files'][0]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course2['files'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[3][0], $course2['files'][1]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $course2['files'][1]['timereleased']);
+        $this->assertCount(1, $course3['files']);
+        $this->assertGreaterThan($this->releases[2][0], $course2['files'][0]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course2['files'][0]['timereleased']);
     }
 
     /**
      * Test the history function for a single element.
      *
      * @covers ::get_release_history_of_identifier
+     * @covers ::metadata_by_type
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function test_get_release_history_of_identifier() {
-
+    public function test_get_release_history_of_identifier(): void {
+        $identifier = reset($this->identifiers); // First identifier has three entries in snapshot table.
+        $history = release::get_release_history_of_identifier($identifier);
+        $this->assertArrayHasKey('elements', $history);
+        $this->assertCount(3, $history['elements']);
+        $this->assertLessThan($history['elements'][0]['timereleased'], $history['elements'][1]['timereleased']);
+        $this->assertLessThan($history['elements'][1]['timereleased'], $history['elements'][2]['timereleased']);
+        $error = release::get_release_history_of_identifier('wrongformat');
+        $this->assertArrayHasKey('error', $error);
+        $this->assertEquals('Identifier has wrong format.', $error['error']);
     }
 
     /**
      * Test if all elements of the same release are loaded.
      *
      * @covers ::get_releases_with_number
+     * @covers ::metadata_by_type
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function test_get_releases_with_number() {
-
+    public function test_get_releases_with_number(): void {
+        $releases = release::get_releases_with_number(1);
+        $this->assertArrayHasKey('release', $releases);
+        $this->assertEquals(1, $releases['release']);
+        $this->assertArrayHasKey('elements', $releases);
+        $this->assertCount(3, $releases['elements']);
+        $this->assertGreaterThan($this->releases[1][0], $releases['elements'][0]['timereleased']);
+        $this->assertLessThan($this->releases[1][1], $releases['elements'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[1][0], $releases['elements'][1]['timereleased']);
+        $this->assertLessThan($this->releases[1][1], $releases['elements'][1]['timereleased']);
+        $this->assertGreaterThan($this->releases[1][0], $releases['elements'][2]['timereleased']);
+        $this->assertLessThan($this->releases[1][1], $releases['elements'][2]['timereleased']);
+        $releases = release::get_releases_with_number(3);
+        $this->assertArrayHasKey('release', $releases);
+        $this->assertEquals(3, $releases['release']);
+        $this->assertArrayHasKey('elements', $releases);
+        $this->assertCount(2, $releases['elements']);
+        $this->assertGreaterThan($this->releases[3][0], $releases['elements'][0]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $releases['elements'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[3][0], $releases['elements'][1]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $releases['elements'][1]['timereleased']);
     }
 
     /**
@@ -79,12 +235,23 @@ class release_test extends \advanced_testcase {
      * @covers ::get_releasenumber_and_date_of_releases
      *
      * @return void
+     * @throws \dml_exception
      */
-    public function test_get_releasenumber_and_date_of_releases() {
-
+    public function test_get_releasenumber_and_date_of_releases(): void {
+        $this->setAdminUser();
+        $releases = release::get_releasenumber_and_date_of_releases();
+        $this->assertArrayHasKey('releasedates', $releases);
+        $this->assertCount(3, $releases['releasedates']);
+        $this->assertEquals(1, $releases['releasedates'][0]['release']);
+        $this->assertEquals('2020-03-20', $releases['releasedates'][0]['date']);
+        $this->assertEquals($this->releases[1][0], $releases['releasedates'][0]['midnight']);
+        $this->assertEquals(2, $releases['releasedates'][1]['release']);
+        $this->assertEquals('2022-06-07', $releases['releasedates'][1]['date']);
+        $this->assertEquals($this->releases[2][0], $releases['releasedates'][1]['midnight']);
+        $this->assertEquals(3, $releases['releasedates'][2]['release']);
+        $this->assertEquals('2024-02-17', $releases['releasedates'][2]['date']);
+        $this->assertEquals($this->releases[3][0], $releases['releasedates'][2]['midnight']);
     }
-
-
 
     /**
      * Test if the snapshot and release classes are working together.
@@ -95,9 +262,7 @@ class release_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_released_files_for_course
      */
-    public function test_get_released_files() {
-        $this->resetAfterTest();
-
+    public function test_get_released_files(): void {
         // TODO: test is dependent from subplugin.
         set_config('enabledmodplugins', 'resource', 'local_oer');
 
@@ -139,9 +304,7 @@ class release_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_file_release_metadata_json
      */
-    public function test_get_file_release_metadata_json() {
-        $this->resetAfterTest();
-
+    public function test_get_file_release_metadata_json(): void {
         // TODO: test is dependent from subplugin.
         set_config('enabledmodplugins', 'resource', 'local_oer');
 
@@ -371,7 +534,7 @@ class release_test extends \advanced_testcase {
      * @param array $expectedcounts
      * @return void
      */
-    private function assert_count_metadata(array $metadata, array $expectedcounts) {
+    private function assert_count_metadata(array $metadata, array $expectedcounts): void {
         $this->assertIsArray($metadata);
         $this->assertIsArray($expectedcounts);
         $this->assertCount($expectedcounts['general'], $metadata);
@@ -396,7 +559,7 @@ class release_test extends \advanced_testcase {
      * @param array $metadata
      * @return void
      */
-    private function assert_metadata_default_fields(array $metadata) {
+    private function assert_metadata_default_fields(array $metadata): void {
         // Test default file metadata.
         $this->assertIsArray($metadata);
         $this->assertArrayHasKey('title', $metadata);
@@ -469,8 +632,7 @@ class release_test extends \advanced_testcase {
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function test_prepare_classification_fields() {
-        $this->resetAfterTest();
+    public function test_prepare_classification_fields(): void {
         $this->setAdminUser();
         global $USER;
         $helper = new testcourse();

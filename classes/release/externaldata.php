@@ -39,6 +39,9 @@ class externaldata extends releasedata {
      */
     public function __construct(\stdClass $elementinfo) {
         parent::__construct($elementinfo);
+        if (is_null($elementinfo->typedata)) {
+            return;
+        }
 
         $typedata = json_decode($elementinfo->typedata);
         foreach ($typedata as $key => $value) {

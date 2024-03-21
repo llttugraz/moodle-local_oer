@@ -25,7 +25,7 @@
 
 namespace local_oer\plugininfo;
 
-// Altough this is stated as unexpected check from codechecker, removing this line causes an error.
+// Although this is stated as unexpected check from codechecker, removing this line causes an error.
 // @codingStandardsIgnoreLine
 defined('MOODLE_INTERNAL') || die();
 

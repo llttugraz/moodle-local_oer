@@ -42,7 +42,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
 class filestate_test extends \advanced_testcase {
     /**
      * A file can have different states inside the oer plugin. These states are defined as constants in the filestate class.
-     * The calculate_file_state function returns the estimated state along with some additional informations about the course where
+     * The calculate_file_state function returns the estimated state along with some additional information about the course where
      * the file is used:
      * - state: int value 0-3 with current state of the file (constants)
      *   - 0 STATE_FILE_ERROR - something is wrong, most likely the file has been edited in more than one course
@@ -60,6 +60,8 @@ class filestate_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @throws \stored_file_creation_exception
      * @covers ::calculate_state
+     * @covers ::determine_element_state
+     * @covers ::find_courses_that_use_this_element
      */
     public function test_calculate_file_state() {
         $this->resetAfterTest(true);
