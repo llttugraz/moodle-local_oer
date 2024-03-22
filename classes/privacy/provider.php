@@ -36,14 +36,7 @@ use core_privacy\local\request\writer;
 /**
  * Class provider
  */
-class provider implements
-        // This tool stores user data.
-        \core_privacy\local\metadata\provider,
-
-        // This plugin is capable of determining which users have data within it.
-        \core_privacy\local\request\core_userlist_provider,
-
-        // This tool may provide access to and deletion of user data.
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider,
         \core_privacy\local\request\plugin\provider {
     /**
      * Get metadata
@@ -78,6 +71,8 @@ class provider implements
      * Delete all users from userlist.
      *
      * @param \context $context
+     * @return void
+     * @throws \dml_exception
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         if ($context->contextlevel != CONTEXT_SYSTEM) {
@@ -114,6 +109,8 @@ class provider implements
      * Delete all given users.
      *
      * @param approved_userlist $userlist
+     * @return void
+     * @throws \dml_exception
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
         $context = $userlist->get_context();
@@ -156,6 +153,7 @@ class provider implements
      *
      * @param int $userid
      * @return contextlist
+     * @throws \dml_exception
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;

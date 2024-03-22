@@ -23,13 +23,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace plugininfo;
+namespace local_oer;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../helper/testcourse.php');
 
-use local_oer\identifier;
 use local_oer\plugininfo\oermod;
-use local_oer\testcourse;
 
 /**
  * Test oermod class

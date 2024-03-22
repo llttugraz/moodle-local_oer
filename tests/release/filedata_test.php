@@ -25,6 +25,8 @@
 
 namespace local_oer;
 
+defined('MOODLE_INTERNAL') || die();
+
 use local_oer\release\filedata;
 
 require_once(__DIR__ . '/../helper/testcourse.php');

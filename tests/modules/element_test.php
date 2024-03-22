@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace modules;
+namespace local_oer;
 
 use local_oer\modules\element;
 use local_oer\modules\information;
@@ -291,7 +291,8 @@ class element_test extends \advanced_testcase {
     public function test_set_stored_metadata_field_must_exist_exception() {
         $element = $this->set_stored_metadata();
         $this->expectException('coding_exception');
-        $this->expectExceptionMessage('Field identifier not allowed to be added to storedmetadata, use element->set_identifier instead');
+        $this->expectExceptionMessage('Field identifier not allowed to be added to storedmetadata, ' .
+                'use element->set_identifier instead');
         $element->set_stored_metadata_field('identifier', 'notallowedtochange', true);
     }
 

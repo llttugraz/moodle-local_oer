@@ -27,6 +27,8 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 /**
  * Step definition for local_oer plugin.
+ *
+ * @package local_oer
  */
 class behat_local_oer extends behat_base {
     /**

@@ -194,7 +194,7 @@ class snapshot {
                 $typedata['filecreationtime'] = $file->get_timecreated();
                 break;
             case element::OERTYPE_EXTERNAL:
-                // TODO;
+                // TODO.
                 break;
         }
         return json_encode($typedata);

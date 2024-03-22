@@ -58,6 +58,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::get_latest_course_snapshot
+     * @covers ::__construct
      */
     public function test_get_latest_course_snapshot() {
         $helper = new testcourse();
@@ -80,6 +81,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::create_snapshot_of_course_files
      * @covers ::create_file_snapshot
+     * @covers ::add_type_data
      */
     public function test_create_snapshot_of_course_files() {
         global $DB;
@@ -185,9 +187,12 @@ class snapshot_test extends \advanced_testcase {
      * - File enables/disables courseinfo from editor course.
      * - File enables additional courseinfo from other course where file is used.
      *
-     * @return void
-     * @throws \ReflectionException
      * @covers ::get_overwritten_courseinfo_metadata
+     *
+     * @return void
+     * @throws \Random\RandomException
+     * @throws \ReflectionException
+     * @throws \dml_exception
      */
     public function test_get_overwritten_courseinfo_metadata() {
         $this->resetAfterTest();
@@ -264,10 +269,12 @@ class snapshot_test extends \advanced_testcase {
      * Simple test for a simple function.
      * Check if the return array has all set fields.
      *
-     * @return void
-     * @throws \ReflectionException
      * @covers ::extract_courseinfo_metadata
      * @covers ::add_customfields_to_snapshot
+     *
+     * @return void
+     * @throws \ReflectionException
+     * @throws \dml_exception
      */
     public function test_extract_courseinfo_metadata() {
         $this->resetAfterTest();

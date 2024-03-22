@@ -23,12 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace release;
+namespace local_oer;
 
-use local_oer\release;
+defined('MOODLE_INTERNAL') || die();
+
 use local_oer\release\releasedata;
-use local_oer\snapshot;
-use local_oer\testcourse;
 
 require_once(__DIR__ . '/../helper/testcourse.php');
 

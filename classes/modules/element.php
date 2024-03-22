@@ -436,7 +436,8 @@ class element {
         $notallowed = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
         foreach ($notallowed as $reflection) {
             if ($reflection->name == $name) {
-                throw new \coding_exception("Field $name not allowed to be added to storedmetadata, use element->set_$name instead");
+                throw new \coding_exception("Field $name not allowed to be added" .
+                        " to storedmetadata, use element->set_$name instead");
             }
         }
         if ($mustexist && !isset($this->storedmetadata->$name)) {

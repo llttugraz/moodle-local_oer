@@ -45,10 +45,19 @@ class release_test extends \advanced_testcase {
      * @var array
      */
     private array $releases = [
-        // Release => Day start, Day end
-            1 => [1584662400, 1584748800,],
-            2 => [1654560000, 1654646400,],
-            3 => [1708128000, 1708214400,],
+        // Release => Day start, Day end.
+            1 => [
+                    1584662400,
+                    1584748800,
+            ],
+            2 => [
+                    1654560000,
+                    1654646400,
+            ],
+            3 => [
+                    1708128000,
+                    1708214400,
+            ],
     ];
 
     /**
@@ -81,10 +90,19 @@ class release_test extends \advanced_testcase {
     private function prepare_releases_in_snapshot_table() {
         global $DB;
         $this->releases = [
-            // Release => Day start, Day end
-                1 => [usergetmidnight(1584662400), usergetmidnight(1584748800),],
-                2 => [usergetmidnight(1654560000), usergetmidnight(1654646400),],
-                3 => [usergetmidnight(1708128000), usergetmidnight(1708214400),],
+            // Release => Day start, Day end.
+                1 => [
+                        usergetmidnight(1584662400),
+                        usergetmidnight(1584748800),
+                ],
+                2 => [
+                        usergetmidnight(1654560000),
+                        usergetmidnight(1654646400),
+                ],
+                3 => [
+                        usergetmidnight(1708128000),
+                        usergetmidnight(1708214400),
+                ],
         ];
 
         $courses = [
@@ -95,13 +113,52 @@ class release_test extends \advanced_testcase {
 
         $file = 1;
         $filereleasematrix = [
-            // Courseid, Filenumber, Releasenumber
-                [$courses[0]->id, $file, 1,], [$courses[0]->id, $file, 2,], [$courses[0]->id, $file, 3,],
-                [$courses[0]->id, ++$file, 2,],
-                [$courses[0]->id, ++$file, 1,],
-                [$courses[1]->id, ++$file, 1,], [$courses[1]->id, $file, 2,],
-                [$courses[1]->id, ++$file, 3,],
-                [$courses[2]->id, ++$file, 2],
+            // Courseid, Filenumber, Releasenumber.
+                [
+                        $courses[0]->id,
+                        $file,
+                        1,
+                ],
+                [
+                        $courses[0]->id,
+                        $file,
+                        2,
+                ],
+                [
+                        $courses[0]->id,
+                        $file,
+                        3,
+                ],
+                [
+                        $courses[0]->id,
+                        ++$file,
+                        2,
+                ],
+                [
+                        $courses[0]->id,
+                        ++$file,
+                        1,
+                ],
+                [
+                        $courses[1]->id,
+                        ++$file,
+                        1,
+                ],
+                [
+                        $courses[1]->id,
+                        $file,
+                        2,
+                ],
+                [
+                        $courses[1]->id,
+                        ++$file,
+                        3,
+                ],
+                [
+                        $courses[2]->id,
+                        ++$file,
+                        2,
+                ],
         ];
 
         foreach ($filereleasematrix as $filerelease) {
