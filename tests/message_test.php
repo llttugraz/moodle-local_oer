@@ -54,7 +54,7 @@ class message_test extends \advanced_testcase {
         $this->waitForSecond();
         $files = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
         $elements = [];
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $elements[$file->courseid] = $file->title;
         }
         $this->preventResetByRollback();

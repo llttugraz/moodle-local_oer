@@ -338,7 +338,7 @@ const showPersonForm = (setInvalid) => {
                 });
                 modal.show();
                 if (setInvalid) {
-                    const element = document.getElementById("id_firstname");
+                    let element = document.getElementById("id_firstname");
                     element.classList.add("is-invalid");
                     element = document.getElementById("id_lastname");
                     element.classList.add("is-invalid");
