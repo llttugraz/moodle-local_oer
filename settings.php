@@ -115,12 +115,12 @@ if ($hassiteconfig) {
             new lang_string('uselicensereplacement', 'local_oer'),
             new lang_string('uselicensereplacement_description', 'local_oer'),
             '0'));
-    $licensereplacedefault = "cc=>CC BY 3.0\r\n" .
-            "cc-nd=>CC BY-ND 3.0\r\n" .
-            "cc-nc-nd=>CC BY-NC-ND 3.0\r\n" .
-            "cc-nc=>CC BY-NC 3.0\r\n" .
-            "cc-nc-sa=>CC BY-NC-SA 3.0\r\n" .
-            "cc-sa=>CC BY-SA 3.0\r\n";
+    $licensereplacedefault = "cc-4.0=>CC BY 4.0\r\n" .
+            "cc-nd-4.0=>CC BY-ND 4.0\r\n" .
+            "cc-nc-nd-4.0=>CC BY-NC-ND 4.0\r\n" .
+            "cc-nc-4.0=>CC BY-NC 4.0\r\n" .
+            "cc-nc-sa-4.0=>CC BY-NC-SA 4.0\r\n" .
+            "cc-sa-4.0=>CC BY-SA 4.0\r\n";
     $settings->add(new admin_setting_configtextarea('local_oer/licensereplacement',
             new lang_string('licensereplacement', 'local_oer'),
             new lang_string('licensereplacement_description', 'local_oer'),
