@@ -10,7 +10,7 @@
     "keywords": ["OER", "OEAA", "Moodle"],
     "name": "llttugraz/moodle-local_oer",
     "require": {
-        "moodle/moodle": "4.1 - 4.2"
+        "moodle/moodle": "4.1 - 4.3"
     },
     "license": "GPL-3.0-or-later"
 }
