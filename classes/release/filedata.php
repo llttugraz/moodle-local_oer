@@ -55,7 +55,7 @@ class filedata extends releasedata {
                 $decomposed->value,
         ];
         $publicurl = implode('/', $urlparts);
-        $typedata = json_decode($elementinfo->typedata);
+        $typedata = empty($elementinfo->typedata) ? [] : json_decode($elementinfo->typedata);
         $this->metadata['contenthash'] = $decomposed->value; // Field for backwards compatibility.
         $this->metadata['fileurl'] = $publicurl; // Field for backwards compatibility.
         $this->metadata['source'] = $publicurl;

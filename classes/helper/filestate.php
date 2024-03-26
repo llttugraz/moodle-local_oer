@@ -264,7 +264,7 @@ class filestate {
                         'value' => $resources[$data->resourcetype],
                 ],
         ];
-        $tags = explode(',', $data->tags);
+        $tags = empty($data->tags) ? [] : explode(',', $data->tags);
         $taglist = [];
         foreach ($tags as $tag) {
             $taglist[] = ['value' => $tag];
@@ -274,7 +274,7 @@ class filestate {
         foreach ($persons as $person) {
             $personlist[] = $person;
         }
-        $classification = json_decode($data->classification, true) ?? [];
+        $classification = empty($data->classification) ? [] : json_decode($data->classification, true);
         $classlist = [];
         foreach ($classification as $type => $entries) {
             $frankenstyle = 'oerclassification_' . $type;

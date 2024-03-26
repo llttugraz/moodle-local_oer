@@ -189,9 +189,9 @@ class elements implements \Iterator, \Countable {
      *
      * PHP countable interface.
      *
-     * @return int|null
+     * @return int
      */
-    public function count(): ?int {
+    public function count(): int {
         return count($this->elements);
     }
 

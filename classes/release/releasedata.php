@@ -88,7 +88,7 @@ abstract class releasedata {
                 'tags' => empty($elementinfo->tags) ? [] : explode(',', $elementinfo->tags),
                 'timereleased' => $elementinfo->timecreated,
                 'classification' => self::prepare_classification_fields($elementinfo->classification),
-                'courses' => json_decode($elementinfo->coursemetadata),
+                'courses' => empty($elementinfo->coursemetadata) ? [] : json_decode($elementinfo->coursemetadata),
         ];
 
         if ($elementinfo->additionaldata) {

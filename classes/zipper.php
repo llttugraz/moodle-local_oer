@@ -50,7 +50,7 @@ class zipper {
      */
     public function separate_files_to_packages(int $courseid, bool $onlyonepackage = false): array {
         $maxpackagesize = $onlyonepackage ? 0 : get_config('local_oer', 'zipperfilesize');
-        $onlyonepackage = $maxpackagesize == 0 ? true : $onlyonepackage;
+        $onlyonepackage = $maxpackagesize == 0 || $onlyonepackage;
 
         $packages = [];
         $info = [];
