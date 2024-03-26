@@ -52,7 +52,7 @@ class elements implements \Iterator, \Countable {
      * @return void
      * @throws \coding_exception
      */
-    public function add_element(element $element) {
+    public function add_element(element $element): void {
         $this->validate_required_fields($element);
         $this->elements[] = $element;
     }
@@ -66,7 +66,7 @@ class elements implements \Iterator, \Countable {
      * @param int $pos
      * @return void
      */
-    public function remove_element(int $pos) {
+    public function remove_element(int $pos): void {
         unset($this->elements[$pos]);
         // Rearrange elements so that there are no holes in the array.
         $this->elements = array_values($this->elements);
@@ -81,7 +81,7 @@ class elements implements \Iterator, \Countable {
      * @param elements $elements
      * @return void
      */
-    public function merge_elements(elements $elements) {
+    public function merge_elements(elements $elements): void {
         $this->rewind();
         foreach ($elements as $element) {
             $this->elements[] = $element;
@@ -122,7 +122,7 @@ class elements implements \Iterator, \Countable {
      * @return element
      * @throws \coding_exception
      */
-    public function get_element_by_key(int $key) {
+    public function get_element_by_key(int $key): element {
         if (!isset($this->elements[$key])) {
             throw new \coding_exception("Out of range! Position: $key Elements " . $this->count());
         }
@@ -136,7 +136,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return element
      */
-    public function current() {
+    public function current(): element {
         return $this->elements[$this->pos];
     }
 
@@ -147,7 +147,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return void
      */
-    public function next() {
+    public function next(): void {
         ++$this->pos;
     }
 
@@ -158,7 +158,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return int
      */
-    public function key() {
+    public function key(): int {
         return $this->pos;
     }
 
@@ -169,7 +169,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return bool
      */
-    public function valid() {
+    public function valid(): bool {
         return isset($this->elements[$this->pos]);
     }
 
@@ -180,7 +180,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return void
      */
-    public function rewind() {
+    public function rewind(): void {
         $this->pos = 0;
     }
 
@@ -191,7 +191,7 @@ class elements implements \Iterator, \Countable {
      *
      * @return int|null
      */
-    public function count() {
+    public function count(): ?int {
         return count($this->elements);
     }
 
@@ -205,7 +205,7 @@ class elements implements \Iterator, \Countable {
      * @return void
      * @throws \coding_exception
      */
-    private function validate_required_fields(element $element) {
+    private function validate_required_fields(element $element): void {
         $required = ['type', 'title', 'identifier', 'license', 'origin', 'source'];
         if ($element->get_type() == element::OERTYPE_MOODLEFILE) {
             $required[] = 'filesize';
