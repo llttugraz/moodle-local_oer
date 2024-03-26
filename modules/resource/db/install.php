@@ -15,19 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Open Educational Resources Plugin
+ * OER subplugin for loading mod_resource files
  *
- * @package    local_oer
+ * @package    oermod_resource
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2024 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2024032600;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.3.0-RC3';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
+/**
+ * Parameters that will be set on installing this plugin.
+ */
+function xmldb_oermod_resource_install() {
+    $enabledsubplugins = get_config('local_oer', 'enabledmodplugins');
+    $enabled = explode(',', $enabledsubplugins);
+    if (!in_array('resource', $enabled)) {
+        $enabled[] = 'resource';
+        set_config('enabledmodplugins', implode(',', $enabled), 'local_oer');
+        core_plugin_manager::reset_caches();
+    }
+}

@@ -164,10 +164,10 @@ class release {
      * ]
      *
      *
+     * @param int $courseid
      * @return array Metadata of releases of one course.
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public static function get_released_files_for_course(int $courseid): array {
         $snapshot = new snapshot($courseid);

@@ -50,9 +50,6 @@ class externaldata_test extends \advanced_testcase {
     public function test_externaldata_constructor() {
         $this->resetAfterTest();
 
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-
         global $DB, $CFG;
         $this->setAdminUser();
         $helper = new testcourse();

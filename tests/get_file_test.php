@@ -223,8 +223,6 @@ class get_file_test extends \advanced_testcase {
      */
     public function test_service() {
         $this->setAdminUser();
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
         $helper = new \local_oer\testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $identifier = $helper->get_identifier_of_first_found_file($course);

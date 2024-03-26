@@ -68,9 +68,6 @@ class get_files_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
 
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-
         require_once(__DIR__ . '/helper/testcourse.php');
         global $CFG;
         // In Moodle 4.2 the namespace core_external was added to external_api.

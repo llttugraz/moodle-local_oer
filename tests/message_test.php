@@ -53,10 +53,14 @@ class message_test extends \advanced_testcase {
         $helper->sync_course_info($course->id);
         $this->waitForSecond();
         $files = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
+        $elements = [];
+        foreach($files as $file) {
+            $elements[$file->courseid] = $file->title;
+        }
         $this->preventResetByRollback();
         unset_config('noemailever');
         $sink = $this->redirectEmails();
-        \local_oer\message::send_requirementschanged($user, $files, $course->id);
+        \local_oer\message::send_requirementschanged($user, $elements, $course->id);
         $messages = $sink->get_messages();
         $this->assertEquals(1, count($messages));
     }

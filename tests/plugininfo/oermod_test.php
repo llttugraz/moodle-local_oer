@@ -65,13 +65,11 @@ class oermod_test extends \advanced_testcase {
      */
     public function test_get_enabled_plugins() {
         $plugins = oermod::get_enabled_plugins();
-        $this->assertEmpty($plugins);
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-        $plugins = oermod::get_enabled_plugins();
-        $this->assertCount(1, $plugins);
-        set_config('enabledmodplugins', 'resource,folder', 'local_oer');
+        // Resource and folder are enabled by default.
         $plugins = oermod::get_enabled_plugins();
         $this->assertCount(2, $plugins);
+        $this->assertArrayHasKey('folder', $plugins);
+        $this->assertArrayHasKey('resource', $plugins);
     }
 
     /**
@@ -174,6 +172,12 @@ class oermod_test extends \advanced_testcase {
         $this->assertIsObject($ADMIN);
     }
 
+    /**
+     * Prepare testdata.
+     *
+     * @return array
+     * @throws \coding_exception
+     */
     private function prepare_testcourse_and_elements() {
         $this->setAdminUser();
         $helper = new testcourse();

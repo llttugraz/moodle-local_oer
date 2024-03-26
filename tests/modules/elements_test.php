@@ -46,12 +46,12 @@ class elements_test extends \advanced_testcase {
     /**
      * Create an element with some random parameter.
      *
-     * @param $setlicense
+     * @param bool $setlicense
      * @return element
      * @throws \coding_exception
      * @throws \invalid_parameter_exception
      */
-    public function create_random_element($setlicense = true): element {
+    public function create_random_element(bool $setlicense = true): element {
         $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $identifier = identifier::compose('phpunit', 'localhost',
                 'test', 'hash',

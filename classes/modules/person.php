@@ -25,6 +25,13 @@
 
 namespace local_oer\modules;
 
+/**
+ * Class person
+ *
+ * A person object consists of a name and a role.
+ * The name can be set as first- and lastname or as full name.
+ * First- and lastname will be preferred.
+ */
 class person {
     /**
      * Shortname of a role.

@@ -41,8 +41,6 @@ class filelist_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
         require_once(__DIR__ . '/helper/testcourse.php');
         $helper = new testcourse();
         $course1 = $helper->generate_testcourse($this->getDataGenerator());

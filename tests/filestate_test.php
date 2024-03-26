@@ -66,9 +66,6 @@ class filestate_test extends \advanced_testcase {
     public function test_calculate_file_state() {
         $this->resetAfterTest(true);
 
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-
         $this->setAdminUser();
         global $DB, $CFG;
         $testcourse = new testcourse();
@@ -222,9 +219,6 @@ class filestate_test extends \advanced_testcase {
      */
     public function test_formatted_notwritable_output_html() {
         $this->resetAfterTest();
-
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
 
         $this->setAdminUser();
         $testcourse = new testcourse();

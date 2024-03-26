@@ -45,8 +45,6 @@ class snapshothelper_test extends \advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
     }
 
     /**

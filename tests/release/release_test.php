@@ -320,8 +320,6 @@ class release_test extends \advanced_testcase {
      * @covers ::get_released_files_for_course
      */
     public function test_get_released_files(): void {
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
 
         $this->setAdminUser();
         global $DB;
@@ -362,8 +360,6 @@ class release_test extends \advanced_testcase {
      * @covers ::get_file_release_metadata_json
      */
     public function test_get_file_release_metadata_json(): void {
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
 
         $this->setAdminUser();
         global $DB;

@@ -216,10 +216,10 @@ class fileinfo_form extends \moodleform {
      * Names can be set as first- and lastname, or as full name.
      * This leads to the assumption that full names also are in the order firstname lastname.
      *
-     * @param $people
+     * @param array $people
      * @return void
      */
-    private function try_to_remove_duplicates(&$people) {
+    private function try_to_remove_duplicates(array &$people) {
         foreach ($people as $key => $person) {
             foreach ($people as $innerkey => $compare) {
                 if ($innerkey == $key) {

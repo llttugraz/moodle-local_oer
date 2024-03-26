@@ -228,9 +228,6 @@ class requirement_test extends \advanced_testcase {
         global $DB, $CFG;
         $this->setAdminUser();
 
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-
         // To load settings.php some admin values have to be prepared.
         require_once($CFG->libdir . '/adminlib.php');
         $ADMIN = \admin_get_root();

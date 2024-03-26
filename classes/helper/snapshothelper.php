@@ -43,7 +43,9 @@ class snapshothelper {
      * Triggered from task and per button in history view (only admins).
      *
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function create_snapshots_of_all_active_courses(): void {
         global $DB;
@@ -87,6 +89,13 @@ class snapshothelper {
                 'timecreated DESC');
     }
 
+    /**
+     * Return all released elements with a certain release number.
+     *
+     * @param int $releasenumber
+     * @return array
+     * @throws \dml_exception
+     */
     public static function get_snapshot_by_releasenumber(int $releasenumber) {
         global $DB;
         return $DB->get_records('local_oer_snapshot', ['releasenumber' => $releasenumber],

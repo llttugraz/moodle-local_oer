@@ -60,9 +60,6 @@ class releasedata_test extends \advanced_testcase {
     public function test_get_array() {
         $this->resetAfterTest();
 
-        // TODO: test is dependent from subplugin.
-        set_config('enabledmodplugins', 'resource', 'local_oer');
-
         global $DB;
         $this->setAdminUser();
         $helper = new testcourse();
