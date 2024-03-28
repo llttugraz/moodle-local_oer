@@ -29,8 +29,6 @@ use local_oer\identifier;
 
 /**
  * Metadata definition for moodle file elements.
- *
- * This class also adds some fields for backwards compatibility of older versions from this plugin.
  */
 class filedata extends releasedata {
     /**
@@ -56,8 +54,6 @@ class filedata extends releasedata {
         ];
         $publicurl = implode('/', $urlparts);
         $typedata = empty($elementinfo->typedata) ? [] : json_decode($elementinfo->typedata);
-        $this->metadata['contenthash'] = $decomposed->value; // Field for backwards compatibility.
-        $this->metadata['fileurl'] = $publicurl; // Field for backwards compatibility.
         $this->metadata['source'] = $publicurl;
         $this->metadata['mimetype'] = $typedata->mimetype ?? '';
         $this->metadata['filesize'] = $typedata->filesize ?? 0;

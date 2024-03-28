@@ -59,7 +59,7 @@ class zipper {
         $size = 0;
         $package = 0;
 
-        $files = release::get_released_files_for_course($courseid);
+        $files = release::get_released_files_for_course($courseid, 'v2.0.0');
         foreach ($files as $filearray) {
             $metadata = $filearray['metadata'];
             if (!$metadata) {

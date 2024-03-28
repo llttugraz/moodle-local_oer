@@ -468,3 +468,13 @@ $string['writablefields'] = 'Die Metadaten für die Felder: "{$a->fields}" werde
 $string['moreinformation'] = 'Weitere informationen';
 $string['noinfo'] = 'Keine zusätzlichen Informationen';
 $string['origin'] = 'Quelle';
+$string['applicationprofile'] = 'Applikationsprofil';
+$string['applicationprofile_description'] = 'Wählen Sie das Applikationsprofil aus, das für die Erzeugung der Metadaten verwendet wird. <br>' .
+        '<ul>' .
+        '<li>v1.0.0: Profil verwendet bis zu local_oer Plugin Version v2.2.1 (2023062800). ' .
+        'Unterstützt nur Dateien, die direkt in Moodle gehostet werden.' .
+        'Für Abwärtskompatibilität verwenden</li>' .
+        '<li>v2.0.0: Unterstützung für verschiedene Quellen. Verwendet neuen Identifier. Nicht kompatibel zu älteren Versionen.</li>' .
+        '</ul>' .
+        'Weitere Informationen über die Struktur der Metadaten finden Sie in der ' .
+        '<a href="https://github.com/llttugraz/moodle-local_oer/blob/main/README.md" target="_blank">ReadMe</a>';

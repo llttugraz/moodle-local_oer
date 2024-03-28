@@ -167,6 +167,16 @@ if ($hassiteconfig) {
             new lang_string('releaseplugin_description', 'local_oer'),
             'pullservice', $select));
 
+    $applicationprofiles = [
+            'v1.0.0' => 'Application profile v1.0.0',
+            'v2.0.0' => 'Application profile v2.0.0',
+    ];
+
+    $settings->add(new admin_setting_configselect('local_oer/applicationprofile',
+            new lang_string('applicationprofile', 'local_oer'),
+            new lang_string('applicationprofile_description', 'local_oer'),
+            'v2.0.0', $applicationprofiles));
+
     if ($ADMIN->fulltree) {
         require_once(__DIR__ . '/adminlib.php');
         $settings->add(new oersubplugins_settings());

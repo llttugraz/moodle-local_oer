@@ -49,6 +49,21 @@ $result = [
         'applicationprofile' => 'v1.0.1',
 ];
 
+$result = [];
+if (strpos($_SERVER["HTTP_ACCEPT"], 'application/json; applicationprofile=v1.0.0') === 0) {
+    header("Content-Type: application/json; applicationprofile=v1.0.0");
+    $version = 'v1.0.0';
+    $result['applicationprofile'] = 'v1.0.0';
+} else if (strpos($_SERVER["HTTP_ACCEPT"], 'application/json; applicationprofile=v2.0.0') === 0) {
+    header("Content-Type: application/json; applicationprofile=v2.0.0");
+    $version = 'v2.0.0';
+    $result['applicationprofile'] = 'v2.0.0';
+} else {
+    $version = get_config('local_oer', 'applicationprofile');
+    header("Content-Type: application/json; applicationprofile=$version");
+    $result['applicationprofile'] = $version;
+}
+
 $context = context_system::instance();
 global $PAGE;
 $PAGE->set_context($context);
@@ -62,9 +77,8 @@ if ($identifier) {
 } else if ($dates !== false) {
     $result = array_merge($result, \local_oer\release::get_releasenumber_and_date_of_releases());
 } else {
-    $result = array_merge($result, \local_oer\release::get_latest_releases());
+    $result = array_merge($result, \local_oer\release::get_latest_releases($version));
 }
 
-header('Content-Type: application/json');
 echo json_encode($result);
 

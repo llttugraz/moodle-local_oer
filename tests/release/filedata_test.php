@@ -58,15 +58,13 @@ class filedata_test extends \advanced_testcase {
         $snapshot = new snapshot($course->id);
         $helper->set_files_to($course->id, 1, true);
         $snapshot->create_snapshot_of_course_files(1);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $data = $DB->get_records('local_oer_snapshot', ['releasenumber' => 1]);
         $elementinfo = reset($data);
         $filedata = new filedata($elementinfo);
         $metadata = $filedata->get_array();
-        $this->assertCount(18, $metadata, '12 default fields and 6 additional.');
-        $this->assertArrayHasKey('contenthash', $metadata);
-        $this->assertArrayHasKey('fileurl', $metadata);
+        $this->assertCount(16, $metadata, '12 default fields and 4 additional.');
         $this->assertArrayHasKey('source', $metadata);
         $this->assertArrayHasKey('mimetype', $metadata);
         $this->assertArrayHasKey('filesize', $metadata);
@@ -76,8 +74,6 @@ class filedata_test extends \advanced_testcase {
                 \context_course::instance($course->id)->id . '/local_oer/public/' .
                 $elementinfo->id . '/' . $decomposed->value;
         $typedata = json_decode($elementinfo->typedata);
-        $this->assertEquals($decomposed->value, $metadata['contenthash']);
-        $this->assertEquals($publicurl, $metadata['fileurl']);
         $this->assertEquals($publicurl, $metadata['source']);
         $this->assertEquals($typedata->mimetype, $metadata['mimetype']);
         $this->assertEquals($typedata->filesize, $metadata['filesize']);

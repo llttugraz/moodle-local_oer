@@ -68,7 +68,7 @@ class releasedata_test extends \advanced_testcase {
         $snapshot = new snapshot($course->id);
         $helper->set_files_to($course->id, 1, true);
         $snapshot->create_snapshot_of_course_files(1);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $data = $DB->get_records('local_oer_snapshot', ['releasenumber' => 1]);
         $elementinfo = reset($data);

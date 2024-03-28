@@ -26,8 +26,10 @@
 namespace local_oer;
 
 use local_oer\modules\element;
+use local_oer\plugininfo\oermod;
 use local_oer\release\externaldata;
 use local_oer\release\filedata;
+use local_oer\release\legacy;
 
 /**
  * Class release
@@ -38,23 +40,24 @@ class release {
     /**
      * Load the latest release of all released files.
      *
+     * @param string $version Application profile version
      * @return array Metadata of all released files.
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \moodle_exception
      */
-    public static function get_latest_releases(): array {
+    public static function get_latest_releases(string $version): array {
         $result = [];
         $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
-        $i = 0;
+        $i = $version == 'v1.0.0' ? 1 : 0;
+        $name = $version == 'v1.0.0' ? 'files' : 'elements';
         foreach ($courses as $course) {
-            $data = static::get_released_files_for_course($course->courseid);
+            $data = static::get_released_files_for_course($course->courseid, $version);
             if (!empty($data)) {
                 $metadata = [];
                 foreach ($data as $entry) {
                     $metadata[] = $entry['metadata'];
                 }
-                $result['moodlecourses'][$i]['files'] = $metadata;
+                $result['moodlecourses'][$i][$name] = $metadata;
             }
             $i++;
         }
@@ -163,19 +166,22 @@ class release {
      *   ]
      * ]
      *
-     *
      * @param int $courseid
+     * @param string $version Application profile
      * @return array Metadata of releases of one course.
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function get_released_files_for_course(int $courseid): array {
+    public static function get_released_files_for_course(int $courseid, string $version): array {
         $snapshot = new snapshot($courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
         $release = [];
         foreach ($metadata as $element) {
+            if ($version == 'v1.0.0' && $element->type == element::OERTYPE_EXTERNAL) {
+                continue; // Application profile v1.0.0 only supports Moodle files.
+            }
             $release[] = [
-                    'metadata' => static::get_file_release_metadata_json($element),
+                    'metadata' => static::get_file_release_metadata_json($element, $version),
             ];
         }
         return $release;
@@ -187,11 +193,16 @@ class release {
      * $elementinfo is a record from the snapshot table with the released license in it.
      *
      * @param \stdClass $elementinfo
+     * @param string $version
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private static function get_file_release_metadata_json(\stdClass $elementinfo): array {
+    private static function get_file_release_metadata_json(\stdClass $elementinfo, string $version): array {
+        if ($version == 'v1.0.0') {
+            $metadata = new legacy($elementinfo);
+            return $metadata->get_array();
+        }
         switch ($elementinfo->type) {
             case element::OERTYPE_MOODLEFILE:
                 $metadata = new filedata($elementinfo);

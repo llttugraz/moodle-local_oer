@@ -152,7 +152,7 @@ abstract class releasedata {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function prepare_classification_fields(?string $fileinfo): array {
+    protected function prepare_classification_fields(?string $fileinfo): array {
         if (is_null($fileinfo)) {
             return [];
         }

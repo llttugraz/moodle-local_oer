@@ -207,28 +207,42 @@ class release_test extends \advanced_testcase {
      * @throws \moodle_exception
      */
     public function test_get_latest_releases(): void {
-        $releases = release::get_latest_releases();
+        global $DB;
+        $releases = release::get_latest_releases('v2.0.0');
         $this->assertArrayHasKey('moodlecourses', $releases);
         $moodlecourses = $releases['moodlecourses'];
         $this->assertCount(3, $moodlecourses);
         $course1 = $moodlecourses[0];
         $course2 = $moodlecourses[1];
         $course3 = $moodlecourses[2];
-        $this->assertCount(3, $course1['files']);
-        $this->assertGreaterThan($this->releases[3][0], $course1['files'][0]['timereleased']);
-        $this->assertLessThan($this->releases[3][1], $course1['files'][0]['timereleased']);
-        $this->assertGreaterThan($this->releases[2][0], $course1['files'][1]['timereleased']);
-        $this->assertLessThan($this->releases[2][1], $course1['files'][1]['timereleased']);
-        $this->assertGreaterThan($this->releases[1][0], $course1['files'][2]['timereleased']);
-        $this->assertLessThan($this->releases[1][1], $course1['files'][2]['timereleased']);
-        $this->assertCount(2, $course2['files']);
-        $this->assertGreaterThan($this->releases[2][0], $course2['files'][0]['timereleased']);
-        $this->assertLessThan($this->releases[2][1], $course2['files'][0]['timereleased']);
-        $this->assertGreaterThan($this->releases[3][0], $course2['files'][1]['timereleased']);
-        $this->assertLessThan($this->releases[3][1], $course2['files'][1]['timereleased']);
-        $this->assertCount(1, $course3['files']);
-        $this->assertGreaterThan($this->releases[2][0], $course2['files'][0]['timereleased']);
-        $this->assertLessThan($this->releases[2][1], $course2['files'][0]['timereleased']);
+        $this->assertCount(3, $course1['elements']);
+        $this->assertGreaterThan($this->releases[3][0], $course1['elements'][0]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $course1['elements'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[2][0], $course1['elements'][1]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course1['elements'][1]['timereleased']);
+        $this->assertGreaterThan($this->releases[1][0], $course1['elements'][2]['timereleased']);
+        $this->assertLessThan($this->releases[1][1], $course1['elements'][2]['timereleased']);
+        $this->assertCount(2, $course2['elements']);
+        $this->assertGreaterThan($this->releases[2][0], $course2['elements'][0]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course2['elements'][0]['timereleased']);
+        $this->assertGreaterThan($this->releases[3][0], $course2['elements'][1]['timereleased']);
+        $this->assertLessThan($this->releases[3][1], $course2['elements'][1]['timereleased']);
+        $this->assertCount(1, $course3['elements']);
+        $this->assertGreaterThan($this->releases[2][0], $course2['elements'][0]['timereleased']);
+        $this->assertLessThan($this->releases[2][1], $course2['elements'][0]['timereleased']);
+
+        $releases = release::get_latest_releases('v1.0.0');
+        $this->assertArrayHasKey('moodlecourses', $releases);
+        $moodlecourses = $releases['moodlecourses'];
+        $courses = $DB->get_records_sql('SELECT DISTINCT(courseid) FROM {local_oer_snapshot} WHERE type = :type',
+                ['type' => element::OERTYPE_MOODLEFILE]);
+        $this->assertCount(count($courses), $moodlecourses);
+        $course = reset($moodlecourses);
+        $courseid = $course['files'][0]['courses'][0]->courseid;
+        $files = $DB->get_records_sql('SELECT DISTINCT(identifier) FROM {local_oer_snapshot} ' .
+                'WHERE type = :type AND courseid = :courseid',
+                ['type' => element::OERTYPE_MOODLEFILE, 'courseid' => $courseid]);
+        $this->assertCount(count($files), $course['files']);
     }
 
     /**
@@ -329,21 +343,21 @@ class release_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('local_oer_courseinfo', ['courseid' => $course->id]),
                 'There should be at least one courseinfo entry for testcourse');
         $snapshot = new snapshot($course->id);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
         $helper->set_files_to($course->id, 1, true);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
         $snapshot->create_snapshot_of_course_files(1);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertEquals(1, count($files), 'One file should be ready for release');
         $helper->set_files_to($course->id, 5, true);
         $snapshot->create_snapshot_of_course_files(2);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertEquals(5, count($files), 'All five files should be ready to release');
         $helper->set_files_to($course->id, 1, false);
         $snapshot->create_snapshot_of_course_files(3);
-        $files = release::get_released_files_for_course($course->id);
+        $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertEquals(5, count($files),
                 'One file has been set to non-release, but the files already have been released, so 5 are found');
     }
@@ -382,7 +396,7 @@ class release_test extends \advanced_testcase {
         $this->assertTrue(is_a($file, 'stored_file'));
         $element = $helper->get_element_for_file($file);
 
-        $release = new release($course->id);
+        $release = new release();
         $releasemetadata = new \ReflectionMethod($release, 'get_file_release_metadata_json');
         $releasemetadata->setAccessible(true);
 
@@ -392,12 +406,12 @@ class release_test extends \advanced_testcase {
         $this->assertCount(1, $snapshots);
         $keys = array_keys($snapshots);
         $this->assertEquals($identifier, reset($keys));
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         // 2024-01-19 Update in snapshot table.
         // The field contenthash has been replaced with the field identifier, also a new field source has been introduced.
         // Hence, there are now 18 fields in the table.
         $expectedcounts = [
-                'general' => 18,
+                'general' => 16,
                 'persons' => 2,
                 'tags' => 0,
                 'courses' => 1,
@@ -411,7 +425,7 @@ class release_test extends \advanced_testcase {
         $DB->set_field('local_oer_elements', 'tags', $tags, ['courseid' => $course->id, 'identifier' => $identifier]);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
@@ -421,7 +435,7 @@ class release_test extends \advanced_testcase {
         $replacement = "xx=>replacement\r\nabc=>otherreplacement\r\ncc-4.0=>replacedtextintest\r\nlast=>lastline";
         set_config('uselicensereplacement', 1, 'local_oer');
         set_config('licensereplacement', $replacement, 'local_oer');
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         $license = $metadata['license'];
         $this->assertEquals('replacedtextintest', $license['shortname']);
 
@@ -464,7 +478,7 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
 
@@ -479,7 +493,7 @@ class release_test extends \advanced_testcase {
         $modifiedsnapshot->additionaldata = json_encode($additionaldata);
         $DB->update_record('local_oer_snapshot', $modifiedsnapshot);
         $snapshots = $snapshot->get_latest_course_snapshot(); // Update snapshots to contain additional data.
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         $expectedcounts['general'] = $expectedcounts['general'] + 3; // Three new fields have been added.
         $this->assert_count_metadata($metadata, $expectedcounts);
         $this->assert_metadata_default_fields($metadata);
@@ -511,8 +525,8 @@ class release_test extends \advanced_testcase {
         $helper->sync_course_info($course->id);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
-        $expectedcounts['general'] = 18; // New release should not have injected additional fields.
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
+        $expectedcounts['general'] = 16; // New release should not have injected additional fields.
         $expectedcounts['courses'] = 1;
         $expectedcounts['course'] = [11]; // Moodle course now has additional customfield.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -523,8 +537,8 @@ class release_test extends \advanced_testcase {
 
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
-        $expectedcounts['general'] = 18; // The new release should not have injected additional fields.
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
+        $expectedcounts['general'] = 16; // The new release should not have injected additional fields.
         $expectedcounts['courses'] = 2;
         $expectedcounts['course'] = [10, true, 1]; // Moodle course now has additional custom field.
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -560,7 +574,7 @@ class release_test extends \advanced_testcase {
         $DB->insert_record('local_oer_coursetofile', $coursetofile);
         $snapshot->create_snapshot_of_course_files(1);
         $snapshots = $snapshot->get_latest_course_snapshot();
-        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier]);
+        $metadata = $releasemetadata->invoke($release, $snapshots[$identifier], 'v2.0.0');
         $expectedcounts['courses'] = 3;
         $expectedcounts['course'] = [10, true, 1];
         $this->assert_count_metadata($metadata, $expectedcounts);
@@ -616,8 +630,6 @@ class release_test extends \advanced_testcase {
         // Test default file metadata.
         $this->assertIsArray($metadata);
         $this->assertArrayHasKey('title', $metadata);
-        $this->assertArrayHasKey('contenthash', $metadata);
-        $this->assertArrayHasKey('fileurl', $metadata);
         $this->assertArrayHasKey('abstract', $metadata);
         $this->assertArrayHasKey('license', $metadata);
         $this->assertArrayHasKey('context', $metadata);
