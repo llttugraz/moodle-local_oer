@@ -23,10 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// TODO:
-// Create cache of these files - as all information is coming from snapshots
-// The lifetime can be coupled with creating snapshots.
-
 // This script serves public accessible information.
 // No guest user check or other login is required.
 // Metadata served by this script has been released.
@@ -41,13 +37,6 @@ if (get_config('local_oer', 'pullservice') != 1) {
 $identifier = optional_param('identifier', false, PARAM_TEXT);
 $release = optional_param('release', false, PARAM_INT);
 $dates = optional_param('releasedates', false, PARAM_BOOL);
-
-// Increase application profile when metadata changes.
-// Update 2024-02-22: Metadata has been extended for external elements.
-// Backwards compatible.
-$result = [
-        'applicationprofile' => 'v1.0.1',
-];
 
 $result = [];
 if (strpos($_SERVER["HTTP_ACCEPT"], 'application/json; applicationprofile=v1.0.0') === 0) {
