@@ -44,7 +44,7 @@ class legacy extends releasedata {
     public function __construct(\stdClass $elementinfo) {
         global $CFG;
 
-        // No parent constructor
+        // No parent constructor.
         $decomposed = identifier::decompose($elementinfo->identifier);
         $typedata = empty($elementinfo->typedata) ? [] : json_decode($elementinfo->typedata);
         $this->context = \context_course::instance($elementinfo->courseid);

@@ -161,6 +161,8 @@ class release_test extends \advanced_testcase {
                 ],
         ];
 
+        $lastfile = 0;
+        $oldtype = 0;
         foreach ($filereleasematrix as $filerelease) {
             $record = new \stdClass();
             $record->courseid = $filerelease[0];
@@ -187,12 +189,16 @@ class release_test extends \advanced_testcase {
             ]]);
             $record->releasehash = hash('sha256', json_encode($record));
             $record->releasenumber = $filerelease[2];
-            $record->type = [element::OERTYPE_MOODLEFILE, element::OERTYPE_EXTERNAL][rand(0, 1)];
+            $type = $oldtype != 0 && $lastfile == $filerelease[1] ? $oldtype :
+                    [element::OERTYPE_MOODLEFILE, element::OERTYPE_EXTERNAL][rand(0, 1)];
+            $record->type = $type;
             $record->usermodified = 2;
             $record->timecreated = rand($this->releases[$filerelease[2]][0], $this->releases[$filerelease[2]][1]);
             $record->timemodified = $record->timecreated;
             $DB->insert_record('local_oer_snapshot', $record);
             $this->identifiers[$record->identifier] = $record->identifier;
+            $oldtype = $type;
+            $lastfile = $filerelease[1];
         }
     }
 
@@ -207,7 +213,6 @@ class release_test extends \advanced_testcase {
      * @throws \moodle_exception
      */
     public function test_get_latest_releases(): void {
-        global $DB;
         $releases = release::get_latest_releases('v2.0.0');
         $this->assertArrayHasKey('moodlecourses', $releases);
         $moodlecourses = $releases['moodlecourses'];
@@ -230,18 +235,40 @@ class release_test extends \advanced_testcase {
         $this->assertCount(1, $course3['elements']);
         $this->assertGreaterThan($this->releases[2][0], $course2['elements'][0]['timereleased']);
         $this->assertLessThan($this->releases[2][1], $course2['elements'][0]['timereleased']);
+    }
 
+    /**
+     * Test latest release with application profile v1.0.0.
+     *
+     * @covers ::get_latest_releases
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_get_latest_release_legacy() {
+        global $DB;
         $releases = release::get_latest_releases('v1.0.0');
+        if (!isset($releases['moodlecourses'])) {
+            $debug = true;
+        }
         $this->assertArrayHasKey('moodlecourses', $releases);
         $moodlecourses = $releases['moodlecourses'];
         $courses = $DB->get_records_sql('SELECT DISTINCT(courseid) FROM {local_oer_snapshot} WHERE type = :type',
                 ['type' => element::OERTYPE_MOODLEFILE]);
+        if (count($moodlecourses) != count($courses)) {
+            $debug = true;
+        }
         $this->assertCount(count($courses), $moodlecourses);
         $course = reset($moodlecourses);
         $courseid = $course['files'][0]['courses'][0]->courseid;
         $files = $DB->get_records_sql('SELECT DISTINCT(identifier) FROM {local_oer_snapshot} ' .
                 'WHERE type = :type AND courseid = :courseid',
                 ['type' => element::OERTYPE_MOODLEFILE, 'courseid' => $courseid]);
+        if (count($files) != count($course['files'])) {
+            $debug = true;
+        }
         $this->assertCount(count($files), $course['files']);
     }
 
