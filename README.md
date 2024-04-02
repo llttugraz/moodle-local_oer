@@ -191,7 +191,7 @@ Mainly used to load additional metadata from linked courses of the educational i
 
 Extend the formular for file metadata with additional classification information. Multiple classification plugins can be used.
 
-## Uploader
+## Uploader (deprecated since v2.3.0, will be removed in a future release)
 
 The base plugin has an endpoint that provides the metadata of all published files including links to the files as JSON. If the preferred way to load the data from Moodle is not via
 this pull service, but via upload, an additional plugin can be defined which enables the upload to a repository.

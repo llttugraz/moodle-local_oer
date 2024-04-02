@@ -63,7 +63,7 @@ class elements_test extends \advanced_testcase {
         }
         $element->set_source('http://localhost/');
         $element->set_mimetype(array_values(get_mimetypes_array())[rand(0, count(get_mimetypes_array()) - 1)]['type']);
-        $element->set_filesize(rand(0, 1000000));
+        $element->set_filesize(rand(1, 1000000));
         $origin = ['mod_folder', 'mod_resource'][rand(0, 1)];
         $element->set_origin($origin, 'pluginname', $origin);
         return $element;
