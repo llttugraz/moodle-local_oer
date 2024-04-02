@@ -59,7 +59,7 @@ class elements_test extends \advanced_testcase {
         $element->set_identifier($identifier);
         $element->set_title($this->getDataGenerator()->firstnames[rand(0, count($this->getDataGenerator()->firstnames) - 1)]);
         if ($setlicense) {
-            $element->set_license(['unknwon', 'cc-4.0', 'cc-nc-4.0', 'cc-nd-4.0', 'allrightsreserved'][rand(0, 4)]);
+            $element->set_license(['unknown', 'cc-4.0', 'cc-nc-4.0', 'cc-nd-4.0', 'allrightsreserved'][rand(0, 4)]);
         }
         $element->set_source('http://localhost/');
         $element->set_mimetype(array_values(get_mimetypes_array())[rand(0, count(get_mimetypes_array()) - 1)]['type']);
