@@ -23,12 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace release;
-
-use local_oer\identifier;
-use local_oer\release;
-use local_oer\snapshot;
-use local_oer\testcourse;
+namespace local_oer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -102,5 +97,4 @@ class legacy_test extends \advanced_testcase {
         $this->assertEquals($typedata->filesize, $metadata['filesize']);
         $this->assertEquals($elementinfo->timecreated, $metadata['filecreationtime']);
     }
-
 }
