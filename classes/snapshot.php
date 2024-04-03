@@ -159,7 +159,7 @@ class snapshot {
         $snapshot->typedata = $this->add_type_data($element);
         $hash = hash('sha256', json_encode($snapshot));
         $snapshot->releasehash = $hash;
-        $snapshot->releasenumber = $release;
+        $snapshot->releasenumber = $releasenumber;
         $snapshot->usermodified = $USER->id;
         $snapshot->timemodified = time();
         $snapshot->timecreated = time();
