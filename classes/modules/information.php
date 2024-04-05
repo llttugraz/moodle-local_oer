@@ -25,6 +25,8 @@
 
 namespace local_oer\modules;
 
+use core_calendar\event_mapper_test_proxy;
+
 /**
  * Class information
  *
@@ -36,37 +38,53 @@ class information {
      *
      * Sha1 hash of parent and name.
      *
-     * @var null
+     * @var string|null
      */
-    private $id = null;
+    private ?string $id = null;
 
     /**
      * Information with the same area will be joined for the view.
      *
      * @var string
      */
-    private $area = '';
+    private string $area = '';
 
     /**
      * Shown name.
      *
      * @var string
      */
-    private $name = '';
+    private string $name = '';
 
     /**
      * Url to the information.
      *
      * @var string
      */
-    private $url = '';
+    private string $url = '';
 
     /**
      * Bool if this information has an url.
      *
      * @var bool
      */
-    private $hasurl = false;
+    private bool $hasurl = false;
+
+    /**
+     * Name of the metadata field for release. Only PARAM_ALPHA characters are allowed.
+     *
+     * Set to null if this field should be ignored.
+     *
+     * @var string|null
+     */
+    private ?string $metadatafield = '';
+
+    /**
+     * Raw data to be added to the release.
+     *
+     * @var string
+     */
+    private string $rawdata = '';
 
     /**
      * Set the area. Use language strings defined in subplugin, local_oer or moodle core.
@@ -167,5 +185,61 @@ class information {
      */
     public function get_hasurl(): bool {
         return $this->hasurl;
+    }
+
+    /**
+     * Set the metadata field name.
+     *
+     * @param string|null $fieldname
+     * @return void
+     * @throws \invalid_parameter_exception
+     */
+    public function set_metadatafield(?string $fieldname): void {
+        if (is_null($fieldname)) {
+            $this->metadatafield = null;
+            return;
+        }
+        validate_param($fieldname, PARAM_ALPHA);
+        $this->metadatafield = $fieldname;
+    }
+
+    /**
+     * Return the metadata field name.
+     *
+     * @return ?string
+     */
+    public function get_metadatafield(): ?string {
+        return $this->metadatafield;
+    }
+
+    /**
+     * Set the raw data.
+     *
+     * @param string $data
+     * @return void
+     */
+    public function set_raw_data(string $data): void {
+        $this->rawdata = $data;
+    }
+
+    /**
+     * Get the raw data.
+     *
+     * @return string
+     */
+    public function get_raw_data(): string {
+        return $this->rawdata;
+    }
+
+    /**
+     * Test if the information is set up correctly.
+     *
+     * All necessary fields need to be set.
+     *
+     * @return bool
+     */
+    public function validate_info(): bool {
+        return !(empty($this->id) || empty($this->name) || empty($this->area) ||
+                (!is_null($this->metadatafield) && empty($this->rawdata)));
     }
 }

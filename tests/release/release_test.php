@@ -250,25 +250,16 @@ class release_test extends \advanced_testcase {
     public function test_get_latest_release_legacy() {
         global $DB;
         $releases = release::get_latest_releases('v1.0.0');
-        if (!isset($releases['moodlecourses'])) {
-            $debug = true;
-        }
         $this->assertArrayHasKey('moodlecourses', $releases);
         $moodlecourses = $releases['moodlecourses'];
         $courses = $DB->get_records_sql('SELECT DISTINCT(courseid) FROM {local_oer_snapshot} WHERE type = :type',
                 ['type' => element::OERTYPE_MOODLEFILE]);
-        if (count($moodlecourses) != count($courses)) {
-            $debug = true;
-        }
         $this->assertCount(count($courses), $moodlecourses);
         $course = reset($moodlecourses);
         $courseid = $course['files'][0]['courses'][0]->courseid;
         $files = $DB->get_records_sql('SELECT DISTINCT(identifier) FROM {local_oer_snapshot} ' .
                 'WHERE type = :type AND courseid = :courseid',
                 ['type' => element::OERTYPE_MOODLEFILE, 'courseid' => $courseid]);
-        if (count($files) != count($course['files'])) {
-            $debug = true;
-        }
         $this->assertCount(count($files), $course['files']);
     }
 

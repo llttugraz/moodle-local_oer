@@ -554,19 +554,24 @@ class element {
      * @param string $areastring Language string identifier
      * @param string $component Component where to find language string
      * @param string $name Name of the information
+     * @param string|null $metadatafield Fieldname for snapshot metadata
+     * @param string $rawdata Unmodified data for snapshot metadata.
      * @param string|null $url Url to the information
      * @return void
      * @throws \coding_exception
      * @throws \invalid_parameter_exception
      */
-    public function add_information(string $areastring, string $component, string $name, ?string $url = null): void {
-        if (empty($areastring) || empty($component) || empty($name)) {
-            throw new \coding_exception('Not all fields for information set.');
-        }
+    public function add_information(string $areastring, string $component, string $name, ?string $metadatafield,
+            string $rawdata, ?string $url = null): void {
         $information = new information();
         $information->set_area($areastring, $component);
         $information->set_name($name);
         $information->set_url($url);
+        $information->set_metadatafield($metadatafield);
+        $information->set_raw_data($rawdata);
+        if (!$information->validate_info()) {
+            throw new \coding_exception('Not all fields for information set.');
+        }
         $this->information[$information->get_id()] = $information;
     }
 
@@ -575,9 +580,13 @@ class element {
      *
      * @param information[] $information
      * @return void
+     * @throws \coding_exception
      */
     public function merge_information(array $information): void {
         foreach ($information as $info) {
+            if (!$info->validate_info()) {
+                throw new \coding_exception('Not all fields for information set.');
+            }
             $this->information[$info->get_id()] = $info;
         }
     }

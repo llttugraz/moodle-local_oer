@@ -410,13 +410,14 @@ class element_test extends \advanced_testcase {
      */
     public function test_add_merge_get_information(): void {
         $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
-        $element->add_information('type', 'local_oer', 'resource');
-        $element->add_information('type', 'local_oer', 'folder');
-        $element->add_information('section', 'moodle', 'abc');
+        $element->add_information('type', 'local_oer', 'resource', 'plugintype', 'mod_resource');
+        $element->add_information('type', 'local_oer', 'folder', null, '');
+        $element->add_information('section', 'moodle', 'abc', 'section', 'abc');
         $this->assertCount(3, $element->get_information());
         $newinfo = new information();
         $newinfo->set_name('blablub');
         $newinfo->set_area('type', 'local_oer');
+        $newinfo->set_metadatafield(null);
         $element->merge_information([$newinfo]);
         $this->assertCount(4, $element->get_information());
         $newinfo->set_name('resource');
@@ -425,6 +426,6 @@ class element_test extends \advanced_testcase {
 
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Not all fields for information set.');
-        $element->add_information('', 'local_oer', 'bla');
+        $element->add_information('pluginname', 'local_oer', '', null, '');
     }
 }
