@@ -129,6 +129,9 @@ class get_file extends \external_api {
                                                                                 'Url to information'),
                                                                         'infohasurl' => new \external_value(PARAM_BOOL,
                                                                                 'Boolean if url is available'),
+                                                                        'last' => new \external_value(PARAM_BOOL,
+                                                                                'Last element in array, ' .
+                                                                                'relevant for comma in mustache'),
                                                                 ]
                                                         )),
                                         ]

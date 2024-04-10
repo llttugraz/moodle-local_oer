@@ -175,6 +175,12 @@ class get_file_test extends \advanced_testcase {
                 get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infohasurl']));
         $this->assertEquals(PARAM_BOOL,
                 $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['infohasurl']->type);
+        $this->assertArrayHasKey('last',
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys);
+        $this->assertEquals($this->value,
+                get_class($returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['last']));
+        $this->assertEquals(PARAM_BOOL,
+                $returnvalue->keys['file']->keys['information']->content->keys['fields']->content->keys['last']->type);
 
         $this->assertArrayHasKey('requirementsmet', $returnvalue->keys['file']->keys);
         $this->assertEquals($this->value, get_class($returnvalue->keys['file']->keys['requirementsmet']));

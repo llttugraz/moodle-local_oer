@@ -136,6 +136,7 @@ class filelist {
                         'infoname' => $information->get_name(),
                         'infourl' => $information->get_url() ?? '',
                         'infohasurl' => $information->get_hasurl(),
+                        'last' => false,
                 ];
             }
             foreach ($info as $key => $information) {
@@ -144,6 +145,10 @@ class filelist {
                         'area' => $key,
                         'fields' => $information,
                 ];
+            }
+            foreach ($inforesult as $key => $info) {
+                $last = array_key_last($info['fields']);
+                $inforesult[$key]['fields'][$last]['last'] = true;
             }
 
             $icon = icon::select_file_icon($element->get_mimetype(), $renderer, $icons);

@@ -49,10 +49,10 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
             <small>{{area}}:
                 {{#fields}}
                     {{#infohasurl}}
-                        <a href="{{infourl}}" target="_blank">{{{infoname}}}</a>,
+                        <a href="{{infourl}}" target="_blank">{{{infoname}}}</a>{{^last}},{{/last}}
                     {{/infohasurl}}
                     {{^infohasurl}}
-                        {{{infoname}}}
+                        {{{infoname}}}{{^last}}, {{/last}}
                     {{/infohasurl}}
                 {{/fields}}
             </small>
