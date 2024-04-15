@@ -295,7 +295,7 @@ class fileinfo_form extends \moodleform {
         $mform->addElement('static', 'addpersons', get_string('person', 'local_oer'), $prefhtml);
         $mform->addHelpButton('addpersons', 'person', 'local_oer');
         $mform->addElement('html', '<hr>');
-        $mform->addRule('addpersons', get_string('required'), 'required', '', 'client');
+        $mform->addRule('addpersons', get_string('required'), 'required', '');
 
         $mform->addElement('hidden', 'storedtags', '');
         $mform->setType('storedtags', PARAM_TEXT);
