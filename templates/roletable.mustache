@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_oer/tags
+    @template local_oer/roletable
 
     Classes required for JS:
     * none
@@ -28,17 +28,24 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
     Example context (json):
     {
-        "timeuploadts": 0,
-        "origins": [
-            {
-                "origin": "mod_resource",
-                "originname": "File"
-            },
-            {
-                "origin": "mod_folder",
-                "originname": "Folder"
-            }
+    "head": [
+        "File",
+        "Folder"
+    ],
+    "data": [
+        [
+            "Field1",
+            "Field2"
+        ],
+        [
+            "Field3",
+            "Field4"
+        ],
+        [
+            "Field5",
+            null
         ]
+    ]
     }
   }}
 
@@ -53,7 +60,6 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
         </tr>
         </thead>
         <tbody>
-        <tr>
         {{#data}}
             <tr>
                 {{#.}}
@@ -61,7 +67,6 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 {{/.}}
             </tr>
         {{/data}}
-        </tr>
         </tbody>
     </table>
 </div>

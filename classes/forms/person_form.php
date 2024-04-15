@@ -107,8 +107,8 @@ class person_form extends \moodleform {
     /**
      * Moodle mform validation method.
      *
-     * @param $data
-     * @param $files
+     * @param array $data
+     * @param array $files
      * @return array
      */
     public function validation($data, $files): array {
