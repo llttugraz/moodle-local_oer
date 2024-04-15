@@ -42,13 +42,26 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     }
   }}
 
-<div class="d-inline-block">
-    {{#timeuploadedts}}
-        <span class="ml-1 badge badge-success">{{#str}} released, local_oer {{/str}}</span>
-    {{/timeuploadedts}}
-    {{^timeuploadedts}}
-        {{#upload}}
-            <span class="ml-1 badge badge-warning">{{#str}} upload, local_oer {{/str}}</span>
-        {{/upload}}
-    {{/timeuploadedts}}
+<div>
+    <p>{{#str}} role_description, local_oer {{/str}}</p>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            {{#head}}
+                <th scope="col">{{.}}</th>
+            {{/head}}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        {{#data}}
+            <tr>
+                {{#.}}
+                    <td>{{.}}</td>
+                {{/.}}
+            </tr>
+        {{/data}}
+        </tr>
+        </tbody>
+    </table>
 </div>

@@ -90,8 +90,7 @@ $string['error_upload_license'] = 'Zum Veröffentlichen von Dateien ist eine ' .
         'Creative Commons oder die Public Domain Lizenz erforderlich' .
         'Sie müssen entweder das Häkchen bei "Freigabe" entfernen ' .
         'oder eine entsprechende Lizenz einstellen.';
-$string['error_upload_author'] = 'Für die Freigabe von Dateien ist ein/e ' .
-        'Autor:in/Verleger:in erforderlich';
+$string['error_upload_author'] = 'Eine Person mit der Rolle "{$a->roles}" wird benötigt.';
 $string['error_license'] = 'Falsche Lizenz zum Veröffentlichen ausgewählt.';
 $string['no_files_heading'] = 'Keine Dateien gefunden';
 $string['no_files_filter'] = 'Mit dieser Filtereinstellung werden keine Dateien gefunden.';
@@ -153,12 +152,17 @@ $string['person'] = 'Person(en)';
 $string['prefperson'] = 'Person(en) (Voreinstellung)';
 $string['preftags'] = 'Schlagwörter (Voreinstellung)';
 $string['prefclassification'] = 'Zusätzliche Schlagwörter (Voreinstellung)';
-$string['person_help'] = '<p>Namen im Format ' .
-        '<strong>Vorname Nachname</strong> eingeben ' .
-        'und mit <strong>Enter</strong> bestätigen.</p> ' .
+$string['person_help'] = 'Die Schaltfläche öffnet ein Formular, in dem Sie den Vor- und Nachnamen einer Person ' .
+        'eingeben und ihre Rolle für dieses Element auswählen können.' .
         '<p>Mehrere Personen können eingegeben werden.</p>' .
-        '<p>Eingegebene Namen werde oberhalb des Eingabefeldes angezeigt.</p>' .
+        '<p>Eingegebene Namen werde oberhalb der Schaltfläche angezeigt.</p>' .
         '<p>Durch Klick auf die Boxen können Namen wieder entfernt werden.</p>';
+$string['role_help'] = 'Wählen Sie die Rolle für die Person aus. ' .
+        'Die Rollen hängen von der Art des Elements ab, daher ist nicht jede Rolle für jedes Element verfügbar.';
+$string['role_description'] = 'Die Tabelle zeigt, welche Rollen für welche Elementart verfügbar sind. ' .
+        'Die mit einem * (Sternchen) gekennzeichneten Rollen sind für diese Elementart obligatorisch. ' .
+        'Wenn eine Person über Voreinstellungen hinzugefügt wird, ' .
+        'wird die Person nur zu Elementen hinzugefügt, wo die Rolle verfügbar ist.';
 $string['confirmperson'] = 'Zum Bestätigen <strong>Enter</strong> drücken.';
 $string['preferenceenabled'] = 'Voreinstellungen sind für diese Datei <strong>aktiviert</strong>.' .
         'Felder welche in den Voreinstellungen ausgefüllt werden ' .
@@ -306,8 +310,6 @@ $string['context_help'] = 'Der Bildungskontext, für den diese Datei ' .
         'konzipiert/geschrieben wurde.';
 $string['license_help'] = 'Um eine Datei zu veröffentlichen, muss eine ' .
         'Creative-Commons Lizenz oder Public Domain verwendet werden.';
-$string['role_help'] = 'Die Rolle, die die Personen im folgenden Textfeld in ' .
-        'Bezug auf diese Datei haben.';
 $string['tags_help'] = '<p>Zusätzliche Schlagwörter zur Klassifizierung der Datei.</p>' .
         '<p>Geben Sie ein Schlagwort ein und bestätigen Sie mit ' .
         '<strong>Enter</strong>.</p>' .
@@ -469,7 +471,8 @@ $string['moreinformation'] = 'Weitere informationen';
 $string['noinfo'] = 'Keine zusätzlichen Informationen';
 $string['origin'] = 'Quelle';
 $string['applicationprofile'] = 'Applikationsprofil';
-$string['applicationprofile_description'] = 'Wählen Sie das Applikationsprofil aus, das für die Erzeugung der Metadaten verwendet wird. <br>' .
+$string['applicationprofile_description'] =
+        'Wählen Sie das Applikationsprofil aus, das für die Erzeugung der Metadaten verwendet wird. <br>' .
         '<ul>' .
         '<li>v1.0.0: Profil verwendet bis zu local_oer Plugin Version v2.2.1 (2023062800). ' .
         'Unterstützt nur Dateien, die direkt in Moodle gehostet werden.' .

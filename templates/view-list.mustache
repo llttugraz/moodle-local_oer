@@ -57,6 +57,9 @@
                     </div>
                     <div class="col-3">
                         <ul class="list-group">
+                            <div class="col-1">
+                                {{> local_oer/badges }}
+                            </div>
                             {{#requirementsmet}}
                                 <li class="list-group-item border-0 p-0">
                                     <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} requirementsmet, local_oer{{/str}}</small></small>
@@ -81,9 +84,6 @@
                                 <small><small>{{#str}} uploaded, local_oer{{/str}} {{timeuploaded}}</small></small>
                             </li>
                         </ul>
-                    </div>
-                    <div class="col-1">
-                        {{> local_oer/badges }}
                     </div>
                     <div class="d-flex float-right mt-2 col-1 justify-content-end">
                         {{> local_oer/file-action-menu }}

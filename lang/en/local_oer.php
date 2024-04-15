@@ -150,14 +150,18 @@ $string['person'] = 'Person(s)';
 $string['prefperson'] = 'Person(s) (Preference)';
 $string['preftags'] = 'Tags (Preference)';
 $string['prefclassification'] = 'Additional tags (Preference)';
-$string['person_help'] = '<p>Enter the name of a person in the format ' .
-        '<strong>Firstname Lastname</strong> ' .
-        'and confirm with <strong>Enter</strong>.</p> ' .
-        '<p>Multiple persons are possible.</p>' .
+$string['person_help'] = 'The button opens a form in which you can enter the first and last name ' .
+        'of a person and select their role for this element.'
+        . '<p>Multiple persons are possible.</p>' .
         '<p>Once you have entered a name, you will see ' .
-        'it above the input field.</p>' .
+        'it above the button.</p>' .
         '<p>You can remove a name by clicking on the ' .
-        'tag above the input field.</p>';
+        'tag above the button.</p>';
+$string['role_help'] = 'Select the role for the person. ' .
+        'Roles depends on the type of the element, so not every role is available for every element.';
+$string['role_description'] = 'The table shows which roles are available for which element type. ' .
+        'Roles marked with a * (asterisk) are mandatory for that element type. ' .
+        'When a person is added per preference form, the person will only be added to elements where the role is available.';
 $string['confirmperson'] = 'Press <strong>Enter</strong> to confirm the person';
 $string['preferenceenabled'] = 'Preferences are <strong>enabled</strong> for this file. ' .
         'Values that are set in preferences are locked in this view';
@@ -293,10 +297,7 @@ $string['preferenceinfoformhelp'] = '<p class="alert alert-info">The filled fiel
         'form are used as the base values for files that are ' .
         'edited for the first time.</p>';
 $string['context_help'] = 'The educational context this file is designed/written for.';
-$string['license_help'] = 'To release a file, it is necessary to use a ' .
-        'Creative Commons license.';
-$string['role_help'] = 'The role that the persons in the following ' .
-        'text field have in relation to this file.';
+$string['license_help'] = 'To release a file, it is necessary to use a Creative Commons license.';
 $string['tags_help'] = '<p>Additional tags to classify the file.</p>' .
         '<p>Enter the tag and confirm with <strong>Enter</strong>.</p>' .
         '<p>Multiple tags are possible.</p>' .
