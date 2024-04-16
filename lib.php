@@ -211,16 +211,20 @@ function local_oer_output_fragment_personform(array $args): string {
 /**
  * Serve public available oer files
  *
- * @param stdClass $course the course object
- * @param stdClass $cm the course module object
- * @param stdClass $context the context
+ * @param stdClass|null $course the course object
+ * @param stdClass|null $cm the course module object
+ * @param stdClass|null $context the context
  * @param string $filearea the name of the file area
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @return bool false if the file not found, just send the file otherwise and do not return anything
+ * @return void just send the file and do not return anything
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
-function local_oer_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+function local_oer_pluginfile(?\stdClass $course, ?\stdClass $cm, ?\stdClass $context,
+        string $filearea, array $args, bool $forcedownload, array $options = []): void {
     if (get_config('local_oer', 'pullservice') != 1) {
         throw new \moodle_exception('Webservice to show public accessible OER Files is not activated on this system.');
     }
@@ -232,8 +236,9 @@ function local_oer_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
     global $DB;
     if ($DB->record_exists('local_oer_snapshot', ['id' => $fileid])) {
         $fileinfo = $DB->get_record('local_oer_snapshot', ['id' => $fileid]);
-        $file = \local_oer\filelist::get_single_file($fileinfo->courseid, $fileinfo->identifier);
-        send_stored_file($file[0]['file']);
+        $element = \local_oer\filelist::get_single_file($fileinfo->courseid, $fileinfo->identifier);
+        $files = $element->get_storedfiles();
+        send_stored_file(reset($files));
     }
     throw new \moodle_exception('File not found.');
 }
