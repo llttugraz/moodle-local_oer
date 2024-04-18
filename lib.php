@@ -237,8 +237,10 @@ function local_oer_pluginfile(?\stdClass $course, ?\stdClass $cm, ?\stdClass $co
     if ($DB->record_exists('local_oer_snapshot', ['id' => $fileid])) {
         $fileinfo = $DB->get_record('local_oer_snapshot', ['id' => $fileid]);
         $element = \local_oer\filelist::get_single_file($fileinfo->courseid, $fileinfo->identifier);
-        $files = $element->get_storedfiles();
-        send_stored_file(reset($files));
+        if ($element && !empty($element->get_storedfiles())) {
+            $files = $element->get_storedfiles();
+            send_stored_file(reset($files));
+        }
     }
     throw new \moodle_exception('File not found.');
 }
