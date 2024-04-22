@@ -33,8 +33,9 @@ import * as Str from 'core/str';
  * Show the files in the browser.
  *
  * @param {boolean} init
+ * @param {boolean} keepFocus
  */
-export const showFiles = (init) => {
+export const showFiles = (init, keepFocus) => {
     const output = Config.getOutputValues(init);
     const oldSearchInput = document.getElementById('local_oer_searchFilecardsInput');
     let oldSearchValue = '';
@@ -45,7 +46,8 @@ export const showFiles = (init) => {
         .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-overview', html, js);
             const searchInput = document.getElementById('local_oer_searchFilecardsInput');
-            if (searchInput !== null) {
+            window.console.log(init, keepFocus);
+            if (keepFocus && searchInput !== null) {
                 // Workaround to fix losing focus of search after Template.replaceNodeContents.
                 // The navigation controls are inside the template and replaced after every search.
                 searchInput.value = oldSearchValue;
@@ -161,7 +163,7 @@ const replaceFileInfo = (promises) => {
             }
         });
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(output);
-        showFiles(false);
+        showFiles(false, true);
     });
 };
 
@@ -174,7 +176,7 @@ const replaceFileInfo = (promises) => {
 export const prepareFiles = (promises, init) => {
     promises[0].done(function(response) {
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(response);
-        showFiles(init);
+        showFiles(init, true);
     });
 };
 
@@ -580,12 +582,12 @@ const addPaginationListeners = (pages) => {
     let selectlistener = document.getElementById('local-oer-pagination-select');
     let pagelistener = document.getElementById('local-oer-pagination-pages');
 
-    selectlistener.addEventListener("click", function(action) {
+    selectlistener.addEventListener("change", function(action) {
         action.preventDefault();
         let value = action.target.value;
         localStorage.setItem('local-oer-pagination-selected-' + courseid, value);
         localStorage.setItem('local-oer-pagination-current-' + courseid, "1");
-        showFiles(false);
+        showFiles(false, false);
     });
 
     pagelistener.addEventListener("click", function(action) {
@@ -604,6 +606,6 @@ const addPaginationListeners = (pages) => {
                 break;
         }
         localStorage.setItem('local-oer-pagination-current-' + courseid, value);
-        showFiles(false);
+        showFiles(false, false);
     });
 };

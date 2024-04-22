@@ -37,7 +37,7 @@ export const initLayoutListener = () => {
     element.addEventListener("click", function(action) {
         action.preventDefault();
         UserPreference.setLayout(action.target.dataset.value);
-        Output.showFiles();
+        Output.showFiles(false, true);
     });
 };
 
@@ -53,7 +53,7 @@ export const initSortListener = () => {
     element.addEventListener("click", function(action) {
         action.preventDefault();
         UserPreference.setSort(action.target.dataset.value);
-        Output.showFiles();
+        Output.showFiles(false, true);
     });
 };
 
@@ -73,7 +73,7 @@ export const initGroupingListener = () => {
         }
         let filtervalue = action.target.dataset.filtervalue;
         UserPreference.setFilter(action.target.dataset.value, filtervalue);
-        Output.showFiles();
+        Output.showFiles(false, true);
     });
 };
 
@@ -122,12 +122,12 @@ export const initSearchListener = () => {
         return;
     }
     const searchFiles = debounce(function() {
-        Output.showFiles();
+        Output.showFiles(false, true);
     }, 500, false);
 
     searchInput.addEventListener("keyup", searchFiles);
     searchInput.addEventListener("search", function() {
-        Output.showFiles();
+        Output.showFiles(false, true);
     });
 };
 
