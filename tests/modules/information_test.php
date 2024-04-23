@@ -32,7 +32,7 @@ use local_oer\modules\information;
  *
  * @coversDefaultClass \local_oer\modules\information
  */
-class information_test extends \advanced_testcase {
+final class information_test extends \advanced_testcase {
     /**
      * Set up test environment.
      *

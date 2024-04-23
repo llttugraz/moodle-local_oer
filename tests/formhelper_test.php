@@ -32,7 +32,7 @@ use local_oer\helper\formhelper;
  *
  * @coversDefaultClass \local_oer\helper\formhelper
  */
-class formhelper_test extends \advanced_testcase {
+final class formhelper_test extends \advanced_testcase {
     /**
      * Test add no preference value.
      *

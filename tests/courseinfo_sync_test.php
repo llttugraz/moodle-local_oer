@@ -32,7 +32,7 @@ use local_oer\metadata\courseinfo_sync;
  *
  * @coversDefaultClass \local_oer\metadata\courseinfo_sync
  */
-class courseinfo_sync_test extends \advanced_testcase {
+final class courseinfo_sync_test extends \advanced_testcase {
     /**
      * A stdClass that can be inserted in courseinfo table for testing purposes.
      *

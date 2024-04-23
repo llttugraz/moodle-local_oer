@@ -33,7 +33,7 @@ use local_oer\time\time_settings;
  *
  * @coversDefaultClass \local_oer\time\time_form
  */
-class time_form_test extends \advanced_testcase {
+final class time_form_test extends \advanced_testcase {
     /**
      * Test the time form validation element.
      *

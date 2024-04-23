@@ -44,7 +44,7 @@ use local_oer\plugininfo\oermod;
  *
  * @coversDefaultClass \local_oer\plugininfo\oermod
  */
-class oermod_test extends \advanced_testcase {
+final class oermod_test extends \advanced_testcase {
     /**
      * Set up the unit tests.
      *

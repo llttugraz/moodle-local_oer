@@ -39,7 +39,7 @@ use local_oer\userlist\userlist;
  *
  * @coversDefaultClass \local_oer\privacy\provider
  */
-class privacy_provider_test extends provider_testcase {
+final class privacy_provider_test extends provider_testcase {
     /**
      * Test get metadata function.
      *

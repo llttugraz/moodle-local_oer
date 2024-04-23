@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\identifier
  */
-class identifier_test extends \advanced_testcase {
+final class identifier_test extends \advanced_testcase {
     /**
      * Test validate.
      *

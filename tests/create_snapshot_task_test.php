@@ -32,7 +32,7 @@ use local_oer\time\time_settings;
  *
  * @coversDefaultClass \local_oer\task\create_snapshot_task
  */
-class create_snapshot_task_test extends \advanced_testcase {
+final class create_snapshot_task_test extends \advanced_testcase {
     /**
      * Set up the test environment.
      *

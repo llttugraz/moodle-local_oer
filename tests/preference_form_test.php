@@ -38,7 +38,7 @@ use local_oer\metadata\courseinfo;
  *
  * @coversDefaultClass \local_oer\forms\preference_form
  */
-class preference_form_test extends \advanced_testcase {
+final class preference_form_test extends \advanced_testcase {
     /**
      * Test validation of formular.
      * Also runs through the formular definition, but there is not tested anything special.

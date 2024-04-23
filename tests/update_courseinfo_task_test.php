@@ -32,7 +32,7 @@ use local_oer\task\update_courseinfo_task;
  *
  * @coversDefaultClass \local_oer\task\update_courseinfo_task
  */
-class update_courseinfo_task_test extends \advanced_testcase {
+final class update_courseinfo_task_test extends \advanced_testcase {
     /**
      * Set up the test environment.
      *

@@ -33,7 +33,7 @@ use local_oer\plugininfo\oermod;
  *
  * @coversDefaultClass \local_oer\helper\license
  */
-class license_test extends \advanced_testcase {
+final class license_test extends \advanced_testcase {
     /**
      * Test license cc check.
      *

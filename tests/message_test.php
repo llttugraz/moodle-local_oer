@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\message
  */
-class message_test extends \advanced_testcase {
+final class message_test extends \advanced_testcase {
     /**
      * Test send email to user.
      *

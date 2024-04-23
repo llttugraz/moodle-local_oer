@@ -38,7 +38,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\metadata\coursetofile
  */
-class coursetofile_test extends \advanced_testcase {
+final class coursetofile_test extends \advanced_testcase {
     /**
      * Test if exception is thrown as expected.
      *

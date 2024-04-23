@@ -33,7 +33,7 @@ use local_oer\userlist\userlist;
  *
  * @coversDefaultClass \local_oer\userlist\userlist
  */
-class userlist_test extends \advanced_testcase {
+final class userlist_test extends \advanced_testcase {
     /**
      * Test if a user is allowed to use oer or not.
      *

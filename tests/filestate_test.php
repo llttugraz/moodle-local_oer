@@ -39,7 +39,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\helper\filestate
  */
-class filestate_test extends \advanced_testcase {
+final class filestate_test extends \advanced_testcase {
     /**
      * A file can have different states inside the oer plugin. These states are defined as constants in the filestate class.
      * The calculate_file_state function returns the estimated state along with some additional information about the course where

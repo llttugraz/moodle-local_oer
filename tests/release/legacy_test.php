@@ -34,7 +34,7 @@ require_once(__DIR__ . '/../helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\release\legacy
  */
-class legacy_test extends \advanced_testcase {
+final class legacy_test extends \advanced_testcase {
     /**
      * Test construction of legacy data structure.
      *

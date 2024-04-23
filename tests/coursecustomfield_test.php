@@ -33,7 +33,7 @@ use local_oer\metadata\courseinfo_sync;
  *
  * @coversDefaultClass \local_oer\metadata\coursecustomfield
  */
-class coursecustomfield_test extends \advanced_testcase {
+final class coursecustomfield_test extends \advanced_testcase {
     /**
      * Data that is generated in setup method.
      *

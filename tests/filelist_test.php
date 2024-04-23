@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\filelist
  */
-class filelist_test extends \advanced_testcase {
+final class filelist_test extends \advanced_testcase {
     /**
      * Testdata.
      *

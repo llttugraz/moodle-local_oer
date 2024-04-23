@@ -34,7 +34,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\zipper
  */
-class zipper_test extends \advanced_testcase {
+final class zipper_test extends \advanced_testcase {
     /**
      * Test if files are correctly added to one or multiple filepackages.
      *

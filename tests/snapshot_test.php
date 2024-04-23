@@ -37,7 +37,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\snapshot
  */
-class snapshot_test extends \advanced_testcase {
+final class snapshot_test extends \advanced_testcase {
     /**
      * Setup test environment.
      *

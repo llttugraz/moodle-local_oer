@@ -32,7 +32,7 @@ use local_oer\forms\person_form;
  *
  * @coversDefaultClass \local_oer\forms\person_form
  */
-class person_form_test extends \advanced_testcase {
+final class person_form_test extends \advanced_testcase {
     /**
      * Just to run through the code and test for PHP and Moodle warnings/errors.
      *

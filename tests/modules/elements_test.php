@@ -33,7 +33,7 @@ use local_oer\modules\elements;
  *
  * @coversDefaultClass \local_oer\modules\elements
  */
-class elements_test extends \advanced_testcase {
+final class elements_test extends \advanced_testcase {
     /**
      * Set up the test environment.
      *

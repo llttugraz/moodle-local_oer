@@ -36,7 +36,7 @@ use local_oer\forms\coursetofile_form;
  *
  * @coversDefaultClass \local_oer\forms\coursetofile_form
  */
-class coursetofile_form_test extends \advanced_testcase {
+final class coursetofile_form_test extends \advanced_testcase {
     /**
      * Form for the test.
      *

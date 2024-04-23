@@ -32,7 +32,7 @@ use local_oer\modules\person;
  *
  * @coversDefaultClass \local_oer\modules\person
  */
-class person_test extends \advanced_testcase {
+final class person_test extends \advanced_testcase {
     /**
      * Set up the unit tests.
      *

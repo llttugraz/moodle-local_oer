@@ -37,7 +37,7 @@ require_once(__DIR__ . '/helper/fromform.php');
  *
  * @coversDefaultClass \local_oer\forms\fileinfo_form
  */
-class fileinfo_form_test extends \advanced_testcase {
+final class fileinfo_form_test extends \advanced_testcase {
     /**
      * Test setup.
      *

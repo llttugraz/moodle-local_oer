@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\logger
  */
-class logger_test extends \advanced_testcase {
+final class logger_test extends \advanced_testcase {
     /**
      * Test add log message.
      *

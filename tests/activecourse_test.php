@@ -32,7 +32,7 @@ use local_oer\helper\activecourse;
  *
  * @coversDefaultClass \local_oer\helper\activecourse
  */
-class activecourse_test extends \advanced_testcase {
+final class activecourse_test extends \advanced_testcase {
     /**
      * Data that is generated in setup method.
      *

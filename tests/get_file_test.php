@@ -31,7 +31,7 @@ namespace local_oer;
  * @runTestsInSeparateProcesses
  * @coversDefaultClass \local_oer\services\get_file
  */
-class get_file_test extends \advanced_testcase {
+final class get_file_test extends \advanced_testcase {
     /**
      * Type of external_value. In Moodle 4.2 the namespace changes.
      *

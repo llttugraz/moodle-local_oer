@@ -34,7 +34,7 @@ use local_oer\modules\person;
  *
  * @coversDefaultClass \local_oer\modules\element
  */
-class element_test extends \advanced_testcase {
+final class element_test extends \advanced_testcase {
     /**
      * Set up the unit tests.
      *

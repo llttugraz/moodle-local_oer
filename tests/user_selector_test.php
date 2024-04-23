@@ -34,7 +34,7 @@ use local_oer\userlist\userlist;
  *
  * @coversDefaultClass \local_oer\userlist\user_selector
  */
-class user_selector_test extends \advanced_testcase {
+final class user_selector_test extends \advanced_testcase {
     /**
      * Test if users are selected correctly on searching them.
      *

@@ -43,7 +43,7 @@ class testdummy extends releasedata {
  *
  * @coversDefaultClass \local_oer\release\releasedata
  */
-class releasedata_test extends \advanced_testcase {
+final class releasedata_test extends \advanced_testcase {
     /**
      * Test if metadata contains all fields after release.
      *

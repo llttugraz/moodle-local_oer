@@ -38,7 +38,7 @@ require_once(__DIR__ . '/../helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\release
  */
-class release_test extends \advanced_testcase {
+final class release_test extends \advanced_testcase {
     /**
      * Releases with timestamps.
      *

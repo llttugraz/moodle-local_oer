@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\time\oer_config_link
  */
-class oer_config_link_test extends \advanced_testcase {
+final class oer_config_link_test extends \advanced_testcase {
     /**
      * Test the time form validation element.
      *

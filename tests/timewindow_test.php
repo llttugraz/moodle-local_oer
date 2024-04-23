@@ -32,7 +32,7 @@ use local_oer\time\time_settings;
  *
  * @coversDefaultClass \local_oer\time\time_settings
  */
-class timewindow_test extends \advanced_testcase {
+final class timewindow_test extends \advanced_testcase {
     /**
      * Test daily release
      *

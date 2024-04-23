@@ -36,7 +36,7 @@ require_once(__DIR__ . '/../helper/testcourse.php');
  *
  * @coversDefaultClass  \local_oer\release\filedata
  */
-class filedata_test extends \advanced_testcase {
+final class filedata_test extends \advanced_testcase {
     /**
      * As the other methods of the abstract class are already tested, only the differences are tested here.
      *

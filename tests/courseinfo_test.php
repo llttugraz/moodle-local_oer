@@ -32,7 +32,7 @@ use local_oer\metadata\courseinfo;
  *
  * @coversDefaultClass \local_oer\metadata\courseinfo
  */
-class courseinfo_test extends \advanced_testcase {
+final class courseinfo_test extends \advanced_testcase {
     /**
      * Moodle courseid used in all tests.
      *
