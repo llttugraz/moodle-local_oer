@@ -57,7 +57,7 @@ final class releasedata_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function test_get_array() {
+    public function test_get_array(): void {
         $this->resetAfterTest();
 
         global $DB;

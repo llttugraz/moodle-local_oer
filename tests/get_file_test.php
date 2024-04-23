@@ -82,7 +82,7 @@ final class get_file_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\services\get_file::service_parameters
      */
-    public function test_service_parameters() {
+    public function test_service_parameters(): void {
         $parameters = \local_oer\services\get_file::service_parameters();
         $this->assertEquals($this->parameter, get_class($parameters));
         $this->assertArrayHasKey('courseid', $parameters->keys);
@@ -100,7 +100,7 @@ final class get_file_test extends \advanced_testcase {
      * @covers \local_oer\services\get_file::service_returns
      * @covers \local_oer\services\get_file::external_file_return_value
      */
-    public function test_service_returns() {
+    public function test_service_returns(): void {
         $returnvalue = \local_oer\services\get_file::service_returns();
         $this->assertEquals($this->single, get_class($returnvalue));
         $this->assertArrayHasKey('courseid', $returnvalue->keys);
@@ -227,7 +227,7 @@ final class get_file_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\services\get_file::service
      */
-    public function test_service() {
+    public function test_service(): void {
         $this->setAdminUser();
         $helper = new \local_oer\testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());

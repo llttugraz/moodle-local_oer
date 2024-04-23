@@ -64,7 +64,7 @@ final class fileinfo_form_test extends \advanced_testcase {
      * @return void
      * @throws \ReflectionException
      */
-    public function test_set_state() {
+    public function test_set_state(): void {
         $testcourse = new testcourse();
         $course = $testcourse->generate_testcourse($this->getDataGenerator());
         $identifier = $testcourse->get_identifier_of_first_found_file($course);
@@ -102,7 +102,7 @@ final class fileinfo_form_test extends \advanced_testcase {
      * @covers ::get_required_fields
      * @covers ::prepare_classification_values_for_form
      */
-    public function test_validation() {
+    public function test_validation(): void {
         // Update from 14.06.2022, now it is possible to select required fields.
         $config = 'description,context';
         set_config('requiredfields', $config, 'local_oer');
@@ -224,7 +224,7 @@ final class fileinfo_form_test extends \advanced_testcase {
      * @covers ::set_value
      * @covers ::prepare_classification_values_to_store
      */
-    public function test_update_metadata() {
+    public function test_update_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;
@@ -294,11 +294,13 @@ final class fileinfo_form_test extends \advanced_testcase {
     /**
      * Test reset to preference method.
      *
-     * @return void
-     * @throws \dml_exception
      * @covers ::reset_form_data_to_preference_values
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function test_reset_form_data_to_preference_values() {
+    public function test_reset_form_data_to_preference_values(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -366,7 +368,7 @@ final class fileinfo_form_test extends \advanced_testcase {
      * @throws \ReflectionException
      * @throws \coding_exception
      */
-    public function test_add_people() {
+    public function test_add_people(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $testcourse = new testcourse();

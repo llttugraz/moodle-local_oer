@@ -47,7 +47,7 @@ final class requirement_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function test_metadata_fulfills_all_requirements() {
+    public function test_metadata_fulfills_all_requirements(): void {
         $this->resetAfterTest();
         static::set_config('');
 
@@ -134,7 +134,7 @@ final class requirement_test extends \advanced_testcase {
      * @param string $config
      * @return void
      */
-    private static function set_config(string $config) {
+    private static function set_config(string $config): void {
         set_config('requiredfields', $config, 'local_oer');
     }
 
@@ -223,7 +223,7 @@ final class requirement_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::reset_releasestate_if_necessary
      */
-    public function test_local_oer_reset_releasestate_if_necessary() {
+    public function test_local_oer_reset_releasestate_if_necessary(): void {
         $this->resetAfterTest();
         global $DB, $CFG;
         $this->setAdminUser();

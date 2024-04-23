@@ -46,10 +46,10 @@ final class zipper_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::separate_files_to_packages
      */
-    public function test_separate_files_to_packages() {
+    public function test_separate_files_to_packages(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
-        // TODO: test is dependent from subplugin.
+        // MDL-0 TODO: test is dependent from subplugin.
         set_config('enabledmodplugins', 'resource', 'local_oer');
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
@@ -67,7 +67,7 @@ final class zipper_test extends \advanced_testcase {
         $this->assertEquals(0, $info['general']['packages'], 'Packages start counting at 0, so 0 should be the correct value');
         $this->assertEquals($size, $info['general']['fullsize'], 'The package size should match the filesizes');
 
-        // TODO: test package separation with lots of big files - look into the old unit test..
+        // MDL-0 TODO: test package separation with lots of big files - look into the old unit test..
     }
 
     /**
@@ -81,10 +81,10 @@ final class zipper_test extends \advanced_testcase {
      * @covers ::prepare_files_to_zip
      * @covers ::create_metadata_json_temp
      */
-    public function test_compress_file_package() {
+    public function test_compress_file_package(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
-        // TODO: test is dependent from subplugin.
+        // MDL-0 TODO: test is dependent from subplugin.
         set_config('enabledmodplugins', 'resource', 'local_oer');
 
         $helper = new testcourse();
@@ -100,6 +100,6 @@ final class zipper_test extends \advanced_testcase {
         $this->assertNotFalse($zipfile, 'Should be a path to a zipfile');
         $this->assertTrue(file_exists($zipfile), 'There should be a ZIP file in the temp directory');
 
-        // TODO: add some variations?...
+        // MDL-0 TODO: add some variations?...
     }
 }

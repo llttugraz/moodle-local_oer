@@ -49,7 +49,7 @@ final class coursetofile_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\metadata\coursetofile::get_courses_metadata_for_file
      */
-    public function test_get_courses_metadata_for_file_exception() {
+    public function test_get_courses_metadata_for_file_exception(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
@@ -74,7 +74,7 @@ final class coursetofile_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\metadata\coursetofile::get_courses_metadata_for_file
      */
-    public function test_get_courses_metadata_for_file() {
+    public function test_get_courses_metadata_for_file(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

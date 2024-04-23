@@ -37,11 +37,10 @@ final class person_form_test extends \advanced_testcase {
      * Just to run through the code and test for PHP and Moodle warnings/errors.
      *
      * @return void
-     * @throws \coding_exception
      * @covers \local_oer\forms\person_form::validation
      * @covers \local_oer\forms\person_form::definition
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $this->resetAfterTest();
         $mform = new person_form(null, ['creator' => 'preference']);
         $result = $mform->validation([], []);

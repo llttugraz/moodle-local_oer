@@ -58,7 +58,7 @@ final class courseinfo_test extends \advanced_testcase {
      * @return void
      * @covers ::get_default_metadata_object
      */
-    public function test_get_default_metadata_object() {
+    public function test_get_default_metadata_object(): void {
         $metadata = courseinfo::get_default_metadata_object($this->courseid);
         $this->assertIsObject($metadata);
         $this->assertTrue(property_exists($metadata, 'courseid'));
@@ -126,7 +126,7 @@ final class courseinfo_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::load_metadata_from_database
      */
-    public function test_load_metadata_from_database() {
+    public function test_load_metadata_from_database(): void {
         $courseinfo = new courseinfo();
         $this->assertEmpty($courseinfo->load_metadata_from_database($this->courseid));
         global $DB;
@@ -154,12 +154,11 @@ final class courseinfo_test extends \advanced_testcase {
      * Test the metadata generator for courseinfo.
      *
      * @return void
-     * @throws \ReflectionException
      * @throws \coding_exception
      * @throws \dml_exception
      * @covers ::generate_metadata
      */
-    public function test_generate_metadata() {
+    public function test_generate_metadata(): void {
         $customcat1 = $this->getDataGenerator()->create_custom_field_category(['name' => 'unittest category 1']);
         $customcat2 = $this->getDataGenerator()->create_custom_field_category(['name' => 'category 2 for unittest']);
         $field1 = $this->getDataGenerator()->create_custom_field([
@@ -229,11 +228,12 @@ final class courseinfo_test extends \advanced_testcase {
     /**
      * Test the html to text function.
      *
-     * @return void
-     * @throws \ReflectionException
      * @covers ::simple_html_to_text_reduction
+     *
+     * @return void
+     * @throws \Exception
      */
-    public function test_simple_html_to_text_reduction() {
+    public function test_simple_html_to_text_reduction(): void {
         $anchor = '<a href="https://irunaunittest.test">this text is lost</a>';
         $expected = "https://irunaunittest.test";
         $result = courseinfo::simple_html_to_text_reduction($anchor);

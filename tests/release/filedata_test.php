@@ -47,7 +47,7 @@ final class filedata_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function test_filedata_constructor() {
+    public function test_filedata_constructor(): void {
         $this->resetAfterTest();
 
         global $DB, $CFG;

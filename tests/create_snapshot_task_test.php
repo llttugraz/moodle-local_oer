@@ -47,10 +47,10 @@ final class create_snapshot_task_test extends \advanced_testcase {
      * Test get name.
      *
      * @return void
-     * @throws coding_exception
+     * @throws \coding_exception
      * @covers ::get_name
      */
-    public function test_get_name() {
+    public function test_get_name(): void {
         $task = new \local_oer\task\create_snapshot_task();
         $this->assertEquals(get_string('snapshottask', 'local_oer'), $task->get_name());
     }
@@ -64,7 +64,7 @@ final class create_snapshot_task_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::execute
      */
-    public function test_execute() {
+    public function test_execute(): void {
         global $DB;
         $this->setAdminUser();
         $helper = new \local_oer\testcourse();

@@ -58,7 +58,7 @@ final class snapshothelper_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\helper\snapshothelper::create_snapshots_of_all_active_courses
      */
-    public function test_create_snapshots_of_all_active_courses() {
+    public function test_create_snapshots_of_all_active_courses(): void {
         global $DB;
         $testcourse = new testcourse();
 
@@ -143,7 +143,7 @@ final class snapshothelper_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\helper\snapshothelper::get_latest_snapshot_timestamp
      */
-    public function test_get_latest_snapshot_timestamp() {
+    public function test_get_latest_snapshot_timestamp(): void {
         global $DB;
 
         $latest = snapshothelper::get_latest_snapshot_timestamp();

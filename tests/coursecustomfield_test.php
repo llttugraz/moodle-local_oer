@@ -188,7 +188,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::get_course_customfields_with_applied_config
      */
-    public function test_get_course_customfields_with_applied_config() {
+    public function test_get_course_customfields_with_applied_config(): void {
         $courseid = $this->data['course1']->id;
         $data = $this->data;
 
@@ -294,7 +294,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    private function set_settings_for_test(int $courseid, int $enable, int $visibility, string $ignored) {
+    private function set_settings_for_test(int $courseid, int $enable, int $visibility, string $ignored): void {
         set_config('coursecustomfields', $enable, 'local_oer');
         set_config('coursecustomfieldsvisibility', $visibility, 'local_oer');
         set_config('coursecustomfieldsignored', $ignored, 'local_oer');
@@ -309,7 +309,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @throws \Exception
      * @covers ::get_course_customfields
      */
-    public function test_get_course_customfields() {
+    public function test_get_course_customfields(): void {
         $data = $this->data;
         // Test for course 1. Course 1 has set all fields.
         $fields = coursecustomfield::get_course_customfields($data['course1']->id);
@@ -381,7 +381,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::load_course_customfields_from_oer
      */
-    public function test_load_course_customfields_from_oer() {
+    public function test_load_course_customfields_from_oer(): void {
         $data = $this->data;
         $this->set_settings_for_test($data['course1']->id, 1, 0, '');
 
@@ -395,7 +395,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @param array $fields
      * @return void
      */
-    private function assert_fields_course_one(array $fields) {
+    private function assert_fields_course_one(array $fields): void {
         $data = $this->data;
         $this->assertCount(3, $fields, 'There are three categories set up for the platform');
         $this->assertEquals((int) $data['cat1']->get('id'), $fields[0]['id']);
@@ -459,7 +459,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::get_customfields_for_snapshot
      */
-    public function test_get_customfields_for_snapshot() {
+    public function test_get_customfields_for_snapshot(): void {
         $data = $this->data;
         $this->set_settings_for_test($data['course1']->id, 1, 0, '');
         $fields = coursecustomfield::get_customfields_for_snapshot($data['course1']->id);
@@ -514,7 +514,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @return void
      * @covers ::get_text_of_select_field
      */
-    public function test_get_text_of_select_field() {
+    public function test_get_text_of_select_field(): void {
         $selectdata = "A\r\nB\r\nC\r\nD\r\nE";
         $this->assertEquals('', coursecustomfield::get_text_of_select_field(0, $selectdata));
         $this->assertEquals('A', coursecustomfield::get_text_of_select_field(1, $selectdata));

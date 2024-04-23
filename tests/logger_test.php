@@ -38,7 +38,7 @@ final class logger_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::add
      */
-    public function test_add() {
+    public function test_add(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;
@@ -59,7 +59,7 @@ final class logger_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::get_logs
      */
-    public function test_get_logs() {
+    public function test_get_logs(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();

@@ -42,7 +42,7 @@ final class time_form_test extends \advanced_testcase {
      * @covers ::validation
      * @covers ::definition
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

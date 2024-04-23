@@ -55,6 +55,7 @@ final class coursetofile_form_test extends \advanced_testcase {
      * Setup courses and formular for tests.
      *
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
      * @throws \file_exception
      * @throws \stored_file_creation_exception

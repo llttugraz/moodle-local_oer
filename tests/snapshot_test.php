@@ -58,7 +58,7 @@ final class snapshot_test extends \advanced_testcase {
      * @covers ::get_latest_course_snapshot
      * @covers ::__construct
      */
-    public function test_get_latest_course_snapshot() {
+    public function test_get_latest_course_snapshot(): void {
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
@@ -81,7 +81,7 @@ final class snapshot_test extends \advanced_testcase {
      * @covers ::create_file_snapshot
      * @covers ::add_type_data
      */
-    public function test_create_snapshot_of_course_files() {
+    public function test_create_snapshot_of_course_files(): void {
         global $DB;
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
@@ -110,9 +110,9 @@ final class snapshot_test extends \advanced_testcase {
      * @return void
      * @covers ::create_file_snapshot
      */
-    public function test_create_file_snapshot() {
+    public function test_create_file_snapshot(): void {
         $this->resetAfterTest();
-        // TODO: write test.
+        // MDL-0 TODO: write test.
     }
 
     /**
@@ -126,7 +126,7 @@ final class snapshot_test extends \advanced_testcase {
      * @throws \ReflectionException
      * @covers ::add_external_metadata
      */
-    public function test_add_external_metadata() {
+    public function test_add_external_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
@@ -145,7 +145,7 @@ final class snapshot_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::get_active_courseinfo_metadata
      */
-    public function test_get_active_courseinfo_metadata() {
+    public function test_get_active_courseinfo_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
@@ -192,7 +192,7 @@ final class snapshot_test extends \advanced_testcase {
      * @throws \ReflectionException
      * @throws \dml_exception
      */
-    public function test_get_overwritten_courseinfo_metadata() {
+    public function test_get_overwritten_courseinfo_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $contenthash = substr(hash('sha256', random_bytes(10)), 0, 40);
@@ -274,7 +274,7 @@ final class snapshot_test extends \advanced_testcase {
      * @throws \ReflectionException
      * @throws \dml_exception
      */
-    public function test_extract_courseinfo_metadata() {
+    public function test_extract_courseinfo_metadata(): void {
         $this->resetAfterTest();
 
         $entry = $this->set_additional_courseinfoentry(7);
@@ -303,7 +303,7 @@ final class snapshot_test extends \advanced_testcase {
      * @return \stdClass
      * @throws \dml_exception
      */
-    private function set_additional_courseinfoentry(int $courseid) {
+    private function set_additional_courseinfoentry(int $courseid): \stdClass {
         global $DB;
         $entry = new \stdClass();
         $entry->courseid = $courseid;

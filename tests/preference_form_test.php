@@ -88,7 +88,7 @@ final class preference_form_test extends \advanced_testcase {
      * @covers ::update_metadata
      * @covers ::add_values_from_form
      */
-    public function test_update_metadata() {
+    public function test_update_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

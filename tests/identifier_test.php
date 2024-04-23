@@ -38,7 +38,7 @@ final class identifier_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_validate() {
+    public function test_validate(): void {
         $this->resetAfterTest();
 
         $success = 'oer:moodle@localhost:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
@@ -73,7 +73,7 @@ final class identifier_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_strict_validate() {
+    public function test_strict_validate(): void {
         $this->resetAfterTest();
         $success = 'oer:moodle@localhost:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
         identifier::strict_validate($success);
@@ -90,7 +90,7 @@ final class identifier_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_compose() {
+    public function test_compose(): void {
         $this->resetAfterTest();
         $platform = 'moodle';
         $instance = 'localhost.root/moodle_instance/';
@@ -114,7 +114,7 @@ final class identifier_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_decompose() {
+    public function test_decompose(): void {
         $this->resetAfterTest();
         $identifier = 'oer:moodle@localhost.root/moodle_instance/:file:contenthash:d7ed44309ee5a94692bbf5c029f96553fc359def';
         $decomposed = identifier::decompose($identifier);

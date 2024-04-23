@@ -62,7 +62,7 @@ final class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_course_files
      */
-    public function test_get_course_files() {
+    public function test_get_course_files(): void {
         $files = filelist::get_course_files($this->data['course1']->id);
         $this->assertCount(5, $files);
         $files = filelist::get_course_files($this->data['course2']->id);
@@ -80,7 +80,7 @@ final class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_single_file
      */
-    public function test_get_single_file() {
+    public function test_get_single_file(): void {
         $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course2']);
         $file = filelist::get_single_file($this->data['course2']->id, $identifier);
         $this->assertIsObject($file);
@@ -97,7 +97,7 @@ final class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_simple_filelist
      */
-    public function test_get_simple_filelist() {
+    public function test_get_simple_filelist(): void {
         [$files, $sections] = filelist::get_simple_filelist($this->data['course1']->id);
         $this->assertIsArray($files);
         $this->assertIsArray($sections);
@@ -115,7 +115,7 @@ final class filelist_test extends \advanced_testcase {
         $this->assertCount(0, $files);
         $this->assertCount(0, $sections);
 
-        // TODO: this method should be tested much more...
+        // MDL-0 TODO: this method should be tested much more...
     }
 
     /**
@@ -128,7 +128,7 @@ final class filelist_test extends \advanced_testcase {
      * @covers ::get_simple_file
      * @covers ::get_simple_filelist
      */
-    public function test_get_simple_file() {
+    public function test_get_simple_file(): void {
         $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course1']);
         $file = filelist::get_simple_file($this->data['course1']->id, $identifier);
         $this->assertIsArray($file);

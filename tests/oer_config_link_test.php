@@ -39,7 +39,7 @@ final class oer_config_link_test extends \advanced_testcase {
      * @covers ::__construct
      * @covers ::output_html
      */
-    public function test_output_html() {
+    public function test_output_html(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

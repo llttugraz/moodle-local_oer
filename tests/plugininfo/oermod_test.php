@@ -63,7 +63,7 @@ final class oermod_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function test_get_enabled_plugins() {
+    public function test_get_enabled_plugins(): void {
         $plugins = oermod::get_enabled_plugins();
         // Resource and folder are enabled by default.
         $plugins = oermod::get_enabled_plugins();
@@ -80,7 +80,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \dml_exception
      */
-    public function test_plugin_is_enabled() {
+    public function test_plugin_is_enabled(): void {
         set_config('enabledmodplugins', 'resource', 'local_oer');
         $enabled = oermod::plugin_is_enabled('resource');
         $this->assertTrue($enabled);
@@ -95,7 +95,7 @@ final class oermod_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_get_all_plugins() {
+    public function test_get_all_plugins(): void {
         $plugins = oermod::get_all_plugins();
         $this->assertGreaterThanOrEqual(2, $plugins, 'There could be more installed, but at least 2 have to.');
         $this->assertArrayHasKey('folder', $plugins);
@@ -109,7 +109,7 @@ final class oermod_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_is_uninstall_allowed() {
+    public function test_is_uninstall_allowed(): void {
         $plugininfo = new oermod();
         $this->assertTrue($plugininfo->is_uninstall_allowed());
     }
@@ -122,7 +122,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \moodle_exception
      */
-    public function test_get_manage_url() {
+    public function test_get_manage_url(): void {
         $url = oermod::get_manage_url();
         $compare = '/admin/settings.php?section=localpluginsoermod';
         $this->assertIsObject($url);
@@ -137,7 +137,7 @@ final class oermod_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_get_settings_section_name() {
+    public function test_get_settings_section_name(): void {
         $plugininfo = new oermod();
         $name = $plugininfo->get_settings_section_name();
         $this->assertEquals('oermodsettings', $name);
@@ -153,7 +153,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_load_settings() {
+    public function test_load_settings(): void {
         global $CFG, $ADMIN;
         require_once($CFG->libdir . '/adminlib.php');
         $this->setAdminUser();
@@ -178,7 +178,7 @@ final class oermod_test extends \advanced_testcase {
      * @return array
      * @throws \coding_exception
      */
-    private function prepare_testcourse_and_elements() {
+    private function prepare_testcourse_and_elements(): array {
         $this->setAdminUser();
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
@@ -194,7 +194,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_load_elements() {
+    public function test_load_elements(): void {
         [$course, $elements] = $this->prepare_testcourse_and_elements();
         $this->assertCount(5, $elements, 'For the testcourse 5 resource elements are generated.');
         $this->expectException('coding_exception');
@@ -211,7 +211,7 @@ final class oermod_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function test_write_external_metadata() {
+    public function test_write_external_metadata(): void {
         global $DB;
         [, $elements] = $this->prepare_testcourse_and_elements();
         $element = $elements->get_element_by_key(0);
@@ -245,7 +245,7 @@ final class oermod_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function test_set_element_to_release() {
+    public function test_set_element_to_release(): void {
         global $DB;
         [$course, $elements] = $this->prepare_testcourse_and_elements();
         $element = $elements->get_element_by_key(0);
@@ -263,7 +263,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_get_writable_fields() {
+    public function test_get_writable_fields(): void {
         [, $elements] = $this->prepare_testcourse_and_elements();
         $element = $elements->get_element_by_key(3);
         $result = oermod::get_writable_fields($element);
@@ -279,7 +279,7 @@ final class oermod_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function test_get_supported_licenses() {
+    public function test_get_supported_licenses(): void {
         global $DB;
         [, $elements] = $this->prepare_testcourse_and_elements();
         $element = $elements->get_element_by_key(3);
@@ -308,7 +308,7 @@ final class oermod_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_get_supported_roles() {
+    public function test_get_supported_roles(): void {
         $compare = [
                 ['Author', 'author', 'local_oer'],
                 ['Publisher', 'publisher', 'local_oer'],

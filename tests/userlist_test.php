@@ -41,7 +41,7 @@ final class userlist_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_oer\userlist\userlist::user_is_allowed
      */
-    public function test_user_is_allowed() {
+    public function test_user_is_allowed(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB, $USER;

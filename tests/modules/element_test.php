@@ -275,7 +275,7 @@ final class element_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \invalid_parameter_exception
      */
-    public function test_set_stored_metadata_field_is_null_exception() {
+    public function test_set_stored_metadata_field_is_null_exception(): void {
         $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Stored metadata has not been set yet, use set_stored_metadata before updating fields');
@@ -292,7 +292,7 @@ final class element_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \invalid_parameter_exception
      */
-    public function test_set_stored_metadata_field_must_exist_exception() {
+    public function test_set_stored_metadata_field_must_exist_exception(): void {
         $element = $this->set_stored_metadata();
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Field identifier not allowed to be added to storedmetadata, ' .
@@ -307,7 +307,7 @@ final class element_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function set_stored_metadata() {
+    private function set_stored_metadata(): element {
         $metadata = new \stdClass();
         $metadata->title = 'abc';
         $metadata->license = 'allrightsreserved';

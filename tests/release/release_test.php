@@ -87,7 +87,7 @@ final class release_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function prepare_releases_in_snapshot_table() {
+    private function prepare_releases_in_snapshot_table(): void {
         global $DB;
         $this->releases = [
             // Release => Day start, Day end.
@@ -247,7 +247,7 @@ final class release_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function test_get_latest_release_legacy() {
+    public function test_get_latest_release_legacy(): void {
         global $DB;
         $releases = release::get_latest_releases('v1.0.0');
         $this->assertArrayHasKey('moodlecourses', $releases);

@@ -103,7 +103,7 @@ final class information_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_set_get_id() {
+    public function test_set_get_id(): void {
         $information = new information();
         $this->assertNull($information->get_id());
         $information->set_area('pluginname', 'local_oer');

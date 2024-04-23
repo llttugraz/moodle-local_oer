@@ -44,7 +44,7 @@ final class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::test_license_correct_for_upload
      */
-    public function test_test_license_correct_for_upload() {
+    public function test_test_license_correct_for_upload(): void {
         $this->resetAfterTest();
         $this->assertFalse(license::test_license_correct_for_upload('doesnotexist'));
         $this->assertFalse(license::test_license_correct_for_upload('allrightsreserved'));
@@ -62,7 +62,7 @@ final class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::get_license_fullname
      */
-    public function test_get_license_fullname() {
+    public function test_get_license_fullname(): void {
         $this->resetAfterTest();
         $this->assertEquals('Creative Commons - NonCommercial-NoDerivatives 4.0 International',
                 license::get_license_fullname('cc-nc-nd-4.0'),
@@ -76,7 +76,7 @@ final class license_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\helper\license::get_license_by_shortname
      */
-    public function test_get_license_by_shortname() {
+    public function test_get_license_by_shortname(): void {
         $this->resetAfterTest();
         $this->assertIsObject(license::get_license_by_shortname('allrightsreserved'));
         $this->assertNull(license::get_license_by_shortname('doesnotexist'));
@@ -89,7 +89,7 @@ final class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::get_licenses_select_data
      */
-    public function test_get_license_select_data() {
+    public function test_get_license_select_data(): void {
         $this->resetAfterTest();
         global $CFG;
         require_once($CFG->libdir . '/licenselib.php');

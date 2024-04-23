@@ -151,7 +151,7 @@ final class activecourse_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_oer\helper\activecourse::get_list_of_courses
      */
-    public function test_get_list_of_courses() {
+    public function test_get_list_of_courses(): void {
         $filecourselist = activecourse::get_list_of_courses();
         $this->assertCount(count($this->data['files']), $filecourselist);
         foreach ($filecourselist as $key => $entry) {

@@ -44,7 +44,7 @@ final class user_selector_test extends \advanced_testcase {
      * @covers \local_oer\userlist\user_selector::__construct
      * @covers \local_oer\userlist\user_selector::find_users
      */
-    public function test_find_users() {
+    public function test_find_users(): void {
         $this->resetAfterTest();
 
         set_config('maxusersperpage', 50); // Moodle default is 100, reduced it for the test.

@@ -40,7 +40,7 @@ final class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::add_no_preference_value
      */
-    public function test_add_no_preference_value() {
+    public function test_add_no_preference_value(): void {
         $this->resetAfterTest();
         $value = [];
         $value = formhelper::add_no_preference_value($value);
@@ -56,7 +56,7 @@ final class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_context_list
      */
-    public function test_lom_context_list() {
+    public function test_lom_context_list(): void {
         $this->resetAfterTest();
         $lom = formhelper::lom_context_list(false, false);
         $this->assertCount(2, $lom);
@@ -87,7 +87,7 @@ final class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_resource_types
      */
-    public function test_lom_resource_types() {
+    public function test_lom_resource_types(): void {
         $this->resetAfterTest();
         $types = formhelper::lom_resource_types(false, false);
         $this->assertCount(15, $types);
@@ -111,7 +111,7 @@ final class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_role_types
      */
-    public function test_lom_roles_types() {
+    public function test_lom_roles_types(): void {
         $this->resetAfterTest();
         $roles = [
                 ['Author', 'author', 'local_oer'],
@@ -140,7 +140,7 @@ final class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::language_select_data
      */
-    public function test_language_select_data() {
+    public function test_language_select_data(): void {
         $this->resetAfterTest();
         $languages = formhelper::language_select_data(false);
         $count = count($languages);

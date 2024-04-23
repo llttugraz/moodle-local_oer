@@ -161,7 +161,7 @@ final class person_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_get_person_array_no_role() {
+    public function test_get_person_array_no_role(): void {
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('A person must have a role');
         $person = new person();
@@ -177,7 +177,7 @@ final class person_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \invalid_parameter_exception
      */
-    public function test_get_person_array_no_name() {
+    public function test_get_person_array_no_name(): void {
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('No name was set for the person');
         $person = new person();

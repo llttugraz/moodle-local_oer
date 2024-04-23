@@ -40,7 +40,7 @@ final class message_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::send_requirementschanged
      */
-    public function test_send_requirements_changed() {
+    public function test_send_requirements_changed(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;

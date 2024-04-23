@@ -202,7 +202,7 @@ final class elements_test extends \advanced_testcase {
      * @return void
      * @throws \coding_exception
      */
-    public function test_find_element_property_exists_exception() {
+    public function test_find_element_property_exists_exception(): void {
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Unknown property unittest');
         $elements = new elements();

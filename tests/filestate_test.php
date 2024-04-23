@@ -26,7 +26,6 @@
 namespace local_oer;
 
 use local_oer\helper\filestate;
-use local_oer\metadata\courseinfo;
 use local_oer\metadata\courseinfo_sync;
 use local_oer\modules\element;
 
@@ -63,7 +62,7 @@ final class filestate_test extends \advanced_testcase {
      * @covers ::determine_element_state
      * @covers ::find_courses_that_use_this_element
      */
-    public function test_calculate_file_state() {
+    public function test_calculate_file_state(): void {
         $this->resetAfterTest(true);
 
         $this->setAdminUser();
@@ -165,7 +164,7 @@ final class filestate_test extends \advanced_testcase {
      * @throws \dml_exception
      */
     private function assert_file_state(element $element, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
-            $expectedwritable) {
+            $expectedwritable): void {
         filestate::calculate_state($element, $courseid);
         $this->assertEquals($expectedstate, $element->get_elementstate()->state);
         $this->assertEquals($expectededitor, $element->get_elementstate()->editorid);
@@ -179,7 +178,7 @@ final class filestate_test extends \advanced_testcase {
      * @return void
      * @covers ::metadata_writable
      */
-    public function test_metadata_writable() {
+    public function test_metadata_writable(): void {
         $this->resetAfterTest(true);
 
         // Something is wrong with the file, so it should not be editable until the problem has been resolved.
@@ -217,7 +216,7 @@ final class filestate_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\helper\filestate::formatted_notwritable_output_html
      */
-    public function test_formatted_notwritable_output_html() {
+    public function test_formatted_notwritable_output_html(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();
