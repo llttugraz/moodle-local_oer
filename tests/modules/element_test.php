@@ -250,7 +250,7 @@ final class element_test extends \advanced_testcase {
         $element->set_stored_metadata_field('abc', 123, false);
         $metadata = $element->get_stored_metadata();
         $this->assertCount($count + 1, (array) $element->get_stored_metadata(), 'New value added');
-        $this->assertObjectHasAttribute('abc', $metadata);
+        $this->assertObjectHasProperty('abc', $metadata);
         $this->assertEquals(123, $metadata->abc);
         $this->assertEquals(0, $metadata->upload);
         $element->set_stored_metadata_field('upload', 1, true);
