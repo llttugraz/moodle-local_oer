@@ -138,7 +138,6 @@ $string['ignore'] = 'Ignored';
 $string['ignore_help'] = 'The file will be shown as ignored and ' .
         'sorted to the end of the file list.';
 $string['noignore'] = 'Not ignored';
-$string['deleted'] = 'Deleted files';
 $string['preferencefilter'] = 'Files using preferences';
 $string['nopreferencefilter'] = 'Files not using preferences';
 $string['list'] = 'List';
