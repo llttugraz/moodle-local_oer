@@ -108,13 +108,7 @@ class courseinfo {
     public function generate_metadata(int $courseid): array {
         global $DB, $CFG;
         $course = get_course($courseid);
-        // TODO: In Moodle 3.11 the get_all_user_name_fields function has been deprecated.
-        // Remove old code when minimum requirements of this plugin are raised.
-        if ($CFG->version >= 2021051700) {
-            $allnames = \core_user\fields::for_name()->get_required_fields();
-        } else {
-            $allnames = get_all_user_name_fields();
-        }
+        $allnames = \core_user\fields::for_name()->get_required_fields();
         foreach ($allnames as $key => $name) {
             $allnames[$key] = 'u.' . $name;
         }
