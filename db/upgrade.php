@@ -421,7 +421,7 @@ function xmldb_local_oer_upgrade($oldversion) {
                 $dbman->add_field($table, $field);
             }
 
-            // TODO Future update: delete local_oer_items table, delete local_oer_user_pref table.
+            // MDL-0 TODO Future update: delete local_oer_items table, delete local_oer_user_pref table.
             // delete local_oer_queue table (queue moved to subplugin).
         }
         // Oer savepoint reached.

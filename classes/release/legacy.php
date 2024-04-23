@@ -76,7 +76,7 @@ class legacy extends releasedata {
                 'tags' => empty($elementinfo->tags) ? [] : explode(',', $elementinfo->tags),
                 'mimetype' => $typedata->mimetype ?? '',
                 'filesize' => $typedata->filesize ?? 0,
-                'filecreationtime' => $elementinfo->timecreated, // TODO: here should be the timestamp of the file.
+                'filecreationtime' => $elementinfo->timecreated, // MDL-0 TODO: here should be the timestamp of the file.
                 'timereleased' => $elementinfo->timecreated,
                 'classification' => self::prepare_classification_fields($elementinfo->classification),
                 'courses' => empty($elementinfo->coursemetadata) ? [] : json_decode($elementinfo->coursemetadata),

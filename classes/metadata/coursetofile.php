@@ -75,14 +75,14 @@ class coursetofile {
         global $DB;
         $decomposed = identifier::decompose($element->get_identifier());
         if ($element->get_type() != element::OERTYPE_MOODLEFILE || $decomposed->valuetype != 'contenthash') {
-            // TODO: what is the correct behavior here for other types?
+            // MDL-0 TODO: what is the correct behavior here for other types?
             return [];
         }
         if (empty($courses)) {
             filestate::calculate_state($element, $courseid);
             $courses = $element->get_elementstate()->courses;
         }
-        // TODO: should the table also be changed from contenthash to identifier?
+        // MDL-0 TODO: should the table also be changed from contenthash to identifier?
         $overwrites = $DB->get_records('local_oer_coursetofile', ['contenthash' => $decomposed->value]);
         $owformatted = [];
         foreach ($overwrites as $ow) {

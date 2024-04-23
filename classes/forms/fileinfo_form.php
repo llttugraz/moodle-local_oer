@@ -543,7 +543,7 @@ class fileinfo_form extends \moodleform {
             // This code is not reachable without subplugins installed.
             $frankenstyle = 'oerclassification_' . $plugin;
             // The autocomplete field submits a string when no selection has been made. Make sure this string is not stored.
-            // TODO: Is this intended behaviour or am i missing here something?
+            // MDL-0 TODO: Is this intended behaviour or am i missing here something?
             if (isset($fromform[$frankenstyle]) && $fromform[$frankenstyle] != '_qf__force_multiselect_submission') {
                 $result[$plugin] = $fromform[$frankenstyle];
             } else {

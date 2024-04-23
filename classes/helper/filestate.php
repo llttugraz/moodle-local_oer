@@ -83,7 +83,7 @@ class filestate {
                 [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
                 break;
             case element::OERTYPE_EXTERNAL:
-                // TODO: is there a performant way to find all courses for an external object?
+                // MDL-0 TODO: is there a performant way to find all courses for an external object?
                 // Maybe this should be implemented in module subplugin as every subplugin has an other way for this information?
                 global $DB;
                 $course = get_course($currentcourseid);
@@ -321,7 +321,7 @@ class filestate {
                                 ['support' => $support->email]),
                         'multiple' => count($element->get_elementstate()->courses) > 1,
                         'courses' => array_values($element->get_elementstate()->courses),
-                        'showmetadata' => true, // TODO: this flag can be removed as STATE_FILE_ERROR does not exist anymore.
+                        'showmetadata' => true, // MDL-0 TODO: this flag can be removed as STATE_FILE_ERROR does not exist anymore.
                         'metadata' => $metadata,
                         'wwwroot' => $CFG->wwwroot,
                 ]);

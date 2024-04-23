@@ -54,7 +54,7 @@ foreach ($activecourses as $course) {
             'url' => new moodle_url('/local/oer/views/main.php', ['id' => $course->courseid]),
             'course' => $course->courseid . ': ' . $coursename,
             'files' => count($files),
-        // TODO - detailed infos about files - history etc..
+        // MDL-0 TODO - detailed infos about files - history etc..
     ];
 }
 
