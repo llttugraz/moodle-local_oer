@@ -46,7 +46,6 @@ export const showFiles = (init, keepFocus) => {
         .then(function(html, js) {
             Templates.replaceNodeContents('#local-oer-overview', html, js);
             const searchInput = document.getElementById('local_oer_searchFilecardsInput');
-            window.console.log(init, keepFocus);
             if (keepFocus && searchInput !== null) {
                 // Workaround to fix losing focus of search after Template.replaceNodeContents.
                 // The navigation controls are inside the template and replaced after every search.
