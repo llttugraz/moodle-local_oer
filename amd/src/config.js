@@ -67,7 +67,7 @@ export const getOutputValues = (init) => {
         "f_deleted": 0,
         // Origins are counted in the origin property.
     };
-    // TODO: there has to be a better way to calculate this?
+    // MDL-0 TODO: there has to be a better way to calculate this?
     output.files.forEach(function(file) {
         if (file.upload === true && file.timeuploadedts === 0) {
             countelements.f_upload++;
