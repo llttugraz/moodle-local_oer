@@ -316,7 +316,7 @@ final class oermod_test extends \advanced_testcase {
         ];
         $roles = oermod::get_supported_roles('oermod_resource\module');
         $this->assertCount(2, $roles);
-        $this->assertCount(4, $roles[0]) ;
+        $this->assertCount(4, $roles[0]);
         $this->assertCount(3, $roles[1]);
         $this->assertEquals($compare, $roles);
     }
