@@ -423,6 +423,7 @@ $string['selfassesment'] = 'Selbsteinschätzung';
 $string['showmetadata'] = 'Gespeicherte Metadaten anzeigen';
 $string['simulation'] = 'Simulation';
 $string['snapshottask'] = 'Task to create release snapshots';
+$string['source'] = 'Quelle';
 $string['state'] = 'Status der Datei';
 $string['structure'] = 'Struktur';
 $string['structure_help'] = 'Was ist der Modus des Kurses? zB. Vorlesung, Übung, Labor ...';
