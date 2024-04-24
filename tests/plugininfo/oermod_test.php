@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../helper/testcourse.php');
 
+use local_oer\modules\module;
 use local_oer\plugininfo\oermod;
 
 /**
@@ -310,12 +311,12 @@ final class oermod_test extends \advanced_testcase {
      */
     public function test_get_supported_roles(): void {
         $compare = [
-                ['Author', 'author', 'local_oer'],
+                ['Author', 'author', 'local_oer', module::ROLE_REQUIRED],
                 ['Publisher', 'publisher', 'local_oer'],
         ];
         $roles = oermod::get_supported_roles('oermod_resource\module');
         $this->assertCount(2, $roles);
-        $this->assertCount(3, $roles[0]);
+        $this->assertCount(4, $roles[0]) ;
         $this->assertCount(3, $roles[1]);
         $this->assertEquals($compare, $roles);
     }

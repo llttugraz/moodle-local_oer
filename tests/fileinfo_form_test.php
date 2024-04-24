@@ -148,7 +148,7 @@ final class fileinfo_form_test extends \advanced_testcase {
                 'cc', 'en', 1, [], 1, 0);
         $errors = $form->validation($fromform, []);
         $this->assertTrue(isset($errors['addpersons']), 'Release cannot be set when no person is added to metadata');
-        $this->assertEquals(get_string('error_upload_author', 'local_oer', ['roles' => 'Author or Publisher']),
+        $this->assertEquals(get_string('error_upload_author', 'local_oer', ['roles' => 'Author']),
                 $errors['addpersons'],
                 'Upload cannot be set when no person is added to metadata');
 
