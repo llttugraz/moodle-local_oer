@@ -124,7 +124,7 @@ class module implements \local_oer\modules\module {
      */
     public function supported_roles(): array {
         return [
-                ['Author', 'author', 'local_oer'],
+                ['Author', 'author', 'local_oer', self::ROLE_REQUIRED],
                 ['Publisher', 'publisher', 'local_oer'],
         ];
     }

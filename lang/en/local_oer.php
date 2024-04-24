@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['addpersonbtn'] = 'Add person';
-$string['all'] = 'All files';
+$string['all'] = 'All elements';
 $string['allowed'] = '<p>By uploading your teaching and learning materials, ' .
         'you make them openly and freely accessible through the ' .
         'library service so that other teachers and learners worldwide ' .
