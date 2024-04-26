@@ -33,7 +33,7 @@ $string['allowed'] = '<p>Durch den Upload Ihrer Lehr- und Lernmaterialien machen
         'diese verwenden können.<br> ' .
         'Bitte beachten Sie, dass diese Materialien unter einer ' .
         'offenen Lizenzierung stehen und damit die geltenden ' .
-        'Urheberrechtsbestimmung eingehalten sind.</p>';
+        'Urheberrechtsbestimmungen eingehalten sind.</p>';
 $string['amount'] = 'Elemente pro Seite';
 $string['applicationprofile'] = 'Applikationsprofil';
 $string['applicationprofile_description'] =
