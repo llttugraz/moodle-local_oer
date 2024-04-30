@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as Service from 'local_oer/service';
-import * as Output from 'local_oer/output';
+import * as Service from 'local_oer/service-lazy';
+import * as Output from 'local_oer/output-lazy';
 
 /**
  * Main entry point. Just start the output.

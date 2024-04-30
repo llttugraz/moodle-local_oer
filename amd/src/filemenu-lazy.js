@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as Output from 'local_oer/output';
+import * as Output from 'local_oer/output-lazy';
 
 /**
  * Add listener to the filecard file menu
@@ -33,7 +33,7 @@ export const initActionMenuListener = (identifier) => {
     if (menu === null) {
         return;
     }
-    menu[0].addEventListener("click", function(action) {
+    menu[0].addEventListener("click", (action) => {
         action.preventDefault();
         const type = action.target.dataset.action;
         const ch = action.target.dataset.identifier;

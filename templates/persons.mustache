@@ -34,6 +34,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 {{#persons}}
     <button type="button" class="badge badge-info mb-1 mr-1" style="font-size: 100%" data-name="storedperson"
             data-role="{{role}}" data-firstname="{{firstname}}" data-lastname="{{lastname}}" data-fullname="{{fullname}}">
-        <span aria-hidden="true">x </span>{{name}}
+        <span aria-hidden="true" data-name="storedperson"
+              data-role="{{role}}" data-firstname="{{firstname}}" data-lastname="{{lastname}}" data-fullname="{{fullname}}">x </span>{{name}}
     </button>
 {{/persons}}

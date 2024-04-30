@@ -21,13 +21,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as Service from 'local_oer/service';
+import * as Service from 'local_oer/service-lazy';
 import * as Templates from "core/templates";
-import * as Config from "local_oer/config";
+import * as Config from "local_oer/config-lazy";
 import * as ModalFactory from 'core/modal_factory';
 import * as ModalEvents from 'core/modal_events';
 import * as Fragment from 'core/fragment';
 import * as Str from 'core/str';
+import Log from 'core/log';
 
 /**
  * Show the files in the browser.
@@ -35,27 +36,23 @@ import * as Str from 'core/str';
  * @param {boolean} init
  * @param {boolean} keepFocus
  */
-export const showFiles = (init, keepFocus) => {
+// eslint-disable-next-line space-before-function-paren
+export const showFiles = async (init, keepFocus) => {
     const output = Config.getOutputValues(init);
     const oldSearchInput = document.getElementById('local_oer_searchFilecardsInput');
     let oldSearchValue = '';
     if (oldSearchInput !== null) {
         oldSearchValue = oldSearchInput.value;
     }
-    Templates.render('local_oer/files', output)
-        .then(function(html, js) {
-            Templates.replaceNodeContents('#local-oer-overview', html, js);
-            const searchInput = document.getElementById('local_oer_searchFilecardsInput');
-            if (keepFocus && searchInput !== null) {
-                // Workaround to fix losing focus of search after Template.replaceNodeContents.
-                // The navigation controls are inside the template and replaced after every search.
-                searchInput.value = oldSearchValue;
-                searchInput.focus();
-            }
-            return; // For eslint.
-        }).fail(function(error) {
-        window.console.debug(error);
-    });
+    const {html, js} = await Templates.renderForPromise('local_oer/files', output);
+    Templates.replaceNodeContents('#local-oer-overview', html, js);
+    const searchInput = document.getElementById('local_oer_searchFilecardsInput');
+    if (keepFocus && searchInput !== null) {
+        // Workaround to fix losing focus of search after Template.replaceNodeContents.
+        // The navigation controls are inside the template and replaced after every search.
+        searchInput.value = oldSearchValue;
+        searchInput.focus();
+    }
     showPagination();
 };
 
@@ -76,52 +73,50 @@ export const showForm = (type, title, options) => {
         params: params,
     };
     const form = Fragment.loadFragment('local_oer', 'formdata', context, args);
-    form.done(function(data) {
+    form.then((data) => {
         // MDL-0 TODO: Better way to do this?
         let nosave = data.includes('<input name="nosave" type="hidden" value="1" />');
         if (nosave !== false) {
             type = 'nosave';
         }
         showFormModal(form, type, title, options);
-    });
+        return;
+    }).catch(Log.error);
 };
 
 
-const showFormModal = (form, type, title, options) => {
+// eslint-disable-next-line space-before-function-paren
+const showFormModal = async (form, type, title, options) => {
     const element = document.getElementById("local_oer_files_main_area");
     const modaltype = type === 'nosave' ? ModalFactory.types.CANCEL : ModalFactory.types.SAVE_CANCEL;
-    ModalFactory.create({
+    const modal = await ModalFactory.create({
         type: modaltype,
         title: title,
         body: form,
-    }).then(function(modal) {
-        modal.setLarge();
-        modal.show();
-        switch (type) {
-            case 'FileinfoForm':
-            case 'FileinfoFormSave':
-                initPersonButtonListener();
-                addRemoveTagListener('storedperson');
-                initSetPreferenceListener(modal);
-                addInputFieldInputListener('stored', 'tags');
-                break;
-            case 'PreferenceForm':
-            case 'PreferenceFormSave':
-                // Add additional form listener(s) and special behaviour.
-                initPersonButtonListener();
-                addRemoveTagListener('storedperson');
-                addInputFieldInputListener('stored', 'tags');
-                break;
-        }
-        modal.getRoot().on(ModalEvents.hidden, function() {
-            modal.destroy();
-        });
-        modal.getRoot().on(ModalEvents.save, function() {
-            saveForm(modal, element, options, type, title);
-        });
-        return; // For eslint.
-    }).catch(function(error) {
-        window.console.debug(error);
+    });
+    modal.setLarge();
+    modal.show();
+    switch (type) {
+        case 'FileinfoForm':
+        case 'FileinfoFormSave':
+            initPersonButtonListener();
+            addRemoveTagListener('storedperson');
+            initSetPreferenceListener(modal);
+            addInputFieldInputListener('stored', 'tags');
+            break;
+        case 'PreferenceForm':
+        case 'PreferenceFormSave':
+            // Add additional form listener(s) and special behaviour.
+            initPersonButtonListener();
+            addRemoveTagListener('storedperson');
+            addInputFieldInputListener('stored', 'tags');
+            break;
+    }
+    modal.getRoot().on(ModalEvents.hidden, () => {
+        modal.destroy();
+    });
+    modal.getRoot().on(ModalEvents.save, () => {
+        saveForm(modal, element, options, type, title);
     });
 };
 
@@ -134,36 +129,37 @@ const saveForm = (modal, element, options, type, title) => {
     };
     const context = element.dataset.context;
     const formSubmit = Fragment.loadFragment('local_oer', 'formdata', context, saveargs);
-    formSubmit.done(function(response) {
+    // eslint-disable-next-line space-before-function-paren
+    formSubmit.then(async (response) => {
         if (response.indexOf('<form') !== -1) {
             modal.destroy();
             if (options.hasOwnProperty('preference')) {
                 delete options.preference;
-                replaceFileInfo(Service.loadFile(options.identifier));
+                replaceFileInfo(await Service.loadFile(options.identifier));
             }
             showFormModal(formSubmit, type, title, options);
         } else if (type === 'FileinfoForm') {
-            replaceFileInfo(Service.loadFile(options.identifier));
+            replaceFileInfo(await Service.loadFile(options.identifier));
         } else if (type === 'PreferenceForm') {
-            prepareFiles(Service.loadFiles(), true);
+            prepareFiles(await Service.loadFiles(), true);
         }
-    }).catch(function(error) {
-        window.console.debug('Form submission failed', error);
-    });
+        return;
+    }).catch(Log.error);
 };
 
 const replaceFileInfo = (promises) => {
-    promises[0].done(function(response) {
+    promises[0].then((response) => {
         const filelist = document.getElementById("local-oer-overview-filelist").innerHTML;
         const output = JSON.parse(filelist);
-        output.files.forEach(function(file, index) {
+        output.files.forEach((file, index) => {
             if (file.identifier === response.file.identifier) {
                 output.files[index] = response.file;
             }
         });
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(output);
         showFiles(false, true);
-    });
+        return;
+    }).catch(Log.error);
 };
 
 /**
@@ -173,29 +169,23 @@ const replaceFileInfo = (promises) => {
  * @param {boolean} init
  */
 export const prepareFiles = (promises, init) => {
-    promises[0].done(function(response) {
+    promises[0].then((response) => {
         document.getElementById("local-oer-overview-filelist").innerHTML = JSON.stringify(response);
         showFiles(init, true);
-    });
+        return;
+    }).catch(Log.error);
 };
 
 const addInputFieldInputListener = (prefix, area) => {
+    addRemoveTagListener(prefix + area);
     showTags(prefix + area);
-    document.getElementById('id_' + area).addEventListener('keypress', function(e) {
+    document.getElementById('id_' + area).addEventListener('keypress', (e) => {
         if (e.key !== 'Enter') {
             return;
         }
         addStoredTag(prefix, area);
         showTags(prefix + area);
     });
-    document.getElementById('id_' + area).addEventListener('focusout', function() {
-        if (area.length === 0) {
-            return;
-        }
-        addStoredTag(prefix, area);
-        showTags(prefix + area);
-    });
-    addRemoveTagListener(prefix + area);
 };
 
 const addStoredTag = (prefix, tagarea) => {
@@ -204,7 +194,7 @@ const addStoredTag = (prefix, tagarea) => {
     tag = tag.replace(',', ' ').trim();
     const tags = document.querySelector('[name="' + prefix + tagarea + '"]').value;
     document.getElementById('id_' + tagarea).value = '';
-    if (!tags.includes(tag)) {
+    if (!RegExp('\\b' + tag + '\\b').test(tags)) {
         if (tags === '') {
             document.querySelector('[name="' + prefix + tagarea + '"]').value = tag;
         } else {
@@ -214,7 +204,7 @@ const addStoredTag = (prefix, tagarea) => {
 };
 
 const addRemoveTagListener = (tagarea) => {
-    document.getElementById('local_oer_' + tagarea + '_tagarea').addEventListener('click', function(e) {
+    document.getElementById('local_oer_' + tagarea + '_tagarea').addEventListener('click', (e) => {
         if (e.target.dataset.name !== tagarea) {
             return;
         }
@@ -224,7 +214,7 @@ const addRemoveTagListener = (tagarea) => {
             let name = e.target.dataset.value;
             let tags = document.querySelector('[name="' + tagarea + '"]').value.split(',');
             let result = [];
-            tags.forEach(function(tag) {
+            tags.forEach((tag) => {
                 if (tag !== '' && tag !== name) {
                     result.push(tag);
                 }
@@ -235,26 +225,18 @@ const addRemoveTagListener = (tagarea) => {
     });
 };
 
-const showTags = (tagarea) => {
+// eslint-disable-next-line space-before-function-paren
+const showTags = async (tagarea) => {
     let entries = document.querySelector('[name="' + tagarea + '"]').value;
     let tags = {tags: []};
     if (entries.length > 0) {
         entries = entries.split(',');
-        entries.forEach(function(entry) {
+        entries.forEach((entry) => {
             tags.tags.push({tagarea: tagarea, tagvalue: entry, tag: entry});
         });
-    } else {
-        tags = false;
     }
-
-    Templates.render('local_oer/tags', tags)
-        .then(function(html, js) {
-            Templates.replaceNodeContents('#local_oer_' + tagarea + '_tagarea', html, js);
-            return; // For eslint.
-        }).fail(function(e) {
-            window.console.log(e);
-        }
-    );
+    const {html, js} = await Templates.renderForPromise('local_oer/tags', tags);
+    Templates.replaceNodeContents('#local_oer_' + tagarea + '_tagarea', html, js);
 };
 
 const initSetPreferenceListener = (modal) => {
@@ -263,7 +245,7 @@ const initSetPreferenceListener = (modal) => {
         return;
     }
 
-    button.addEventListener("click", function(action) {
+    button.addEventListener("click", (action) => {
         action.preventDefault();
         let options = {
             identifier: button.dataset.identifier,
@@ -282,7 +264,7 @@ const initPersonButtonListener = () => {
 
     showPersons();
 
-    button.addEventListener("click", function(action) {
+    button.addEventListener("click", (action) => {
         action.preventDefault();
         showPersonForm();
     });
@@ -295,61 +277,57 @@ const showPersonForm = (setInvalid) => {
     const creator = document.querySelector('[name="creator"]').value;
     const context = document.getElementById("local_oer_files_main_area").dataset.context;
     const form = Fragment.loadFragment('local_oer', 'personform', context, {'creator': creator});
-    form.done(function() {
-        let title = Str.get_string('addpersonbtn', 'local_oer');
-        title.done(function(localizedTitle) {
-            ModalFactory.create({
-                type: ModalFactory.types.SAVE_CANCEL,
-                title: localizedTitle,
-                body: form,
-            }).then(function(modal) {
-                modal.setSaveButtonText(localizedTitle);
-                modal.getRoot().on(ModalEvents.hidden, function() {
-                    modal.destroy();
-                });
-                modal.getRoot().on(ModalEvents.save, function() {
-                    const formData = modal.getRoot().find('form').serialize();
-                    const fields = formData.split('&');
-                    let role = '';
-                    let firstname = '';
-                    let lastname = '';
-                    fields.forEach(function(field) {
-                        let pair = field.split('=');
-                        let key = pair[0];
-                        let value = pair[1];
-                        switch (key) {
-                            case 'role':
-                                role = value;
-                                break;
-                            case 'firstname':
-                                firstname = value;
-                                break;
-                            case 'lastname':
-                                lastname = value;
-                                break;
-                        }
-                    });
-                    const name = {
-                        role: role,
-                        firstname: firstname,
-                        lastname: lastname,
-                    };
-                    addPerson(name);
-
-                });
-                modal.show();
-                if (setInvalid) {
-                    let element = document.getElementById("id_firstname");
-                    element.classList.add("is-invalid");
-                    element = document.getElementById("id_lastname");
-                    element.classList.add("is-invalid");
-                }
-                return; // For eslint.
-            }).catch(function(error) {
-                window.console.debug(error);
-            });
+    // eslint-disable-next-line space-before-function-paren
+    form.then(async () => {
+        const title = await Str.get_string('addpersonbtn', 'local_oer');
+        const modal = await ModalFactory.create({
+            type: ModalFactory.types.SAVE_CANCEL,
+            title: title,
+            body: form,
         });
-    });
+        await modal.setSaveButtonText(title);
+        modal.getRoot().on(ModalEvents.hidden, () => {
+            modal.destroy();
+        });
+        modal.getRoot().on(ModalEvents.save, () => {
+            const formData = modal.getRoot().find('form').serialize();
+            const fields = formData.split('&');
+            let role = '';
+            let firstname = '';
+            let lastname = '';
+            fields.forEach((field) => {
+                let pair = field.split('=');
+                let key = pair[0];
+                let value = pair[1];
+                switch (key) {
+                    case 'role':
+                        role = value;
+                        break;
+                    case 'firstname':
+                        firstname = value;
+                        break;
+                    case 'lastname':
+                        lastname = value;
+                        break;
+                }
+            });
+            const name = {
+                role: role,
+                firstname: firstname,
+                lastname: lastname,
+            };
+            addPerson(name);
+
+        });
+        modal.show();
+        if (setInvalid) {
+            let element = document.getElementById("id_firstname");
+            element.classList.add("is-invalid");
+            element = document.getElementById("id_lastname");
+            element.classList.add("is-invalid");
+        }
+        return; // For eslint.
+    }).catch(Log.error);
 };
 
 /**
@@ -366,7 +344,7 @@ const addPerson = (person) => {
         names = JSON.parse(names);
         let found = false;
         let update = false;
-        names.persons.forEach(function(storedname, key) {
+        names.persons.forEach((storedname, key) => {
             if (person.role === storedname.role
                 && person.firstname === storedname.firstname
                 && person.lastname === storedname.lastname) {
@@ -403,7 +381,7 @@ const removePerson = (person) => {
     }
     entries = JSON.parse(entries);
     const persons = {persons: []};
-    entries.persons.forEach(function(storedperson) {
+    entries.persons.forEach((storedperson) => {
         if (person.role === storedperson.role
             && ((person.firstname === storedperson.firstname
                     && person.lastname === storedperson.lastname)
@@ -417,59 +395,51 @@ const removePerson = (person) => {
     showPersons();
 };
 
-const showPersons = () => {
+// eslint-disable-next-line space-before-function-paren
+const showPersons = async () => {
     let entries = document.querySelector('[name="storedperson"]').value;
     if (entries === '') {
         return;
     }
     const roles = JSON.parse(document.querySelector('[name="personroletypes"]').value);
     let strings = [];
-    roles.forEach(function(role) {
+    roles.forEach((role) => {
         strings.push({
             key: role[1],
             component: role[2],
         });
     });
-    Str.get_strings(strings).then(function(results) {
-        entries = JSON.parse(entries);
-        let persons = {persons: []};
-        entries.persons.forEach(function(person) {
-            let localizedrole = results[0];
-            roles.forEach(function(role, index) {
-                if (role[0] === person.role) {
-                    localizedrole = results[index];
-                }
-            });
-            persons.persons.push({
-                role: person.role,
-                firstname: person.firstname,
-                lastname: person.lastname,
-                fullname: person.fullname,
-                name: decodeURI(localizedrole + ': ' +
-                    (person.fullname === undefined ?
-                        person.firstname + ' ' + person.lastname : person.fullname))
-            });
+    const results = await Str.get_strings(strings);
+    entries = JSON.parse(entries);
+    let persons = {persons: []};
+    entries.persons.forEach((person) => {
+        let localizedrole = results[0];
+        roles.forEach((role, index) => {
+            if (role[0] === person.role) {
+                localizedrole = results[index];
+            }
         });
-        renderPersonsTemplate(persons);
-        return; // For eslint.
-    }).fail(function(e) {
-            window.console.debug(e);
-        }
-    );
+        persons.persons.push({
+            role: person.role,
+            firstname: person.firstname,
+            lastname: person.lastname,
+            fullname: person.fullname,
+            name: decodeURI(localizedrole + ': ' +
+                (person.fullname === undefined ?
+                    person.firstname + ' ' + person.lastname : person.fullname))
+        });
+    });
+    renderPersonsTemplate(persons);
 };
 
-const renderPersonsTemplate = (persons) => {
-    Templates.render('local_oer/persons', persons)
-        .then(function(html, js) {
-            Templates.replaceNodeContents('#local_oer_storedperson_tagarea', html, js);
-            return; // For eslint.
-        }).fail(function(e) {
-            window.console.log(e);
-        }
-    );
+// eslint-disable-next-line space-before-function-paren
+const renderPersonsTemplate = async (persons) => {
+    const {html, js} = await Templates.renderForPromise('local_oer/persons', persons);
+    Templates.replaceNodeContents('#local_oer_storedperson_tagarea', html, js);
 };
 
-const showPagination = () => {
+// eslint-disable-next-line space-before-function-paren
+const showPagination = async () => {
     const courseid = document.getElementById("local_oer_files_main_area").dataset.courseid;
     // Filecount is the number of elements currently available due to filter restrictions.
     let filecount = parseInt(localStorage.getItem('local-oer-pagination-filecount-' + courseid), 10);
@@ -546,14 +516,9 @@ const showPagination = () => {
         filecount: filecount,
         filemax: filemax
     };
-    Templates.render('local_oer/pagination', data)
-        .then(function(html, js) {
-            Templates.replaceNodeContents('#local-oer-pagination', html, js);
-            addPaginationListeners(pages);
-            return; // For eslint.
-        }).fail(function(error) {
-        window.console.debug(error);
-    });
+    const {html, js} = await Templates.renderForTemplate('local_oer/pagination', data);
+    Templates.replaceNodeContents('#local-oer-pagination', html, js);
+    addPaginationListeners(pages);
 };
 
 const paginationSelectOptions = (selected) => {
@@ -581,7 +546,7 @@ const addPaginationListeners = (pages) => {
     let selectlistener = document.getElementById('local-oer-pagination-select');
     let pagelistener = document.getElementById('local-oer-pagination-pages');
 
-    selectlistener.addEventListener("change", function(action) {
+    selectlistener.addEventListener("change", (action) => {
         action.preventDefault();
         let value = action.target.value;
         localStorage.setItem('local-oer-pagination-selected-' + courseid, value);
@@ -589,7 +554,7 @@ const addPaginationListeners = (pages) => {
         showFiles(false, false);
     });
 
-    pagelistener.addEventListener("click", function(action) {
+    pagelistener.addEventListener("click", (action) => {
         action.preventDefault();
         let value = action.target.dataset.page;
         if (value === undefined || value === '..') {

@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import * as UserPreference from 'local_oer/userpreferences';
-import * as Output from 'local_oer/output';
+import * as UserPreference from 'local_oer/userpreferences-lazy';
+import * as Output from 'local_oer/output-lazy';
 import * as Str from 'core/str';
 
 /**
@@ -34,7 +34,7 @@ export const initLayoutListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", (action) => {
         action.preventDefault();
         UserPreference.setLayout(action.target.dataset.value);
         Output.showFiles(false, true);
@@ -50,7 +50,7 @@ export const initSortListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", (action) => {
         action.preventDefault();
         UserPreference.setSort(action.target.dataset.value);
         Output.showFiles(false, true);
@@ -66,7 +66,7 @@ export const initGroupingListener = () => {
         return;
     }
 
-    element.addEventListener("click", function(action) {
+    element.addEventListener("click", (action) => {
         action.preventDefault();
         if (typeof action.target.dataset.value === 'undefined') {
             return;
@@ -85,13 +85,11 @@ export const initCourseinfoListener = () => {
     if (element === null) {
         return;
     }
-
-    element.addEventListener("click", function(action) {
+    // eslint-disable-next-line space-before-function-paren
+    element.addEventListener("click", async (action) => {
         action.preventDefault();
-        const title = Str.get_string('courseinfobutton', 'local_oer');
-        title.done(function(localizedTitle) {
-            Output.showForm('CourseinfoForm', localizedTitle, {});
-        });
+        const title = await Str.get_string('courseinfobutton', 'local_oer');
+        Output.showForm('CourseinfoForm', title, {});
     });
 };
 
@@ -103,13 +101,11 @@ export const initPreferenceListener = () => {
     if (element === null) {
         return;
     }
-
-    element.addEventListener("click", function(action) {
+    // eslint-disable-next-line space-before-function-paren
+    element.addEventListener("click", async (action) => {
         action.preventDefault();
-        const title = Str.get_string('preferencebutton', 'local_oer');
-        title.done(function(localizedTitle) {
-            Output.showForm('PreferenceForm', localizedTitle, {});
-        });
+        const title = await Str.get_string('preferencebutton', 'local_oer');
+        Output.showForm('PreferenceForm', title, {});
     });
 };
 
@@ -121,12 +117,12 @@ export const initSearchListener = () => {
     if (searchInput === null) {
         return;
     }
-    const searchFiles = debounce(function() {
+    const searchFiles = debounce(() => {
         Output.showFiles(false, true);
     }, 500, false);
 
     searchInput.addEventListener("keyup", searchFiles);
-    searchInput.addEventListener("search", function() {
+    searchInput.addEventListener("search", () => {
         Output.showFiles(false, true);
     });
 };
