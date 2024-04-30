@@ -163,8 +163,8 @@ final class elements_test extends \advanced_testcase {
      */
     private function create_list_of_elements_with_one_known_element(): array {
         $element = $this->create_random_element();
-        $limit = rand(100, 1000);
-        $insert = rand(100, $limit);
+        $limit = rand(101, 1000);
+        $insert = rand(100, $limit - 1);
         $elements = new elements();
         for ($i = 0; $i < $limit; $i++) {
             if ($i == $insert) {
