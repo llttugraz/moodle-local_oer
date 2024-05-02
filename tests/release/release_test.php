@@ -93,15 +93,15 @@ final class release_test extends \advanced_testcase {
             // Release => Day start, Day end.
                 1 => [
                         usergetmidnight(1584662400),
-                        usergetmidnight(1584748800),
+                        usergetmidnight(1584748800) - 1,
                 ],
                 2 => [
                         usergetmidnight(1654560000),
-                        usergetmidnight(1654646400),
+                        usergetmidnight(1654646400) - 1,
                 ],
                 3 => [
                         usergetmidnight(1708128000),
-                        usergetmidnight(1708214400),
+                        usergetmidnight(1708214400) - 1,
                 ],
         ];
 
@@ -199,6 +199,10 @@ final class release_test extends \advanced_testcase {
             $this->identifiers[$record->identifier] = $record->identifier;
             $oldtype = $type;
             $lastfile = $filerelease[1];
+        }
+        if (!$DB->get_records('local_oer_snapshot', ['type' => 1])) {
+            // There is no element with type MOODLEFILE, so we need at least one.
+            $DB->set_field('local_oer_snapshot', 'type', 1, ['courseid' => $courses[0]->id]);
         }
     }
 

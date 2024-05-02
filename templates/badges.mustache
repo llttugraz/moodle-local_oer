@@ -50,5 +50,11 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
         {{#upload}}
             <span class="ml-1 badge badge-warning">{{#str}} upload, local_oer {{/str}}</span>
         {{/upload}}
+        {{^upload}}
+            <span class="ml-1 badge badge-secondary">{{#str}} notmarkedforupload, local_oer {{/str}}</span>
+        {{/upload}}
     {{/timeuploadedts}}
+    {{#ignore}}
+        <span class="ml-1 badge badge-dark">{{#str}} ignore, local_oer {{/str}}</span>
+    {{/ignore}}
 </div>

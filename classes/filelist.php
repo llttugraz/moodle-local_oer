@@ -40,10 +40,6 @@ class filelist {
     /**
      * Load all files from moodle course modules and return all files and modules.
      *
-     * At the moment only mod_folder and mod_resource are supported.
-     * Most of the other modules will probably work out of the box when added, but this has not been tested.
-     * For future updates this part should be extracted to subplugins. So it would be easier to also support 3rd party plugins.
-     *
      * @param int $courseid Moodle courseid
      * @return elements
      * @throws \coding_exception
