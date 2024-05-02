@@ -448,6 +448,7 @@ $string['title_help'] = 'Titel der Datei. Initial wird der Dateiname, welcher be
 $string['tocourse'] = 'Zum Kurs';
 $string['type'] = 'Typ';
 $string['updatecourseinfo'] = 'Task zum synchronisieren der Kurs-Metadaten';
+$string['updating'] = 'Wird aktualisiert...';
 $string['upload'] = 'Zur Veröffentlichung freigegeben';
 $string['upload_help'] = 'To mark a file for release some requirements are necessary:' .
         '<ul>' .

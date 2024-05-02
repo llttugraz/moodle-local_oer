@@ -419,6 +419,7 @@ $string['title_help'] = 'File title. Initially, the file name used when uploadin
 $string['tocourse'] = 'link';
 $string['type'] = 'Type';
 $string['updatecourseinfo'] = 'Task to synchronise course metadata';
+$string['updating'] = 'Updating...';
 $string['upload'] = 'Marked for release';
 $string['upload_help'] = 'To mark a file for release some requirements are necessary:' .
         '<ul>' .

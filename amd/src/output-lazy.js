@@ -120,7 +120,11 @@ const showFormModal = async (form, type, title, options) => {
     });
 };
 
-const saveForm = (modal, element, options, type, title) => {
+// eslint-disable-next-line space-before-function-paren
+const saveForm = async (modal, element, options, type, title) => {
+    const {html, js} = await Templates.renderForPromise('local_oer/spinner', []);
+    const node = document.querySelectorAll("[data-oerid='" + options.identifier + "']");
+    Templates.replaceNodeContents(node, html, js);
     const formData = modal.getRoot().find('form').serialize();
     const saveargs = {
         courseid: element.dataset.courseid,
