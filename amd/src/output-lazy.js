@@ -516,7 +516,7 @@ const showPagination = async () => {
         filecount: filecount,
         filemax: filemax
     };
-    const {html, js} = await Templates.renderForTemplate('local_oer/pagination', data);
+    const {html, js} = await Templates.renderForPromise('local_oer/pagination', data);
     Templates.replaceNodeContents('#local-oer-pagination', html, js);
     addPaginationListeners(pages);
 };
