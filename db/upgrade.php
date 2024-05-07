@@ -421,7 +421,7 @@ function xmldb_local_oer_upgrade($oldversion) {
                 $dbman->add_field($table, $field);
             }
 
-            // TODO Future update: delete local_oer_items table, delete local_oer_user_pref table.
+            // MDL-0 TODO Future update: delete local_oer_items table, delete local_oer_user_pref table.
             // delete local_oer_queue table (queue moved to subplugin).
         }
         // Oer savepoint reached.
@@ -710,6 +710,237 @@ function xmldb_local_oer_upgrade($oldversion) {
 
         // Oer savepoint reached.
         upgrade_plugin_savepoint(true, 2022111700, 'local', 'oer');
+    }
+
+    if ($oldversion < 2023111700) {
+
+        // Define table local_oer_elements to be created.
+        $table = new xmldb_table('local_oer_elements');
+
+        // Adding fields to table local_oer_elements.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('identifier', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('context', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('license', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'unknown');
+        $table->add_field('persons', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('tags', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('language', XMLDB_TYPE_CHAR, '2', null, XMLDB_NOTNULL, null, 'en');
+        $table->add_field('resourcetype', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('classification', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('releasestate', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_oer_elements.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('license', XMLDB_KEY_FOREIGN, ['license'], 'license', ['shortname']);
+
+        // Adding indexes to table local_oer_elements.
+        $table->add_index('identifier', XMLDB_INDEX_UNIQUE, ['identifier']);
+
+        // Conditionally launch create table for local_oer_elements.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $records = $DB->get_records('local_oer_files');
+        foreach ($records as $record) {
+            unset($record->id);
+            $identifier = \local_oer\identifier::compose(
+                    'moodle', $CFG->wwwroot,
+                    'file', 'contenthash', $record->contenthash
+            );
+
+            $record->identifier = $identifier;
+            unset($record->contenthash);
+            $record->type = \local_oer\modules\element::OERTYPE_MOODLEFILE;
+            $record->releasestate = $record->state;
+            unset($record->state);
+            $DB->insert_record('local_oer_elements', $record);
+        }
+
+        // Define table local_oer_files to be dropped.
+        $table = new xmldb_table('local_oer_files');
+
+        // Conditionally launch drop table for local_oer_files.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111700, 'local', 'oer');
+    }
+
+    if ($oldversion < 2023111701) {
+
+        $records = $DB->get_records('local_oer_snapshot');
+
+        // Rename field contenthash on table local_oer_snapshot to identifier.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('contenthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null, 'courseid');
+
+        // Launch rename field contenthash.
+        $dbman->rename_field($table, $field, 'identifier');
+
+        // Changing precision of field identifier on table local_oer_snapshot to (255).
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('identifier', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'courseid');
+
+        // Launch change of precision for field identifier.
+        $dbman->change_field_precision($table, $field);
+
+        foreach ($records as $record) {
+            $identifier = \local_oer\identifier::compose(
+                    'moodle', $CFG->wwwroot,
+                    'file', 'contenthash', $record->contenthash
+            );
+
+            $record->identifier = $identifier;
+            unset($record->contenthash);
+            $DB->update_record('local_oer_snapshot', $record);
+        }
+
+        // Define index courseid (not unique) to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $index = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+
+        // Conditionally launch add index courseid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index identifier (not unique) to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $index = new xmldb_index('identifier', XMLDB_INDEX_NOTUNIQUE, ['identifier']);
+
+        // Conditionally launch add index identifier.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111701, 'local', 'oer');
+    }
+
+    if ($oldversion < 2024022200) {
+
+        // Define field releasenumber to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('releasenumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'releasehash');
+
+        // Conditionally launch add field releasenumber.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update all existing snapshots to get the releasenumber.
+        $records = $DB->get_records('local_oer_snapshot', null, 'timecreated ASC');
+        $release = 1;
+        $lastdaystart = 0;
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($records as $record) {
+            if ($lastdaystart == 0) {
+                // Init first release.
+                $lastdaystart = strtotime('midnight', $record->timecreated);
+                $lastdayend = strtotime('tomorrow', $record->timecreated);
+            }
+            if ($record->timecreated >= $lastdaystart && $record->timecreated < $lastdayend) {
+                $record->releasenumber = $release;
+                $DB->update_record('local_oer_snapshot', $record);
+            } else if ($record->timecreated >= $lastdayend) {
+                // Next release number.
+                $lastdaystart = strtotime('midnight', $record->timecreated);
+                $lastdayend = strtotime('tomorrow', $record->timecreated);
+                $record->releasenumber = ++$release;
+                $DB->update_record('local_oer_snapshot', $record);
+            } else {
+                // How can it be smaller? The values were sorted by timecreated.
+                echo html_writer::div($record->identifier .
+                        ': "releasenumber" could not be updated, has to be changed manually',
+                        'adminwarning');
+            }
+        }
+        $transaction->allow_commit();
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2024022200, 'local', 'oer');
+    }
+
+    if ($oldversion < 2024022601) {
+
+        // Define field type to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'releasenumber');
+
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field typedata to be added to local_oer_snapshot.
+        $table = new xmldb_table('local_oer_snapshot');
+        $field = new xmldb_field('typedata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'type');
+
+        // Conditionally launch add field typedata.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // At the moment, there are only OERMOD_MOODLEFILE elements stored.
+        // To update the typedata field, all released elements have to be loaded from the courses and the data has to be added.
+        $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
+        foreach ($courses as $course) {
+            $releasedfiles = $DB->get_records('local_oer_snapshot', ['courseid' => $course->courseid]);
+            // Function get_fast_modinfo() not allowed during upgrade. So files have to be loaded manually.
+            foreach ($releasedfiles as $releasedfile) {
+                $decomposed = \local_oer\identifier::decompose($releasedfile->identifier);
+                if ($decomposed->valuetype != 'contenthash') {
+                    echo html_writer::div($releasedfile->identifier .
+                            ': Element is not a Moodle stored file. How is that possible during this update?',
+                            'adminwarning');
+                    continue;
+                }
+                // Contenthash always leads to the same file.
+                $files = $DB->get_records('files', ['contenthash' => $decomposed->value]);
+                foreach ($files as $file) {
+                    if (is_null($file->mimetype)) {
+                        continue;
+                    }
+                    $fs = get_file_storage();
+                    $storedfile = $fs->get_file($file->contextid, $file->component, $file->filearea, $file->itemid, $file->filepath,
+                            $file->filename);
+                    if (!$storedfile) {
+                        echo html_writer::div($releasedfile->identifier .
+                                ': File does not exist anymore. Entry has to be cleaned up manually',
+                                'adminwarning');
+                        continue;
+                    }
+                    $url = \moodle_url::make_pluginfile_url($storedfile->get_contextid(),
+                            $storedfile->get_component(),
+                            $storedfile->get_filearea(),
+                            $storedfile->get_itemid(),
+                            $storedfile->get_filepath(),
+                            $storedfile->get_filename());
+                    $releasedfile->typedata = json_encode([
+                            'mimetype' => $storedfile->get_mimetype(),
+                            'filesize' => $storedfile->get_filesize(),
+                            'source' => $url->out(),
+                    ]);
+                    $DB->update_record('local_oer_snapshot', $releasedfile);
+                    break;
+                }
+            }
+        }
+
+        // Oer savepoint reached.
+        upgrade_plugin_savepoint(true, 2024022601, 'local', 'oer');
     }
 
     return true;

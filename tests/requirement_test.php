@@ -26,6 +26,7 @@
 namespace local_oer;
 
 use local_oer\helper\requirements;
+use local_oer\modules\element;
 use local_oer\userlist\userlist;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,23 +38,24 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\helper\requirements
  */
-class requirement_test extends \advanced_testcase {
+final class requirement_test extends \advanced_testcase {
     /**
      * Test different combinations on the method which decides if a file is ready for release.
      *
-     * @return void
-     * @throws \dml_exception
      * @covers ::metadata_fulfills_all_requirements
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function test_metadata_fulfills_all_requirements() {
+    public function test_metadata_fulfills_all_requirements(): void {
         $this->resetAfterTest();
         static::set_config('');
 
         // No additional fields are added. Initially all values except title and license have a 'false' state.
-        $metadata = self::get_metadata(
+        $element = self::get_element(
                 'test1',
                 '',
-                'cc',
+                'cc-4.0',
                 '',
                 0,
                 '',
@@ -62,7 +64,7 @@ class requirement_test extends \advanced_testcase {
                 '',
                 0
         );
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertArrayHasKey('title', $reqarray);
         $this->assertArrayHasKey('license', $reqarray);
         $this->assertArrayHasKey('persons', $reqarray);
@@ -70,57 +72,58 @@ class requirement_test extends \advanced_testcase {
         $this->assertCount(3, $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
-        $metadata->state = 1;
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_stored_metadata_field('releasestate', 1);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
-        $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}]}';
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_stored_metadata_field('persons',
+                '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}]}');
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context');
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertCount(5, $reqarray);
         $this->assertArrayHasKey('context', $reqarray);
         $this->assertArrayHasKey('description', $reqarray);
         $this->assertArrayNotHasKey('tags', $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
-        $metadata->description = 'abc';
-        $metadata->context = 1;
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_stored_metadata_field('description', 'abc');
+        $element->set_stored_metadata_field('context', 1);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context,tags,language,resourcetype');
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertArrayHasKey('tags', $reqarray);
         $this->assertArrayHasKey('language', $reqarray);
         $this->assertCount(8, $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
 
-        $metadata->tags = 'abc,cde';
-        $metadata->language = 'de';
-        $metadata->resourcetype = 5;
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_stored_metadata_field('tags', 'abc,cde');
+        $element->set_stored_metadata_field('language', 'de');
+        $element->set_stored_metadata_field('resourcetype', 5);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
         static::set_config('description,context,tags,language,resourcetype,oerclassification_oefos');
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertArrayHasKey('oerclassification_oefos', $reqarray);
         $this->assertCount(9, $reqarray);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
-        $metadata->classification = '{"oefos":["101001","101027"]}';
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_stored_metadata_field('classification', '{"oefos":["101001","101027"]}');
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
 
-        $metadata->license = 'unknown';
-        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($metadata);
+        $element->set_license('unknown');
+        [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
     }
@@ -131,7 +134,7 @@ class requirement_test extends \advanced_testcase {
      * @param string $config
      * @return void
      */
-    private static function set_config(string $config) {
+    private static function set_config(string $config): void {
         set_config('requiredfields', $config, 'local_oer');
     }
 
@@ -148,9 +151,11 @@ class requirement_test extends \advanced_testcase {
      * @param int $resourcetype
      * @param string $oefos
      * @param int $state
-     * @return \stdClass
+     * @return element
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    private static function get_metadata(string $title,
+    private static function get_element(string $title,
             string $description,
             string $license,
             string $persons,
@@ -160,7 +165,11 @@ class requirement_test extends \advanced_testcase {
             int $resourcetype,
             string $oefos,
             int $state
-    ) {
+    ): element {
+        global $CFG;
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
+        $identifer = identifier::compose('moodle', $CFG->wwwroot, 'file', 'contenthash', 'abcdefgh123456789');
+        $element->set_identifier($identifer);
         $metadata = new \stdClass();
         $metadata->title = $title;
         $metadata->description = $description;
@@ -171,8 +180,10 @@ class requirement_test extends \advanced_testcase {
         $metadata->language = $language;
         $metadata->resourcetype = $resourcetype;
         $metadata->classification = $oefos;
-        $metadata->state = $state;
-        return $metadata;
+        $metadata->releasestate = $state;
+        $metadata->timemodified = time();
+        $element->set_stored_metadata($metadata);
+        return $element;
     }
 
     /**
@@ -212,10 +223,11 @@ class requirement_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::reset_releasestate_if_necessary
      */
-    public function test_local_oer_reset_releasestate_if_necessary() {
+    public function test_local_oer_reset_releasestate_if_necessary(): void {
         $this->resetAfterTest();
         global $DB, $CFG;
         $this->setAdminUser();
+
         // To load settings.php some admin values have to be prepared.
         require_once($CFG->libdir . '/adminlib.php');
         $ADMIN = \admin_get_root();
@@ -268,29 +280,29 @@ class requirement_test extends \advanced_testcase {
 
         // Case 1: Test release in first course.
         $testcourse->set_files_to($course1->id, 6, true);
-        $this->assertCount(5, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(5, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
         $sink = $this->redirectMessages();
         local_oer_reset_releasestate_if_necessary();
         $messages = $sink->get_messages();
         $this->assertEquals(1, count($messages), 'Only one teacher has the allowance to use oer.');
         $this->assertEquals($teacher11->id, reset($messages)->useridto);
-        $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(0, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
 
         // Case 2: Test release in second course, first course does not have any files left for release.
         $testcourse->set_files_to($course2->id, 4, true);
-        $this->assertCount(4, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(4, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
         $sink = $this->redirectMessages();
         local_oer_reset_releasestate_if_necessary();
         $messages = $sink->get_messages();
         $this->assertEquals(2, count($messages), 'Two teachers have the allowance to use oer in course2.');
         $this->assertEquals($teacher22->id, reset($messages)->useridto);
         $this->assertEquals($teacher32->id, end($messages)->useridto);
-        $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(0, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
 
         // Case 3: Files in both courses are released.
         $testcourse->set_files_to($course1->id, 5, true);
         $testcourse->set_files_to($course2->id, 5, true);
-        $this->assertCount(10, $DB->get_records('local_oer_files', ['state' => 1], 'id ASC'));
+        $this->assertCount(10, $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC'));
         $sink = $this->redirectMessages();
         local_oer_reset_releasestate_if_necessary();
         $messages = $sink->get_messages();
@@ -298,34 +310,34 @@ class requirement_test extends \advanced_testcase {
         $this->assertEquals($teacher11->id, $messages[0]->useridto);
         $this->assertEquals($teacher22->id, $messages[1]->useridto);
         $this->assertEquals($teacher32->id, $messages[2]->useridto);
-        $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(0, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
 
         // Case 4: File has been deleted, but metadata still exists, no notification should be sent.
         $testcourse->set_files_to($course1->id, 5, true);
         $testcourse->set_files_to($course2->id, 5, true);
-        $coursefiles = filelist::get_course_files($course1->id);
-        $this->assertNotEmpty($coursefiles);
-        foreach ($coursefiles as $files) {
-            foreach ($files as $file) {
-                $file['file']->delete();
+        $elements = filelist::get_course_files($course1->id);
+        $this->assertNotEmpty($elements);
+        foreach ($elements as $element) {
+            foreach ($element->get_storedfiles() as $file) {
+                $file->delete();
             }
         }
-        $coursefiles = filelist::get_course_files($course2->id);
-        $this->assertNotEmpty($coursefiles);
-        foreach ($coursefiles as $files) {
-            foreach ($files as $file) {
-                $file['file']->delete();
+        $elements = filelist::get_course_files($course2->id);
+        $this->assertNotEmpty($elements);
+        foreach ($elements as $element) {
+            foreach ($element->get_storedfiles() as $file) {
+                $file->delete();
             }
         }
         $coursefiles = filelist::get_course_files($course1->id);
         $this->assertEmpty($coursefiles);
         $coursefiles = filelist::get_course_files($course2->id);
         $this->assertEmpty($coursefiles);
-        $this->assertCount(10, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(10, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
         $sink = $this->redirectMessages();
         local_oer_reset_releasestate_if_necessary();
         $messages = $sink->get_messages();
         $this->assertEquals(0, count($messages), 'As the files have been deleted, no notifications should be sent.');
-        $this->assertCount(0, $DB->get_records('local_oer_files', ['state' => 1]));
+        $this->assertCount(0, $DB->get_records('local_oer_elements', ['releasestate' => 1]));
     }
 }

@@ -240,7 +240,7 @@ class courseinfo_form extends \moodleform {
         $availablefromgroup[] =& $mform->createElement($type, $name, $shownname, $additionaldata);
         $availablefromgroup[] =& $mform->createElement('checkbox', $checkbox, '', get_string('overwrite', 'local_oer'));
         $mform->addGroup($availablefromgroup, $name . 'group', $shownname, ' ', false);
-        $mform->setType($name, PARAM_RAW); // TODO: how to define a more precise type for the fields?
+        $mform->setType($name, PARAM_RAW); // MDL-0 TODO: how to define a more precise type for the fields?
         $mform->disabledIf($group, $checkbox);
         $mform->hideif($group, 'ignored_' . $course->coursecode, 'checked');
         if ($ignoreable) {

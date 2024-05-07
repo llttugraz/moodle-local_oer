@@ -85,14 +85,18 @@ class license {
     /**
      * Prepare an associative array for frontend form select fields.
      *
-     * @param bool $addnoprefval
+     * @param bool $addnoprefval Bool value if a nopref value should be added to select.
+     * @param array $supportedlicences A list of licences an element can have. If addnoprefval is true, this list is ignored.
      * @return array
      * @throws \coding_exception
      */
-    public static function get_licenses_select_data(bool $addnoprefval = false) {
+    public static function get_licenses_select_data(bool $addnoprefval, array $supportedlicences) {
         $licenses = \license_manager::get_active_licenses();
         $licenseselect = [];
         foreach ($licenses as $key => $license) {
+            if ($addnoprefval == false && !in_array($key, $supportedlicences)) {
+                continue;
+            }
             $licenseselect[$key] = $license->fullname;
         }
         return $addnoprefval ? formhelper::add_no_preference_value($licenseselect) : $licenseselect;

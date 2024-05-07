@@ -26,6 +26,7 @@
 namespace local_oer\forms;
 
 use local_oer\helper\formhelper;
+use local_oer\plugininfo\oermod;
 
 /**
  * Formular to define all necessary metadata fields.
@@ -35,12 +36,60 @@ class person_form extends \moodleform {
      * Mform definition function, required by moodleform.
      *
      * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    protected function definition() {
+    protected function definition(): void {
         $mform = $this->_form;
+        $args = $this->_customdata;
+        $allroles = [];
+        $head = [];
+        $tabledata = [];
+        $plugins = oermod::get_enabled_plugins();
+        foreach ($plugins as $plugin => $name) {
+            $skip = false;
+            switch ($plugin) {
+                case 'folder':
+                    $sourcename = get_string('pluginname', 'mod_folder');
+                    $skip = true; // Prevent misleading labeling.
+                    break;
+                case 'resource':
+                    $sourcename = get_string('pluginname', 'mod_resource');
+                    break;
+                default:
+                    $sourcename = get_string('origin', "oermod_$plugin");
+            }
+            if (!$skip) {
+                $head[] = $sourcename;
+            }
+            $rolecase = [];
+            $supportedroles = oermod::get_supported_roles("oermod_" . $plugin . "\\module");
+            foreach ($supportedroles as $role) {
+                $allroles[$role[0]] = $role;
+                $rolename = get_string($role[1], $role[2]);
+                $rolecase[] = count($role) == 4 ? "*$rolename" : $rolename;
+            }
+            if (!$skip) {
+                $tabledata[] = $rolecase;
+            }
+        }
 
-        $mform->addElement('select', 'role', get_string('role', 'local_oer'), formhelper::lom_role_types());
+        $tabledata = array_map(null, ...$tabledata); // Transpose the array.
+
+        if ($args['creator'] == 'preference') {
+            global $OUTPUT;
+            $mform->addElement('html', $OUTPUT->render_from_template('local_oer/roletable', [
+                    'head' => $head,
+                    'data' => $tabledata,
+            ]));
+            $roles = $allroles;
+        } else {
+            $roles = oermod::get_supported_roles($args['creator']);
+        }
+
+        $mform->addElement('select', 'role', get_string('role', 'local_oer'), formhelper::lom_role_types($roles));
         $mform->setDefault('role', 'Author');
+        $mform->addHelpButton('role', 'role', 'local_oer');
 
         $mform->addElement('text', 'firstname', get_string('firstname'));
         $mform->addRule('firstname', get_string('required'), 'required', '', 'client');
@@ -61,9 +110,8 @@ class person_form extends \moodleform {
      * @param array $data
      * @param array $files
      * @return array
-     * @throws \coding_exception
      */
-    public function validation($data, $files) {
+    public function validation($data, $files): array {
         return [];
     }
 }

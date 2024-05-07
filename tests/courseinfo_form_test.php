@@ -37,7 +37,7 @@ use local_oer\metadata\courseinfo;
  *
  * @coversDefaultClass \local_oer\forms\courseinfo_form
  */
-class courseinfo_form_test extends \advanced_testcase {
+final class courseinfo_form_test extends \advanced_testcase {
     /**
      * Test validation of formular.
      * Also runs through the formular definition, but there is not tested anything special.
@@ -51,7 +51,7 @@ class courseinfo_form_test extends \advanced_testcase {
      * @covers \local_oer\forms\courseinfo_form::form_default_element
      * @covers \local_oer\forms\courseinfo_form::parse_identifier
      */
-    public function test_validation() {
+    public function test_validation(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;
@@ -216,7 +216,7 @@ class courseinfo_form_test extends \advanced_testcase {
      * @covers \local_oer\forms\courseinfo_form::update_metadata
      * @covers \local_oer\forms\courseinfo_form::overwrite_disabled
      */
-    public function test_update_metadata() {
+    public function test_update_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB;

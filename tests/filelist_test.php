@@ -30,7 +30,7 @@ namespace local_oer;
  *
  * @coversDefaultClass \local_oer\filelist
  */
-class filelist_test extends \advanced_testcase {
+final class filelist_test extends \advanced_testcase {
     /**
      * Testdata.
      *
@@ -55,20 +55,6 @@ class filelist_test extends \advanced_testcase {
     }
 
     /**
-     * Test get_files.
-     *
-     * @return void
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @covers ::__construct
-     * @covers ::get_files
-     */
-    public function test_get_files() {
-        $filelist = new filelist($this->data['course2']->id);
-        $this->assertCount(5, $filelist->get_files());
-    }
-
-    /**
      * Test get_course_files.
      *
      * @return void
@@ -76,7 +62,7 @@ class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_course_files
      */
-    public function test_get_course_files() {
+    public function test_get_course_files(): void {
         $files = filelist::get_course_files($this->data['course1']->id);
         $this->assertCount(5, $files);
         $files = filelist::get_course_files($this->data['course2']->id);
@@ -94,12 +80,12 @@ class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_single_file
      */
-    public function test_get_single_file() {
-        $contenthash = $this->data['helper']->get_contenthash_of_first_found_file($this->data['course2']);
-        $file = filelist::get_single_file($this->data['course2']->id, $contenthash);
-        $this->assertIsArray($file);
-        $this->assertEquals($contenthash, $file[0]['file']->get_contenthash());
-        // TODO: refactor, why is there an additional layer in the array?
+    public function test_get_single_file(): void {
+        $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course2']);
+        $file = filelist::get_single_file($this->data['course2']->id, $identifier);
+        $this->assertIsObject($file);
+        $this->assertInstanceOf('\local_oer\modules\element', $file);
+        $this->assertEquals($identifier, $file->get_identifier());
     }
 
     /**
@@ -110,10 +96,8 @@ class filelist_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::get_simple_filelist
-     * @covers ::prepare_file_icon_renderer
-     * @covers ::select_file_icon_or_thumbnail
      */
-    public function test_get_simple_filelist() {
+    public function test_get_simple_filelist(): void {
         [$files, $sections] = filelist::get_simple_filelist($this->data['course1']->id);
         $this->assertIsArray($files);
         $this->assertIsArray($sections);
@@ -131,11 +115,11 @@ class filelist_test extends \advanced_testcase {
         $this->assertCount(0, $files);
         $this->assertCount(0, $sections);
 
-        // TODO: this method should be tested much more...
+        // MDL-0 TODO: this method should be tested much more...
     }
 
     /**
-     * Test get_simple_filelist
+     * Test get_simple_file
      *
      * @return void
      * @throws \coding_exception
@@ -143,13 +127,11 @@ class filelist_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_simple_file
      * @covers ::get_simple_filelist
-     * @covers ::prepare_file_icon_renderer
-     * @covers ::select_file_icon_or_thumbnail
      */
-    public function test_get_simple_file() {
-        $contenthash = $this->data['helper']->get_contenthash_of_first_found_file($this->data['course1']);
-        $file = filelist::get_simple_file($this->data['course1']->id, $contenthash);
+    public function test_get_simple_file(): void {
+        $identifier = $this->data['helper']->get_identifier_of_first_found_file($this->data['course1']);
+        $file = filelist::get_simple_file($this->data['course1']->id, $identifier);
         $this->assertIsArray($file);
-        $this->assertEquals($contenthash, $file['contenthash']);
+        $this->assertEquals($identifier, $file['identifier']);
     }
 }

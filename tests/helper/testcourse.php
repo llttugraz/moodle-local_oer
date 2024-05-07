@@ -25,7 +25,9 @@
 
 namespace local_oer;
 
+use local_oer\helper\filehelper;
 use local_oer\metadata\courseinfo_sync;
+use local_oer\modules\element;
 
 /**
  * Class testcourse
@@ -69,11 +71,13 @@ class testcourse {
      * @param int $courseid
      * @param \stored_file $file
      * @return \stdClass
+     * @throws \coding_exception
      */
     public function generate_oer_non_release_metadata(int $courseid, \stored_file $file) {
         $metadata = new \stdClass();
+        $metadata->type = element::OERTYPE_MOODLEFILE;
         $metadata->courseid = $courseid;
-        $metadata->contenthash = $file->get_contenthash();
+        $metadata->identifier = $this->generate_identifier($file->get_contenthash());
         $metadata->title = $file->get_filename();
         $metadata->description = '';
         $metadata->context = 0;
@@ -83,8 +87,10 @@ class testcourse {
         $metadata->language = 'en';
         $metadata->resourcetype = 0;
         $metadata->classification = null;
-        $metadata->state = 0;
+        $metadata->releasestate = 0;
         $metadata->preference = 0;
+        $metadata->type = element::OERTYPE_MOODLEFILE;
+        $metadata->typedata = null;
         $metadata->usermodified = 2;
         $metadata->timemodified = time();
         $metadata->timecreated = time();
@@ -92,23 +98,74 @@ class testcourse {
     }
 
     /**
+     * Get the element object for a test file.
+     *
+     * @param \stored_file $file
+     * @return element
+     * @throws \coding_exception
+     */
+    public function get_element_for_file(\stored_file $file): element {
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
+        $element->set_identifier($this->generate_identifier($file->get_contenthash()));
+        $element->set_title($file->get_filename());
+        $element->set_license($file->get_license());
+        $element->set_mimetype($file->get_mimetype());
+        $element->set_filesize($file->get_filesize());
+        $element->set_origin('mod_resource', 'pluginname', 'mod_resource');
+        $element->set_source(filehelper::get_file_url($file, true));
+        return $element;
+    }
+
+    /**
      * Overwrite the fields that are required with a certain value for release.
      * Returns filesize for comparison.
      *
      * @param int $courseid
-     * @param \stored_file $file
+     * @param element $element
      * @return int
+     * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function set_file_to_release(int $courseid, \stored_file $file) {
+    public function set_file_to_release(int $courseid, element $element) {
+        $file = $this->find_file_by_element($element);
         $metadata = $this->generate_oer_non_release_metadata($courseid, $file);
         $metadata->context = 1;
         $metadata->license = 'cc-4.0'; // Updated 2023-11-02 due to Moodle licence change.
         $metadata->persons = '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}, ' .
-                '{"role":"Publisher","lastname":"Other","firstname":"Name"}]}';
-        $metadata->state = 1;
+                '{"role":"publisher","lastname":"Other","firstname":"Name"}]}';
+        $metadata->typedata = json_encode([
+                'mimetype' => $file->get_mimetype(),
+                'filesize' => $file->get_filesize(),
+                'filecreationtime' => $file->get_timecreated(),
+        ]);
+        $metadata->releasestate = 1;
         $this->update_db($metadata);
         return $file->get_filesize();
+    }
+
+    /**
+     * Find a stored file based on the information stored in element class.
+     *
+     * @param element $element
+     * @return \stored_file
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private function find_file_by_element(element $element): \stored_file {
+        global $DB;
+        $decompose = identifier::decompose($element->get_identifier());
+        // All entries with the same contenthash are the same file.
+        // Maybe some metadata in the table differs, but that is of no concern for the tests.
+        $records = $DB->get_records('files', ['contenthash' => $decompose->value]);
+        $file = null;
+        foreach ($records as $record) {
+            if ($record->filename != '.') {
+                $file = $record;
+                break;
+            }
+        }
+        $fs = get_file_storage();
+        return $fs->get_file_by_id($file->id);
     }
 
     /**
@@ -132,9 +189,9 @@ class testcourse {
             }
             $i++;
             if ($release) {
-                $size += $this->set_file_to_release($courseid, $coursefile[0]['file']);
+                $size += $this->set_file_to_release($courseid, $coursefile);
             } else {
-                $this->set_file_to_non_release($courseid, $coursefile[0]['file']);
+                $this->set_file_to_non_release($courseid, $coursefile);
             }
         }
         return $size;
@@ -149,12 +206,14 @@ class testcourse {
      */
     private function update_db(\stdClass $metadata) {
         global $DB;
-        if ($DB->record_exists('local_oer_files', ['courseid' => $metadata->courseid, 'contenthash' => $metadata->contenthash])) {
-            $metadata->id = $DB->get_field('local_oer_files', 'id',
-                    ['courseid' => $metadata->courseid, 'contenthash' => $metadata->contenthash]);
-            $DB->update_record('local_oer_files', $metadata);
+        if ($record = $DB->get_record('local_oer_elements', [
+                'courseid' => $metadata->courseid,
+                'identifier' => $metadata->identifier,
+        ])) {
+            $metadata->id = $record->id;
+            $DB->update_record('local_oer_elements', $metadata);
         } else {
-            $DB->insert_record('local_oer_files', $metadata);
+            $DB->insert_record('local_oer_elements', $metadata);
         }
     }
 
@@ -162,11 +221,12 @@ class testcourse {
      * Similar to the set_release function - but set a file to non-release.
      *
      * @param int $courseid
-     * @param \stored_file $file
+     * @param element $element
      * @return void
      * @throws \dml_exception
      */
-    public function set_file_to_non_release(int $courseid, \stored_file $file) {
+    public function set_file_to_non_release(int $courseid, element $element) {
+        $file = $this->find_file_by_element($element);
         $metadata = $this->generate_oer_non_release_metadata($courseid, $file);
         $this->update_db($metadata);
     }
@@ -203,7 +263,7 @@ class testcourse {
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function generate_file(string $filename = '', ?int $draftid = null, string $content = '') {
+    public function generate_file(string $filename = '', ?int $draftid = null, string $content = ''): array {
         global $USER;
         if ($filename == '') {
             $filename = 'Testfile' . rand(1000000, 1000000000);
@@ -222,6 +282,7 @@ class testcourse {
                 'filepath' => '/',
                 'filename' => $filename,
                 'sortorder' => 1,
+                'license' => 'allrightsreserved',
         ];
         $file = $fs->create_file_from_string($filerecord, $content);
         return [$draftid, $file];
@@ -231,10 +292,10 @@ class testcourse {
      * Returns the contenthash of the first found
      *
      * @param \stdClass $course Course object of Moodle test data generator.
-     * @return null
+     * @return string|null
      * @throws \dml_exception
      */
-    public function get_contenthash_of_first_found_file($course) {
+    public function get_contenthash_of_first_found_file(\stdClass $course): ?string {
         global $DB;
         $module = $DB->get_record('modules', ['name' => 'resource']);
         $cms = $DB->get_records('course_modules', ['course' => $course->id, 'module' => $module->id], 'id ASC');
@@ -249,5 +310,28 @@ class testcourse {
             }
         }
         return $contenthash;
+    }
+
+    /**
+     * Wrapper for get_contenthash_of_first_found_file to create an identifier for the contenthash.
+     *
+     * @param \stdClass $course Course object of Moodle test data generator.
+     * @return string|null
+     */
+    public function get_identifier_of_first_found_file(\stdClass $course): ?string {
+        $contenthash = $this->get_contenthash_of_first_found_file($course);
+        return $this->generate_identifier($contenthash);
+    }
+
+    /**
+     * To ensure the identifier in all tests has the same format, use this function in testcourse functions.
+     *
+     * @param string $contenthash
+     * @return string
+     * @throws \coding_exception
+     */
+    public function generate_identifier(string $contenthash): string {
+        global $CFG;
+        return identifier::compose('moodle', $CFG->wwwroot, 'file', 'contenthash', $contenthash);
     }
 }

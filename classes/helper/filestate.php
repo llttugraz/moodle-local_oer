@@ -26,7 +26,9 @@
 namespace local_oer\helper;
 
 use local_oer\forms\fileinfo_form;
+use local_oer\identifier;
 use local_oer\logger;
+use local_oer\modules\element;
 
 /**
  * Class filestate
@@ -57,24 +59,73 @@ class filestate {
     const STATE_FILE_RELEASED = 3;
 
     /**
-     * File may be in an ambiguous state. Maybe it has been edited in multiple courses.
-     * In this state an administrator needs to examine what's wrong and clean up the mess.
+     * Calculate the state of the element.
+     *
+     * This will affect which actions a user can take to manipulate the metadata.
+     * Other courses are also considered in calculation.
+     * See states above to learn more about the different possibilities.
+     *
+     * @param element $element
+     * @param int $currentcourseid
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    const STATE_FILE_ERROR = 0;
+    public static function calculate_state(element $element, int $currentcourseid): void {
+        $courses = [];
+        switch ($element->get_type()) {
+            case element::OERTYPE_MOODLEFILE:
+                // Step 1: Load usage of contenthash.
+                // Step 2: Extract courseids from contexts.
+                $decomposed = identifier::decompose($element->get_identifier());
+                $courses = self::find_courses_that_use_this_element($decomposed->value);
+                // Step 3: Determine OER element state. Is element being edited or already released?
+                [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
+                break;
+            case element::OERTYPE_EXTERNAL:
+                // MDL-0 TODO: is there a performant way to find all courses for an external object?
+                // Maybe this should be implemented in module subplugin as every subplugin has an other way for this information?
+                global $DB;
+                $course = get_course($currentcourseid);
+                $courses[$currentcourseid] = [
+                        'id' => $currentcourseid,
+                        'name' => $course->fullname,
+                        'editor' => false,
+                ];
+                if ($edited = $DB->get_record('local_oer_elements', ['identifier' => $element->get_identifier()])) {
+                    $course = get_course($edited->courseid);
+                    $courses[$edited->courseid] = [
+                            'id' => $edited->courseid,
+                            'name' => $course->fullname,
+                            'editor' => true,
+                    ];
+                }
+                [$state, $courses, $editorid, $writable] = self::determine_element_state($element, $currentcourseid, $courses);
+                break;
+            default:
+                throw new \coding_exception('Unknown element type: ' . $element->get_type());
+        }
+        $elementstate = new \stdClass();
+        $elementstate->state = $state;
+        $elementstate->editorid = $editorid;
+        $elementstate->courses = $courses;
+        $elementstate->writable = $writable;
+        $element->set_elementstate($elementstate);
+    }
 
     /**
-     * Calculate the current file state for a file that has been found in a mod_resource or mod_folder activity.
+     * Search for the usages of a given contenthash. This function only works for Moodle based subplugins.
+     * Due to historical reasons at the moment only mod_resource and mod_folder are supported.
+     * TODO: If anytime in the future a subplugin will be created that loads files from other activities this has to be extended.
      *
      * @param string $contenthash Moodle file contenthash
-     * @param int $currentcourseid Course where this function is currently called.
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function calculate_file_state(string $contenthash, int $currentcourseid): array {
-        $courses = [];
+    private static function find_courses_that_use_this_element(string $contenthash): array {
         global $DB;
-        // Step 1: Load usage of contenthash.
+        $courses = [];
         $sql = "SELECT DISTINCT contextid FROM {files} " .
                 "WHERE contenthash = :contenthash " .
                 "AND (component = 'mod_resource' OR component = 'mod_folder')";
@@ -86,50 +137,62 @@ class filestate {
                     ') has been searched that is not used anywhere');
         }
 
-        // Step 2: Extract courseids from contexts.
         // As this are module contexts we need to find the parent course of it.
         foreach ($usages as $contextid => $usage) {
-            [, $course, $cm] = get_context_info_array($contextid);
+            [, $course] = get_context_info_array($contextid);
             $courses[$course->id] = [
                     'id' => $course->id,
                     'name' => format_string($course->fullname),
                     'editor' => false,
             ];
         }
+        return $courses;
+    }
 
-        // Step 3: Determine OER file state. Is file being edited or already released?
-        // There should only be one entry possible, but it is also tested if there.
-        // Is ambiguous information in the table about this file.
+    /**
+     * Returns the state for a given element.
+     *
+     * State consists of:
+     * - Has element already been edited or released?
+     * - In which courses is this element in use (for external elements this will only work if another course is editing)
+     * - Which course is the editor course
+     * - Is the element writable in this course
+     *
+     * @param element $element
+     * @param int $currentcourseid
+     * @param array $courses
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private static function determine_element_state(element $element, int $currentcourseid, array $courses = []): array {
+        global $DB;
         $state = self::STATE_FILE_NOT_EDITED;
         $editorid = 0;
-        $oerfiles = $DB->get_records('local_oer_files', ['contenthash' => $contenthash], 'id ASC', 'courseid');
-        if ($oerfiles && count($oerfiles) > 1) {
-            $message = 'Ambiguous metadata for file ' . $contenthash .
-                    ' found. File has been edited in ' . count($oerfiles) . ' courses';
-            logger::add($currentcourseid, logger::LOGERROR, $message);
-            return [self::STATE_FILE_ERROR, 0, [], false];
-        } else if ($oerfiles && count($oerfiles) == 1) {
-            $cid = array_key_first($oerfiles);
+        $oerelement = $DB->get_record('local_oer_elements', ['identifier' => $element->get_identifier()], 'courseid');
+        if ($oerelement) {
             $state = self::STATE_FILE_EDITED;
-            if (isset($courses[$cid])) {
-                $editorid = $cid;
+            if (isset($courses[$oerelement->courseid])) {
+                $editorid = $oerelement->courseid;
             } else {
                 // Why is the course not set for this file? Probably it has been deleted in this context.
                 // So it will be inherited to the first course in the list.
                 $editorid = array_key_first($courses);
-                $DB->set_field('local_oer_files', 'courseid', $editorid, ['contenthash' => $contenthash]);
+                $DB->set_field('local_oer_elements', 'courseid', $editorid, ['identifier' => $element->get_identifier()]);
+                logger::add($editorid, logger::LOGERROR,
+                        'Inherited file ' . $element->get_identifier() . ' from course ' . $oerelement->courseid);
             }
             $courses[$editorid]['editor'] = true;
         }
 
         // Snapshots will not be inherited to another course.
-        if ($DB->record_exists('local_oer_snapshot', ['contenthash' => $contenthash])) {
+        if ($DB->record_exists('local_oer_snapshot', ['identifier' => $element->get_identifier()])) {
             $state = self::STATE_FILE_RELEASED;
         }
 
         $writable = self::metadata_writable($state, $editorid == $currentcourseid);
 
-        return [$state, $editorid, $courses, $writable];
+        return [$state, $courses, $editorid, $writable];
     }
 
     /**
@@ -141,7 +204,6 @@ class filestate {
      */
     public static function metadata_writable(int $state, bool $editor): bool {
         switch ($state) {
-            case self::STATE_FILE_ERROR:
             case self::STATE_FILE_RELEASED:
                 return false;
             case self::STATE_FILE_NOT_EDITED:
@@ -155,96 +217,93 @@ class filestate {
     /**
      * Generate a placeholder text to show when a file is not writable.
      *
-     * @param array $file
+     * @param element $element
      * @return string
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function formatted_notwritable_output_html(array $file): string {
+    public static function formatted_notwritable_output_html(element $element): string {
         global $OUTPUT, $DB, $CFG;
         $support = \core_user::get_support_user();
-        $metadata = [];
-        if ($file['state'] !== self::STATE_FILE_ERROR) {
-            $data = $DB->get_record('local_oer_files',
-                    ['courseid' => $file['editor'], 'contenthash' => $file['file']->get_contenthash()]);
-            $context = formhelper::lom_context_list();
-            $resources = formhelper::lom_resource_types();
-            // It ain`t much, but it`s honest work.
-            $linebreak = str_replace("\r\n", '<br>', $data->description);
-            $firstbreak = strpos($linebreak, '<br>');
-            $firstline = $firstbreak && $firstbreak < 80 ? $firstbreak : 80;
-            $simplemetadata = [
-                    [
-                            'name' => get_string('title', 'local_oer'),
-                            'value' => $data->title,
-                    ],
-                    [
-                            'name' => get_string('description', 'local_oer'),
-                            'heading' => substr($linebreak, 0, $firstline),
-                            'body' => substr($linebreak, $firstline, strlen($linebreak)),
-                            'value' => $data->description,
-                            'collapse' => true,
-                    ],
-                    [
-                            'name' => get_string('context', 'local_oer'),
-                            'value' => $context[$data->context],
-                    ],
-                    [
-                            'name' => get_string('license', 'local_oer'),
-                            'value' => license::get_license_fullname($data->license),
-                    ],
-                    [
-                            'name' => get_string('language', 'local_oer'),
-                            'value' => $data->language,
-                    ],
-                    [
-                            'name' => get_string('resourcetype', 'local_oer'),
-                            'value' => $resources[$data->resourcetype],
-                    ],
-            ];
-            $tags = explode(',', $data->tags);
-            $taglist = [];
-            foreach ($tags as $tag) {
-                $taglist[] = ['value' => $tag];
-            }
-            $persons = empty($data->persons) ? [] : json_decode($data->persons, true)['persons'];
-            $personlist = [];
-            foreach ($persons as $person) {
-                $personlist[] = $person;
-            }
-            $classification = json_decode($data->classification, true) ?? [];
-            $classlist = [];
-            foreach ($classification as $type => $entries) {
-                $frankenstyle = 'oerclassification_' . $type;
-                [$url, $classdata] = fileinfo_form::load_classification_plugin_values($type);
-                $values = [];
-                foreach ($entries as $entry) {
-                    $values[] = [
-                            'name' => $classdata[$entry],
-                            'code' => $entry,
-                    ];
-                }
-                $classlist[] = [
-                        'type' => get_string('selectname', $frankenstyle),
-                        'url' => $url,
-                        'values' => $values,
+        $data = $DB->get_record('local_oer_elements', ['identifier' => $element->get_identifier()]);
+        $context = formhelper::lom_context_list();
+        $resources = formhelper::lom_resource_types();
+        // It ain`t much, but it`s honest work.
+        $linebreak = str_replace("\r\n", '<br>', $data->description);
+        $firstbreak = strpos($linebreak, '<br>');
+        $firstline = $firstbreak && $firstbreak < 80 ? $firstbreak : 80;
+        $heading = substr($linebreak, 0, $firstline);
+        $body = substr($linebreak, $firstline, strlen($linebreak));
+        $simplemetadata = [
+                [
+                        'name' => get_string('title', 'local_oer'),
+                        'value' => $data->title,
+                ],
+                [
+                        'name' => get_string('description', 'local_oer'),
+                        'heading' => $heading,
+                        'body' => $body,
+                        'value' => $data->description,
+                        'emptybody' => empty($body),
+                        'collapse' => true, // Used for different state in mustache than other values here.
+                ],
+                [
+                        'name' => get_string('context', 'local_oer'),
+                        'value' => $context[$data->context],
+                ],
+                [
+                        'name' => get_string('license'),
+                        'value' => license::get_license_fullname($data->license),
+                ],
+                [
+                        'name' => get_string('language', 'local_oer'),
+                        'value' => $data->language,
+                ],
+                [
+                        'name' => get_string('resourcetype', 'local_oer'),
+                        'value' => $resources[$data->resourcetype],
+                ],
+        ];
+        $tags = empty($data->tags) ? [] : explode(',', $data->tags);
+        $taglist = [];
+        foreach ($tags as $tag) {
+            $taglist[] = ['value' => $tag];
+        }
+        $persons = empty($data->persons) ? [] : json_decode($data->persons, true)['persons'];
+        $personlist = [];
+        foreach ($persons as $person) {
+            $personlist[] = $person;
+        }
+        $classification = empty($data->classification) ? [] : json_decode($data->classification, true);
+        $classlist = [];
+        foreach ($classification as $type => $entries) {
+            $frankenstyle = 'oerclassification_' . $type;
+            [$url, $classdata] = fileinfo_form::load_classification_plugin_values($type);
+            $values = [];
+            foreach ($entries as $entry) {
+                $values[] = [
+                        'name' => $classdata[$entry],
+                        'code' => $entry,
                 ];
             }
-            $metadata = [
-                    'simple' => $simplemetadata,
-                    'tags' => !empty($taglist),
-                    'taglist' => $taglist,
-                    'persons' => !empty($personlist),
-                    'personlist' => $personlist,
-                    'classification' => !empty($classification),
-                    'classificationlist' => $classlist,
+            $classlist[] = [
+                    'type' => get_string('selectname', $frankenstyle),
+                    'url' => $url,
+                    'values' => $values,
             ];
         }
+        $metadata = [
+                'simple' => $simplemetadata,
+                'tags' => !empty($taglist),
+                'taglist' => $taglist,
+                'persons' => !empty($personlist),
+                'personlist' => $personlist,
+                'classification' => !empty($classification),
+                'classificationlist' => $classlist,
+        ];
 
-        switch ($file['state']) {
-            case self::STATE_FILE_ERROR:
-                $alert = 'danger';
-                break;
+        $state = $element->get_elementstate()->state;
+        switch ($state) {
             case self::STATE_FILE_RELEASED:
                 $alert = 'success';
                 break;
@@ -256,13 +315,13 @@ class filestate {
                 [
                         'header' => get_string('metadatanotwritable', 'local_oer'),
                         'alert' => $alert,
-                        'reason' => get_string('metadatanotwritable' . $file['state'],
+                        'reason' => get_string('metadatanotwritable' . $state,
                                 'local_oer'),
                         'support' => get_string('contactsupport', 'local_oer',
                                 ['support' => $support->email]),
-                        'multiple' => count($file['courses']) > 1,
-                        'courses' => array_values($file['courses']),
-                        'showmetadata' => $file['state'] != self::STATE_FILE_ERROR,
+                        'multiple' => count($element->get_elementstate()->courses) > 1,
+                        'courses' => array_values($element->get_elementstate()->courses),
+                        'showmetadata' => true, // MDL-0 TODO: this flag can be removed as STATE_FILE_ERROR does not exist anymore.
                         'metadata' => $metadata,
                         'wwwroot' => $CFG->wwwroot,
                 ]);

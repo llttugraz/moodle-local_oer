@@ -51,7 +51,7 @@ if ($allowed) {
         $sync = new \local_oer\metadata\courseinfo_sync();
         $sync->sync_course($courseid);
     }
-    $PAGE->requires->js_call_amd('local_oer/main', 'init', ['courseid' => $courseid]);
+    $PAGE->requires->js_call_amd('local_oer/main-lazy', 'init', ['courseid' => $courseid]);
 }
 
 if (optional_param('download_zip', false, PARAM_BOOL)) {

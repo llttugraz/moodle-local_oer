@@ -23,17 +23,18 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     {
         "viewurl": "https://moodlesite/course/view.php?id=2",
         "ignore": true,
-        "iconisimage": false,
         "icon": "config.wwwroot/theme/image.php/boost/core/1644361882/f/pdf",
         "title": "abc.pdf",
         "mimetype": "application/pdf",
         "timemodified": 0,
-        "timeuploaded": 0
+        "timeuploaded": 0,
+        "requirementsmet": true,
+        "upload": true
     }
 }}
 
 <div class="card-deck col-sm-6 col-md-6 col-lg-4 col-xl-3" {{#ignore}}style="opacity: 0.5;"{{/ignore}}>
-    <div class="card shadow-sm mb-4">
+    <div data-oerid="{{identifier}}" class="card shadow-sm mb-4">
         <div class="card-header container">
             <div class="row">
                 {{> local_oer/file-action-menu }}
@@ -41,49 +42,28 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
             <div class="row">
                 <div class="col-3">
                     <div class="d-flex justify-content-start align-items-top my-2">
-                        {{#iconisimage}}
-                            <img class="m-0 img-thumbnail" alt="" aria-hidden="true" style="object-fit: cover; width: 40px; height: 40px;"
-                                 src="data:image/{{icontype}};base64, {{icon}}">
-                        {{/iconisimage}}
-                        {{^iconisimage}}
-                            <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
-                                <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
-                            </div>
-                        {{/iconisimage}}
+                        <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
+                            <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm pl-0 pt-1">
+                <div class="col-9 pl-0 pt-1">
                     <p class="card-title text-wrap d-block m-0">{{{title}}}</p>
                 </div>
+            </div>
+            <div class="row">
+                {{> local_oer/badges }}
             </div>
         </div>
         <div class="card-body p-0 d-flex flex-column">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <ul class="list-group">
-                        <li class="list-group-item border-0 p-0">
-                            <div class="text-truncate d-block">
-                                <small>{{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span></small>
-                            </div>
-                        </li>
-                        <li class="list-group-item border-0 p-0">
-                            <small>{{#str}} section {{/str}}:
-                                {{#sections}}
-                                    {{{sectionname}}},
-                                {{/sections}}
-                            </small>
-                        </li>
-                        <li class="list-group-item border-0 p-0">
-                            <small>{{#str}} activity {{/str}}:
-                                {{#modules}}
-                                    <a href="{{moduleurl}}">{{{modulename}}}</a>,
-                                {{/modules}}
-                            </small>
-                        </li>
-                    </ul>
+                    <details>
+                        <summary>{{#str}} moreinformation, local_oer {{/str}}</summary>
+                        {{> local_oer/information }}
+                    </details>
                 </li>
                 <li class="list-group-item">
-                    <h5>{{#str}} readyforupload, local_oer{{/str}}</h5>
                     <ul class="list-group">
                         {{#requirementsmet}}
                             <li class="list-group-item border-0 p-0">
@@ -95,16 +75,6 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                                 <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} requirementsnotmet, local_oer{{/str}}</small>
                             </li>
                         {{/requirementsmet}}
-                        {{#upload}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small>
-                            </li>
-                        {{/upload}}
-                        {{^upload}}
-                            <li class="list-group-item border-0 p-0">
-                                <small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} notmarkedforupload, local_oer{{/str}}</small>
-                            </li>
-                        {{/upload}}
                     </ul>
                 </li>
             </ul>

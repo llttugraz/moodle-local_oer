@@ -5,7 +5,8 @@ The first version of the plugin was developed during a project about [open educa
 Technology customizations of Moodle. The use for other educational institutions was therefore very limited.
 
 In this repository a refactored version of the plugin can be found. This version has been developed for Moodles Boost theme. Adaptations, which are necessary for the Moodle
-instance at Graz University of Technology, were moved to subplugins. The base plugin is fully functional without these subplugins.
+instance at Graz University of Technology, were moved to subplugins. ~~The base plugin is fully functional without these subplugins.~~
+Since the version v2.3.0 subplugins for loading the OER resources are necessary, but the basic versions for Moodle files are bundled with the local_oer plugin.
 
 # Requirements
 
@@ -41,6 +42,10 @@ After installation of the plugin, there are several settings that can be made:
 * `local_oer | coursetofile` When enabled, the course metadata can be selected for each file separately. The setting on course level will be applied per default, but can be
   overwritten per file. Also it is possible to add course metadata of other courses to a file, if the file is used in multiple courses.
 
+### New settings in version v2.3.0
+
+* `local_oer | applicationprofile` Select the default applicationprofile for the JSON metadata from pull service.
+
 # Release snapshots
 
 The metadata of released files is stored in an extra snapshot table. A snapshot contains all metadata the file had on the release. When the metadata changes a new release will be
@@ -65,10 +70,36 @@ When the pull service is active the newest releases can be requested on `https:/
 
 JSON Format:
 
+Since release v2.3.0 there are different application profiles.
+The version **v1.0.0** is the legacy profile and only supports Moodle Files as the contenthash of a file is the main identifier.
+The new profile is **v2.0.0** has been created to use a new identifier that also supports external element types like opencast.
+With the setting `local_oer | applicationprofile` the default profile can be selected. When calling the pull service `local/oer/public_metadata.php`
+a header value can be set to load a different profile as set in the setting.
+`ACCEPT: application/json; applicationprofile={version}`
+
+Most of the metadata fields remain the same, but there are some significant differences:
+
+```
+  "applicationprofile": "v2.0.0",
+  "moodlecourses": [
+    { // course array starts counting at 0, so no extra key is made in JSON
+      "elements": [
+        "title": "remains the same",
+        "identifier": "oer:moodle@localhost:file:contenthash:ABC123",
+        "source": "fileurl has been renamed to source",
+        // abstract, license, context, resourcetype, 
+        // language, persons, tags, timereleased, classification, courses
+        // are also present for every element (same structure as in v1.0.0)
+        // Not every subplugin delivers all the other fields:
+        // For example mimetype, filesize, filecreationtime may not be 
+        // available
+      ]
+```
+
 ```
   "applicationprofile": "v1.0.0",
   "moodlecourses": [
-    {
+    "1" => {
       "files": [
         {
           "title": "Title of file",
@@ -131,9 +162,26 @@ JSON Format:
 }
 ```
 
+# Pull service parameters
+
+Since **v2.3.0** parameters can be used for the pull service in `/local/oer/public_metadata.php`.
+
+* no parameter: Default behaviour, latest release of all elements is shown with selected application profile.  
+                Application profile is either chosen by setting, or with an additional header attribute (see [metadata](#metadata) section)
+* _?identifier={identifier}_: Loads the release history of a single element.
+* _?releasedates_: Loads a list of all releases with releasedates. Includes the **releasenumber** needed for _?release_
+* _?release={releasenumber}_: Loads all elements from a given release
+
 # Subplugin types
 
-There are three subplugintypes that can be used with this plugin.
+There are ~~three~~ four (since v2.3.0) subplugintypes that can be used with this plugin.
+
+## Modules
+
+With version **v2.3.0** the OER resources can be delievered from different sources, so it was necessary to create this subplugin type.
+
+The plugin has the first two subplugins bundled. **oermod_resources** and **oermod_folder** are loading Moodle files from the Moodle activities mod_resource and mod_folder.
+**oermod_opencast** is a new source for releasing OER content. The plugin can be found on github: [oermod_opencast](https://github.com/llttugraz/moodle-oermod_opencast)
 
 ## Metadata aggregator
 
@@ -143,13 +191,16 @@ Mainly used to load additional metadata from linked courses of the educational i
 
 Extend the formular for file metadata with additional classification information. Multiple classification plugins can be used.
 
-## Uploader
+## Uploader (deprecated since v2.3.0, will be removed in a future release)
 
 The base plugin has an endpoint that provides the metadata of all published files including links to the files as JSON. If the preferred way to load the data from Moodle is not via
 this pull service, but via upload, an additional plugin can be defined which enables the upload to a repository.
 
 ## Subplugins used by Graz University of Technology
 
+moodle-oermod_resource (bundled with local_oer)  
+moodle-oermod_folder (bundled with local_oer)  
+[moodle-oermod_opencast](https://github.com/llttugraz/moodle-oermod_opencast)
 [moodle-oercourseinfo_tugraz](https://github.com/llttugraz/moodle-oercourseinfo_tugraz)  
 [moodle-oerclassifcation_oefos](https://github.com/llttugraz/moodle-oerclassification_oefos)  
 [moodle-oeruploader_tugraz](https://github.com/llttugraz/moodle-oeruploader_tugraz)

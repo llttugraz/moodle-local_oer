@@ -36,7 +36,17 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\helper\snapshothelper
  */
-class snapshothelper_test extends \advanced_testcase {
+final class snapshothelper_test extends \advanced_testcase {
+    /**
+     * Setup test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+    }
+
     /**
      * Test the helper to create snapshots.
      *
@@ -48,12 +58,8 @@ class snapshothelper_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\helper\snapshothelper::create_snapshots_of_all_active_courses
      */
-    public function test_create_snapshots_of_all_active_courses() {
-        $this->resetAfterTest();
-
+    public function test_create_snapshots_of_all_active_courses(): void {
         global $DB;
-        $this->setAdminUser();
-
         $testcourse = new testcourse();
 
         // Every testcourse has already 5 resources with files generated.
@@ -79,15 +85,40 @@ class snapshothelper_test extends \advanced_testcase {
         $testcourse->set_files_to($course3->id, 3, true);
         snapshothelper::create_snapshots_of_all_active_courses();
         $this->assertEquals(3, $DB->count_records('local_oer_snapshot'));
+        // Set the release timestamp of release 1 to an older date, so that the next release will produce a higher release date.
+        $records = $DB->get_records('local_oer_snapshot', ['releasenumber' => 1]);
+        $releasedate = new \DateTime('-5 weeks');
+        foreach ($records as $record) {
+            if ($record->releasenumber == 1) {
+                $record->timecreated = $releasedate->getTimestamp();
+                $DB->update_record('local_oer_snapshot', $record);
+            }
+        }
 
         $testcourse->set_files_to($course4->id, 4, false);
         $testcourse->set_files_to($course4->id, 2, true);
         snapshothelper::create_snapshots_of_all_active_courses();
         $this->assertEquals(5, $DB->count_records('local_oer_snapshot'));
+        $records = $DB->get_records('local_oer_snapshot', ['releasenumber' => 2]);
+        $releasedate = new \DateTime('-4 weeks');
+        foreach ($records as $record) {
+            if ($record->releasenumber == 2) {
+                $record->timecreated = $releasedate->getTimestamp();
+                $DB->update_record('local_oer_snapshot', $record);
+            }
+        }
 
         $testcourse->set_files_to($course1->id, 5, true);
         snapshothelper::create_snapshots_of_all_active_courses();
         $this->assertEquals(10, $DB->count_records('local_oer_snapshot'));
+        $records = $DB->get_records('local_oer_snapshot', ['releasenumber' => 3]);
+        $releasedate = new \DateTime('-3 weeks');
+        foreach ($records as $record) {
+            if ($record->releasenumber == 3) {
+                $record->timecreated = $releasedate->getTimestamp();
+                $DB->update_record('local_oer_snapshot', $record);
+            }
+        }
 
         // Removing the release state of files does not remove old releases (intended behaviour).
         $testcourse->set_files_to($course4->id, 5, false);
@@ -98,6 +129,9 @@ class snapshothelper_test extends \advanced_testcase {
         $testcourse->set_files_to($course2->id, 3, true);
         snapshothelper::create_snapshots_of_all_active_courses();
         $this->assertEquals(10, $DB->count_records('local_oer_snapshot'), 'Courseinfo missing, will not be added.');
+        $this->assertEquals(3, $DB->count_records('local_oer_snapshot', ['releasenumber' => 1]));
+        $this->assertEquals(2, $DB->count_records('local_oer_snapshot', ['releasenumber' => 2]));
+        $this->assertEquals(5, $DB->count_records('local_oer_snapshot', ['releasenumber' => 3]));
     }
 
     /**
@@ -109,10 +143,8 @@ class snapshothelper_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\helper\snapshothelper::get_latest_snapshot_timestamp
      */
-    public function test_get_latest_snapshot_timestamp() {
-        $this->resetAfterTest();
+    public function test_get_latest_snapshot_timestamp(): void {
         global $DB;
-        $this->setAdminUser();
 
         $latest = snapshothelper::get_latest_snapshot_timestamp();
         $this->assertEquals(0, $latest, 'Returns zero if no records are in the table');

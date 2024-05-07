@@ -25,26 +25,128 @@
 
 namespace local_oer;
 
-use local_oer\helper\formhelper;
-use local_oer\helper\license;
-use local_oer\plugininfo\oerclassification;
+use local_oer\modules\element;
+use local_oer\plugininfo\oermod;
+use local_oer\release\externaldata;
+use local_oer\release\filedata;
+use local_oer\release\legacy;
 
 /**
  * Class release
+ *
+ * Load metadata of released files.
  */
 class release {
     /**
-     * @var int Moodle courseid
+     * Load the latest release of all released files.
+     *
+     * @param string $version Application profile version
+     * @return array Metadata of all released files.
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    private $courseid = null;
+    public static function get_latest_releases(string $version): array {
+        $result = [];
+        $courses = \local_oer\helper\activecourse::get_list_of_courses(true);
+        $i = $version == 'v1.0.0' ? 1 : 0;
+        $name = $version == 'v1.0.0' ? 'files' : 'elements';
+        foreach ($courses as $course) {
+            $data = static::get_released_files_for_course($course->courseid, $version);
+            if (!empty($data)) {
+                $metadata = [];
+                foreach ($data as $entry) {
+                    $metadata[] = $entry['metadata'];
+                }
+                $result['moodlecourses'][$i][$name] = $metadata;
+            }
+            $i++;
+        }
+        return $result;
+    }
 
     /**
-     * Constructor.
+     * Get the release history of an identifier.
      *
-     * @param int $courseid Moodle courseid
+     * @param string $identifier
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function __construct(int $courseid) {
-        $this->courseid = $courseid;
+    public static function get_release_history_of_identifier(string $identifier): array {
+        global $DB;
+        if (!identifier::validate($identifier)) {
+            return ['error' => 'Identifier has wrong format.'];
+        }
+        $history = $DB->get_records('local_oer_snapshot', ['identifier' => $identifier], 'timecreated DESC');
+        $result = static::metadata_by_type($history);
+        return ['elements' => $result];
+    }
+
+    /**
+     * Get the releases of a given release.
+     *
+     * @param int $releasenumber
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_releases_with_number(int $releasenumber): array {
+        global $DB;
+        $releases = $DB->get_records('local_oer_snapshot', ['releasenumber' => $releasenumber]);
+        $result = static::metadata_by_type($releases);
+        return ['release' => $releasenumber, 'elements' => $result];
+    }
+
+    /**
+     * Calculate the release date for each release number.
+     *
+     * There can only be one release per day per configuration.
+     * So this function calculates the date for each releasenumber,
+     * based on the timestamps of the releases.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_releasenumber_and_date_of_releases(): array {
+        global $DB;
+        $records = $DB->get_records('local_oer_snapshot');
+        $releases = [];
+        foreach ($records as $record) {
+            $date = new \DateTime();
+            $date->setTimestamp($record->timecreated);
+            $date->setTime(0, 0);
+            $releases[$record->releasenumber] = [
+                    'release' => (int) $record->releasenumber,
+                    'date' => $date->format('Y-m-d'),
+                    'midnight' => $date->getTimestamp(),
+            ];
+        }
+        return ['releasedates' => array_values($releases)];
+    }
+
+    /**
+     * Get prepared metadata filtered by type.
+     *
+     * @param array $data
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private static function metadata_by_type(array $data): array {
+        $result = [];
+        foreach ($data as $entry) {
+            switch ($entry->type) {
+                case element::OERTYPE_MOODLEFILE:
+                    $metadata = new filedata($entry);
+                    $result[] = $metadata->get_array();
+                    break;
+                case element::OERTYPE_EXTERNAL:
+                    $metadata = new externaldata($entry);
+                    $result[] = $metadata->get_array();
+                    break;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -64,25 +166,22 @@ class release {
      *   ]
      * ]
      *
-     *
-     * @return array
+     * @param int $courseid
+     * @param string $version Application profile
+     * @return array Metadata of releases of one course.
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \moodle_exception
      */
-    public function get_released_files() {
-        $files = filelist::get_course_files($this->courseid);
-        $snapshot = new snapshot($this->courseid);
+    public static function get_released_files_for_course(int $courseid, string $version): array {
+        $snapshot = new snapshot($courseid);
         $metadata = $snapshot->get_latest_course_snapshot();
         $release = [];
-        foreach ($files as $filearray) {
-            $file = $filearray[0]['file'];
-            if (!isset($metadata[$file->get_contenthash()])) {
-                continue;
+        foreach ($metadata as $element) {
+            if ($version == 'v1.0.0' && $element->type == element::OERTYPE_EXTERNAL) {
+                continue; // Application profile v1.0.0 only supports Moodle files.
             }
             $release[] = [
-                    'metadata' => $this->get_file_release_metadata_json($file, $metadata[$file->get_contenthash()]),
-                    'storedfile' => $file,
+                    'metadata' => static::get_file_release_metadata_json($element, $version),
             ];
         }
         return $release;
@@ -91,123 +190,30 @@ class release {
     /**
      * Prepare the stored metadata of snapshot table for output.
      *
-     * @param \stored_file $file
-     * @param \stdClass $fileinfo
+     * $elementinfo is a record from the snapshot table with the released license in it.
+     *
+     * @param \stdClass $elementinfo
+     * @param string $version
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function get_file_release_metadata_json(\stored_file $file, \stdClass $fileinfo): array {
-        global $CFG;
-        $contexts = formhelper::lom_context_list(false);
-        $resourcetypes = formhelper::lom_resource_types(false);
-        $classification = self::prepare_classification_fields($fileinfo->classification);
-        $licenseobject = license::get_license_by_shortname($fileinfo->license);
-        $license = $fileinfo->license;
-        if (get_config('local_oer', 'uselicensereplacement') == 1) {
-            $replacement = get_config('local_oer', 'licensereplacement');
-            $replacement = explode("\r\n", $replacement);
-            $list = [];
-            foreach ($replacement as $line) {
-                $entry = explode('=>', $line);
-                if (empty($entry[1])) {
-                    continue; // Skip false or empty entries.
-                }
-                $list[$entry[0]] = $entry[1];
-            }
-            if (isset($list[$fileinfo->license])) {
-                $license = $list[$fileinfo->license];
-            }
+    private static function get_file_release_metadata_json(\stdClass $elementinfo, string $version): array {
+        if ($version == 'v1.0.0') {
+            $metadata = new legacy($elementinfo);
+            return $metadata->get_array();
+        }
+        switch ($elementinfo->type) {
+            case element::OERTYPE_MOODLEFILE:
+                $metadata = new filedata($elementinfo);
+                break;
+            case element::OERTYPE_EXTERNAL:
+                $metadata = new externaldata($elementinfo);
+                break;
+            default:
+                throw new \coding_exception('Element type not set');
         }
 
-        $fulllicense = [
-                'shortname' => $license,
-                'fullname' => $licenseobject->fullname,
-                'source' => $licenseobject->source,
-        ];
-
-        $coursecontext = \context_course::instance($this->courseid);
-        $metadata = [
-                'title' => $fileinfo->title,
-                'contenthash' => $fileinfo->contenthash,
-                'fileurl' => $CFG->wwwroot . '/pluginfile.php/' .
-                        $coursecontext->id . '/local_oer/public/' .
-                        $fileinfo->id . '/' . $fileinfo->contenthash,
-                'abstract' => $fileinfo->description ?? '',
-                'license' => $fulllicense,
-                'context' => $contexts[$fileinfo->context],
-                'resourcetype' => $resourcetypes[$fileinfo->resourcetype],
-                'language' => $fileinfo->language,
-                'persons' => json_decode($fileinfo->persons)->persons,
-                'tags' => is_null($fileinfo->tags) || $fileinfo->tags == '' ? [] : explode(',', $fileinfo->tags),
-                'mimetype' => $file->get_mimetype(),
-                'filesize' => $file->get_filesize(),
-                'filecreationtime' => $file->get_timecreated(),
-                'timereleased' => $fileinfo->timecreated,
-                'classification' => $classification,
-                'courses' => json_decode($fileinfo->coursemetadata),
-        ];
-
-        if ($fileinfo->additionaldata) {
-            $additionaldata = json_decode($fileinfo->additionaldata);
-            foreach ($additionaldata as $key => $value) {
-                // Do not overwrite existing data.
-                if (!isset($metadata[$key])) {
-                    $metadata[$key] = $value;
-                }
-            }
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Prepare the json_encoded classification field.
-     *
-     * @param string|null $fileinfo
-     * @return array
-     */
-    private function prepare_classification_fields(?string $fileinfo): array {
-        if (is_null($fileinfo)) {
-            return [];
-        }
-        $classification = oerclassification::get_enabled_plugins();
-        $info = ($fileinfo && $fileinfo != '') ? json_decode($fileinfo) : false;
-        if (!$fileinfo) {
-            return [];
-        }
-        $result = [];
-
-        // @codeCoverageIgnoreStart
-        // This code is not reachable without subplugins installed.
-        foreach ($classification as $key => $pluginname) {
-            $frankenstyle = 'oerclassification_' . $key;
-            $plugin = '\\' . $frankenstyle . '\plugin';
-            $url = $plugin::url_to_external_resource();
-            $selectdata = $plugin::get_select_data(false);
-
-            if (isset($info->$key)) {
-                if (!isset($result[$key])) {
-                    $result[$key] = [
-                            'type' => $key,
-                            'url' => $url,
-                            'values' => [],
-                    ];
-                }
-                foreach ($info->$key as $identifier) {
-                    if (empty($identifier)) {
-                        continue;
-                    }
-                    $result[$key]['values'][] = [
-                            'identifier' => $identifier,
-                            'name' => $selectdata[$identifier],
-                    ];
-                }
-            }
-        }
-
-        $result = array_values($result);
-        return $result;
-        // @codeCoverageIgnoreEnd
+        return $metadata->get_array();
     }
 }

@@ -40,20 +40,12 @@
 <ul class="list-group">
     {{#files}}
         <li class="list-group-item">
-            <div class="row-fluid">
+            <div data-oerid="{{identifier}}" class="row-fluid">
                 <div class="col-md-11 col-md-11 d-flex align-items-center" style="{{#ignore}} opacity: 0.5 {{/ignore}}">
                     <div class="d-flex justify-content-start align-items-top my-2">
-                        {{#iconisimage}}
-                            <div class="m-0 p-0 border-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: contain; width: 40px; height: 40px;">
-                                <img class="m-0 img-thumbnail" alt="" aria-hidden="true" style="object-fit: cover; width: 40px; height: 40px;"
-                                     src="data:image/{{icontype}};base64, {{icon}}">
-                            </div>
-                        {{/iconisimage}}
-                        {{^iconisimage}}
-                            <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
-                                <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
-                            </div>
-                        {{/iconisimage}}
+                        <div class="m-0 img-thumbnail d-flex justify-content-center align-items-center" style="object-fit: cover; width: 40px; height: 40px;">
+                            <img class="icon m-0 p-0" alt="" aria-hidden="true" style="object-fit: cover; width: 16px; height: 16px;" src="{{icon}}"/>
+                        </div>
                     </div>
                     <div class="pl-1 col-2">
                         <p class="card-title d-block m-0">
@@ -65,6 +57,9 @@
                     </div>
                     <div class="col-3">
                         <ul class="list-group">
+                            <div class="col-1">
+                                {{> local_oer/badges }}
+                            </div>
                             {{#requirementsmet}}
                                 <li class="list-group-item border-0 p-0">
                                     <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} requirementsmet, local_oer{{/str}}</small></small>
@@ -75,42 +70,10 @@
                                     <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} requirementsnotmet, local_oer{{/str}}</small></small>
                                 </li>
                             {{/requirementsmet}}
-                            {{#upload}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}i/valid, core{{/pix}} {{#str}} markedforupload, local_oer{{/str}}</small></small>
-                                </li>
-                            {{/upload}}
-                            {{^upload}}
-                                <li class="list-group-item border-0 p-0">
-                                    <small><small>{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}{{#str}} notmarkedforupload, local_oer{{/str}}</small></small>
-                                </li>
-                            {{/upload}}
                         </ul>
                     </div>
                     <div class="col-3">
-                        <ul class="list-group">
-                            <li class="list-group-item border-0 p-0">
-                                <small><small>
-                                    <div class="text-truncate d-block">
-                                        {{#str}} type, local_oer {{/str}}: <span title="{{mimetype}}">{{mimetype}}</span>,
-                                    </div>
-                                </small> </small>
-                            </li>
-                            <li class="list-group-item border-0 p-0">
-                                <small><small>{{#str}} section {{/str}}:
-                                    {{#sections}}
-                                        {{{sectionname}}},
-                                    {{/sections}}
-                                </small> </small>
-                            </li>
-                            <li class="list-group-item border-0 p-0">
-                                <small><small>{{#str}} activity {{/str}}:
-                                    {{#modules}}
-                                        <a href="{{moduleurl}}">{{{modulename}}}</a>,
-                                    {{/modules}}
-                                </small> </small>
-                            </li>
-                        </ul>
+                        {{> local_oer/information }}
                     </div>
                     <div class="col-3">
                         <ul class="list-group">

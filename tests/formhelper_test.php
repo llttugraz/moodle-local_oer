@@ -32,7 +32,7 @@ use local_oer\helper\formhelper;
  *
  * @coversDefaultClass \local_oer\helper\formhelper
  */
-class formhelper_test extends \advanced_testcase {
+final class formhelper_test extends \advanced_testcase {
     /**
      * Test add no preference value.
      *
@@ -40,7 +40,7 @@ class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::add_no_preference_value
      */
-    public function test_add_no_preference_value() {
+    public function test_add_no_preference_value(): void {
         $this->resetAfterTest();
         $value = [];
         $value = formhelper::add_no_preference_value($value);
@@ -56,7 +56,7 @@ class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_context_list
      */
-    public function test_lom_context_list() {
+    public function test_lom_context_list(): void {
         $this->resetAfterTest();
         $lom = formhelper::lom_context_list(false, false);
         $this->assertCount(2, $lom);
@@ -87,7 +87,7 @@ class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_resource_types
      */
-    public function test_lom_resource_types() {
+    public function test_lom_resource_types(): void {
         $this->resetAfterTest();
         $types = formhelper::lom_resource_types(false, false);
         $this->assertCount(15, $types);
@@ -111,15 +111,19 @@ class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::lom_role_types
      */
-    public function test_lom_roles_types() {
+    public function test_lom_roles_types(): void {
         $this->resetAfterTest();
-        $types = formhelper::lom_role_types(false);
+        $roles = [
+                ['Author', 'author', 'local_oer'],
+                ['Publisher', 'publisher', 'local_oer'],
+        ];
+        $types = formhelper::lom_role_types($roles);
         $this->assertCount(2, $types);
         $this->assertArrayHasKey('Author', $types);
         $this->assertArrayHasKey('Publisher', $types);
         $this->assertEquals(get_string('author', 'local_oer'), $types['Author']);
         $this->assertEquals(get_string('publisher', 'local_oer'), $types['Publisher']);
-        $types = formhelper::lom_role_types(true);
+        $types = formhelper::lom_role_types($roles, true);
         $this->assertCount(3, $types);
         $this->assertArrayHasKey('Author', $types);
         $this->assertArrayHasKey('Publisher', $types);
@@ -136,7 +140,7 @@ class formhelper_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\formhelper::language_select_data
      */
-    public function test_language_select_data() {
+    public function test_language_select_data(): void {
         $this->resetAfterTest();
         $languages = formhelper::language_select_data(false);
         $count = count($languages);

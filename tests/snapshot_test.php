@@ -37,7 +37,17 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\snapshot
  */
-class snapshot_test extends \advanced_testcase {
+final class snapshot_test extends \advanced_testcase {
+    /**
+     * Setup test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+    }
+
     /**
      * Test get latest course snapshot
      *
@@ -46,31 +56,18 @@ class snapshot_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::get_latest_course_snapshot
+     * @covers ::__construct
      */
-    public function test_get_latest_course_snapshot() {
-        $this->resetAfterTest();
-        global $DB;
-        $this->setAdminUser();
+    public function test_get_latest_course_snapshot(): void {
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
         $snapshot = new snapshot($course->id);
         $this->assertEmpty($snapshot->get_latest_course_snapshot());
         $helper->set_files_to($course->id, 3, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $result = $snapshot->get_latest_course_snapshot();
         $this->assertCount(3, $result);
-    }
-
-    /**
-     * Test get file history
-     *
-     * @return void
-     * @covers ::get_file_history
-     */
-    public function test_get_file_history() {
-        $this->resetAfterTest();
-        // TODO: feature has to be implemented in snapshot.
     }
 
     /**
@@ -82,10 +79,9 @@ class snapshot_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::create_snapshot_of_course_files
      * @covers ::create_file_snapshot
+     * @covers ::add_type_data
      */
-    public function test_create_snapshot_of_course_files() {
-        $this->resetAfterTest();
-        $this->setAdminUser();
+    public function test_create_snapshot_of_course_files(): void {
         global $DB;
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
@@ -94,15 +90,15 @@ class snapshot_test extends \advanced_testcase {
                 'There should be at least one courseinfo entry for testcourse');
         $this->assertEmpty($DB->get_records('local_oer_snapshot'));
         $snapshot = new snapshot($course->id);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(1);
         $this->assertEmpty($DB->get_records('local_oer_snapshot'), 'No files are set for release yet.');
         $helper->set_files_to($course->id, 1, true);
-        $snapshot->create_snapshot_of_course_files();
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(2);
+        $snapshot->create_snapshot_of_course_files(3);
         $this->assertEquals(1, $DB->count_records('local_oer_snapshot'),
                 'Although the release is called 2 times, only one file should be released because nothing changed');
         $helper->set_files_to($course->id, 2, true);
-        $snapshot->create_snapshot_of_course_files();
+        $snapshot->create_snapshot_of_course_files(4);
         $this->assertEquals(2, $DB->count_records('local_oer_snapshot'), 'Two files have been released.');
     }
 
@@ -114,9 +110,9 @@ class snapshot_test extends \advanced_testcase {
      * @return void
      * @covers ::create_file_snapshot
      */
-    public function test_create_file_snapshot() {
+    public function test_create_file_snapshot(): void {
         $this->resetAfterTest();
-        // TODO: write test.
+        // MDL-0 TODO: write test.
     }
 
     /**
@@ -130,7 +126,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \ReflectionException
      * @covers ::add_external_metadata
      */
-    public function test_add_external_metadata() {
+    public function test_add_external_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
@@ -149,7 +145,7 @@ class snapshot_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::get_active_courseinfo_metadata
      */
-    public function test_get_active_courseinfo_metadata() {
+    public function test_get_active_courseinfo_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
@@ -189,11 +185,14 @@ class snapshot_test extends \advanced_testcase {
      * - File enables/disables courseinfo from editor course.
      * - File enables additional courseinfo from other course where file is used.
      *
-     * @return void
-     * @throws \ReflectionException
      * @covers ::get_overwritten_courseinfo_metadata
+     *
+     * @return void
+     * @throws \Random\RandomException
+     * @throws \ReflectionException
+     * @throws \dml_exception
      */
-    public function test_get_overwritten_courseinfo_metadata() {
+    public function test_get_overwritten_courseinfo_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $contenthash = substr(hash('sha256', random_bytes(10)), 0, 40);
@@ -268,12 +267,14 @@ class snapshot_test extends \advanced_testcase {
      * Simple test for a simple function.
      * Check if the return array has all set fields.
      *
-     * @return void
-     * @throws \ReflectionException
      * @covers ::extract_courseinfo_metadata
      * @covers ::add_customfields_to_snapshot
+     *
+     * @return void
+     * @throws \ReflectionException
+     * @throws \dml_exception
      */
-    public function test_extract_courseinfo_metadata() {
+    public function test_extract_courseinfo_metadata(): void {
         $this->resetAfterTest();
 
         $entry = $this->set_additional_courseinfoentry(7);
@@ -302,7 +303,7 @@ class snapshot_test extends \advanced_testcase {
      * @return \stdClass
      * @throws \dml_exception
      */
-    private function set_additional_courseinfoentry(int $courseid) {
+    private function set_additional_courseinfoentry(int $courseid): \stdClass {
         global $DB;
         $entry = new \stdClass();
         $entry->courseid = $courseid;

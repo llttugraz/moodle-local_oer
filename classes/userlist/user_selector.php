@@ -87,7 +87,7 @@ class user_selector extends \user_selector_base {
         } else {
             $sql = " FROM {user} u WHERE $wherecondition AND u.deleted = 0
                  AND NOT EXISTS (SELECT oul.userid FROM {local_oer_userlist} oul
-                                                  WHERE oul.userid = u.id AND oul.type = '$this->type')"; // TODO list type.
+                                                  WHERE oul.userid = u.id AND oul.type = '$this->type')"; // MDL-0 TODO list type.
         }
 
         [$sort, $sortparams] = users_order_by_sql('u', $search, $this->accesscontext);

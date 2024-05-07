@@ -21,7 +21,7 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2017-2024 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,15 +43,19 @@ class snapshothelper {
      * Triggered from task and per button in history view (only admins).
      *
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function create_snapshots_of_all_active_courses(): void {
         global $DB;
         $courses = activecourse::get_list_of_courses();
+        $sql = 'SELECT MAX(releasenumber) FROM {local_oer_snapshot}';
+        $releasenumber = $DB->get_field_sql($sql) + 1;
         $before = $DB->count_records('local_oer_snapshot');
         foreach ($courses as $course) {
             $snapshot = new snapshot($course->courseid);
-            $snapshot->create_snapshot_of_course_files();
+            $snapshot->create_snapshot_of_course_files($releasenumber);
         }
         $after = $DB->count_records('local_oer_snapshot');
         logger::add(0, logger::LOGSUCCESS,
@@ -70,5 +74,31 @@ class snapshothelper {
         global $DB;
         $timestamps = $DB->get_records('local_oer_snapshot', null, 'timecreated DESC', 'id,timecreated', 0, 1);
         return empty($timestamps) ? 0 : reset($timestamps)->timecreated;
+    }
+
+    /**
+     * Load all snapshots of a single element.
+     *
+     * @param string $identifier Identifier of element
+     * @return \stdClass[]
+     * @throws \dml_exception
+     */
+    public static function get_element_history(string $identifier): array {
+        global $DB;
+        return $DB->get_records('local_oer_snapshot', ['identifier' => $identifier],
+                'timecreated DESC');
+    }
+
+    /**
+     * Return all released elements with a certain release number.
+     *
+     * @param int $releasenumber
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_snapshot_by_releasenumber(int $releasenumber) {
+        global $DB;
+        return $DB->get_records('local_oer_snapshot', ['releasenumber' => $releasenumber],
+                'timecreated DESC');
     }
 }

@@ -33,7 +33,7 @@ use local_oer\userlist\userlist;
  *
  * @coversDefaultClass \local_oer\userlist\userlist
  */
-class userlist_test extends \advanced_testcase {
+final class userlist_test extends \advanced_testcase {
     /**
      * Test if a user is allowed to use oer or not.
      *
@@ -41,7 +41,7 @@ class userlist_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers \local_oer\userlist\userlist::user_is_allowed
      */
-    public function test_user_is_allowed() {
+    public function test_user_is_allowed(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         global $DB, $USER;

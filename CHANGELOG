@@ -1,3 +1,15 @@
+2024-04-16
+* Release v2.3.0
+* New subplugin type for loading elements from different sources
+* Add subplugins oermod_resource (mod_resource), oermod_folder (mod_folder)
+* Datastructure in backend has changed due to new requirements
+* New identifier for oer elements due to possibility of adding Moodle external objects
+* Database tables updated, see upgrade.php for more information
+* Pull service (public metadata) application profile changed (v2.0.0)
+* Backwards compatibility to application profile v1.0.0 with accept header parameter
+* Slightly optimized frontend card/list view
+* Set subplugin type oeruploader and zipper to deprecated, will be removed in future release
+
 2023-11-27
 * Add composer.json file
 

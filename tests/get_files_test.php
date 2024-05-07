@@ -33,7 +33,7 @@ namespace local_oer;
  * @runTestsInSeparateProcesses
  * @coversDefaultClass \local_oer\services\get_files
  */
-class get_files_test extends \advanced_testcase {
+final class get_files_test extends \advanced_testcase {
     /**
      * Type of external_value. In Moodle 4.2 the namespace changes.
      *
@@ -67,6 +67,7 @@ class get_files_test extends \advanced_testcase {
      */
     public function setUp(): void {
         $this->resetAfterTest();
+
         require_once(__DIR__ . '/helper/testcourse.php');
         global $CFG;
         // In Moodle 4.2 the namespace core_external was added to external_api.
@@ -84,7 +85,7 @@ class get_files_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\services\get_files::service_parameters
      */
-    public function test_service_parameters() {
+    public function test_service_parameters(): void {
         $parameters = \local_oer\services\get_files::service_parameters();
         $this->assertEquals($this->parameter, get_class($parameters));
         $this->assertArrayHasKey('courseid', $parameters->keys);
@@ -98,7 +99,7 @@ class get_files_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\services\get_files::service_returns
      */
-    public function test_service_returns() {
+    public function test_service_returns(): void {
         $returnvalue = \local_oer\services\get_files::service_returns();
         $this->assertEquals($this->single, get_class($returnvalue));
         $this->assertArrayHasKey('courseid', $returnvalue->keys);
@@ -108,15 +109,17 @@ class get_files_test extends \advanced_testcase {
         $this->assertEquals($this->value, get_class($returnvalue->keys['context']));
         $this->assertEquals(PARAM_INT, $returnvalue->keys['context']->type);
 
-        $this->assertEquals($this->multi, get_class($returnvalue->keys['sections']));
-        $this->assertEquals($this->single, get_class($returnvalue->keys['sections']->content));
-        $this->assertArrayHasKey('sectionnum', $returnvalue->keys['sections']->content->keys);
-        $this->assertEquals($this->value, get_class($returnvalue->keys['sections']->content->keys['sectionnum']));
-        $this->assertEquals(PARAM_INT, $returnvalue->keys['sections']->content->keys['sectionnum']->type);
-        $this->assertArrayHasKey('sectionname', $returnvalue->keys['sections']->content->keys);
+        // Update 2024-01-17 Sections have been removed due to the subplugin structure.
+        // A more general approach has been implemented which result in the origin key.
+        $this->assertEquals($this->multi, get_class($returnvalue->keys['origin']));
+        $this->assertEquals($this->single, get_class($returnvalue->keys['origin']->content));
+        $this->assertArrayHasKey('origin', $returnvalue->keys['origin']->content->keys);
+        $this->assertEquals($this->value, get_class($returnvalue->keys['origin']->content->keys['origin']));
+        $this->assertEquals(PARAM_ALPHANUMEXT, $returnvalue->keys['origin']->content->keys['origin']->type);
+        $this->assertArrayHasKey('originname', $returnvalue->keys['origin']->content->keys);
         $this->assertEquals($this->value,
-                get_class($returnvalue->keys['sections']->content->keys['sectionname']));
-        $this->assertEquals(PARAM_TEXT, $returnvalue->keys['sections']->content->keys['sectionname']->type);
+                get_class($returnvalue->keys['origin']->content->keys['originname']));
+        $this->assertEquals(PARAM_TEXT, $returnvalue->keys['origin']->content->keys['originname']->type);
 
         // The main difference to get_file is the multiple structure for the files values.
         $this->assertEquals($this->multi, get_class($returnvalue->keys['files']));
@@ -133,21 +136,20 @@ class get_files_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers \local_oer\services\get_files::service
      */
-    public function test_service() {
+    public function test_service(): void {
         $this->setAdminUser();
         $helper = new \local_oer\testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
-        $contenthash = $helper->get_contenthash_of_first_found_file($course);
 
-        $result = \local_oer\services\get_files::service($course->id, $contenthash);
+        $result = \local_oer\services\get_files::service($course->id);
         $this->assertIsArray($result);
         $this->assertArrayHasKey('courseid', $result);
         $this->assertEquals($course->id, $result['courseid']);
         $this->assertArrayHasKey('context', $result);
         $this->assertEquals(\context_course::instance($course->id)->id, $result['context']);
-        $this->assertArrayHasKey('sections', $result);
-        $this->assertIsArray($result['sections']);
-        $this->assertCount(1, $result['sections']);
+        $this->assertArrayHasKey('origin', $result);
+        $this->assertIsArray($result['origin']);
+        $this->assertCount(1, $result['origin']);
         $this->assertArrayHasKey('files', $result);
         $this->assertIsArray($result['files']);
         $this->assertCount(5, $result['files']);

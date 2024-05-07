@@ -40,17 +40,14 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 {{#str}} reason, local_oer {{/str}}:
 <div class="alert alert-{{alert}}">{{{reason}}}</div>
 {{#multiple}}
-    <p>{{#str}} multiplecourses, local_oer {{/str}}
-        {{> local_oer/multiplecourses}}</p>
+    <fieldset>
+        <legend><small>{{#str}} multiplecourses, local_oer {{/str}}</small></legend>
+        {{> local_oer/multiplecourses}}
+    </fieldset>
 {{/multiple}}
 {{#showmetadata}}
-    <p>
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#local_oer_showmetadata_{{uniqid}}" aria-expanded="false"
-                aria-controls="local_oer_showmetadata_{{uniqid}}">
-            {{#str}} showmetadata, local_oer {{/str}}
-        </button>
-    </p>
-    <div class="collapse" id="local_oer_showmetadata_{{uniqid}}">
+    <details>
+        <summary>{{#str}} showmetadata, local_oer {{/str}}</summary>
         <div class="card card-body">
             <div class="container">
                 {{#metadata.simple}}
@@ -60,11 +57,19 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <div class="col-sm">
                             {{#collapse}}
-                                {{{heading}}}<span class="collapse" id="local_oer_{{uniqid}}">{{{body}}}</span>
-                                <a data-toggle="collapse" href="#local_oer_{{uniqid}}" role="button" aria-expanded="false"
-                                   aria-controls="local_oer_{{uniqid}}"> &raquo; </a>
+                            {{! Content case, if long content use detail for better overview}}
+                                {{#emptybody}}
+                                    {{heading}}
+                                {{/emptybody}}
+                                {{^emptybody}}
+                                    <details>
+                                        <summary>{{heading}}</summary>
+                                        {{body}}
+                                    </details>
+                                {{/emptybody}}
                             {{/collapse}}
                             {{^collapse}}
+                            {{! Basic case for all values except content}}
                                 {{value}}
                             {{/collapse}}
                         </div>
@@ -114,7 +119,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 {{/metadata.classification}}
             </div>
         </div>
-    </div>
+    </details>
 {{/showmetadata}}
 <br>
 <p>{{{support}}}</p>

@@ -36,14 +36,14 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\helper\filehelper
  */
-class filehelper_test extends \advanced_testcase {
+final class filehelper_test extends \advanced_testcase {
     /**
      * Test different integer sizes to be converted to human readable filesize.
      *
      * @return void
      * @covers \local_oer\helper\filehelper::get_readable_filesize
      */
-    public function test_get_readable_filesize() {
+    public function test_get_readable_filesize(): void {
         $this->resetAfterTest();
 
         $this->assertEquals('7.0 Byte', filehelper::get_readable_filesize(7));
@@ -77,7 +77,7 @@ class filehelper_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\helper\filehelper::get_file_url
      */
-    public function test_get_file_url() {
+    public function test_get_file_url(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

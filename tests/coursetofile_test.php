@@ -27,6 +27,7 @@ namespace local_oer;
 
 use local_oer\metadata\courseinfo;
 use local_oer\metadata\coursetofile;
+use local_oer\modules\element;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,7 +38,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\metadata\coursetofile
  */
-class coursetofile_test extends \advanced_testcase {
+final class coursetofile_test extends \advanced_testcase {
     /**
      * Test if exception is thrown as expected.
      *
@@ -48,16 +49,19 @@ class coursetofile_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\metadata\coursetofile::get_courses_metadata_for_file
      */
-    public function test_get_courses_metadata_for_file_exception() {
+    public function test_get_courses_metadata_for_file_exception(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $helper = new testcourse();
         [$draftid, $unusedfile] = $helper->generate_file('unused', null, 'This file is not used anywhere');
+        $identifier = $helper->generate_identifier($unusedfile->get_contenthash());
         $this->expectException('coding_exception');
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (' . $unusedfile->get_contenthash() .
                 ') has been searched that is not used anywhere');
-        coursetofile::get_courses_metadata_for_file($unusedfile->get_contenthash(), 1);
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
+        $element->set_identifier($identifier);
+        coursetofile::get_courses_metadata_for_file($element, 1);
     }
 
     /**
@@ -70,12 +74,15 @@ class coursetofile_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      * @covers \local_oer\metadata\coursetofile::get_courses_metadata_for_file
      */
-    public function test_get_courses_metadata_for_file() {
+    public function test_get_courses_metadata_for_file(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $helper = new testcourse();
         [$draftid, $sharedfile] = $helper->generate_file('shared', null, 'Shared file in multiple courses');
+        $identifier = $helper->generate_identifier($sharedfile->get_contenthash());
+        $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
+        $element->set_identifier($identifier);
 
         // Create a course and add the file to it (with a resource module).
         $course1 = $this->getDataGenerator()->create_course();
@@ -87,14 +94,14 @@ class coursetofile_test extends \advanced_testcase {
 
         // Courseinfo does not exist yet, so result should be empty.
 
-        $courses = coursetofile::get_courses_metadata_for_file($sharedfile->get_contenthash(), 1);
+        $courses = coursetofile::get_courses_metadata_for_file($element, 1);
         $this->assertTrue(isset($courses[$course1->id]), 'File should be found in course 1.');
         $this->assertEmpty($courses[$course1->id]['courseinfo'], 'The courseinfo sync has not been executed yet.');
 
         // Run courseinfo sync.
 
         $helper->sync_course_info($course1->id);
-        $courses = coursetofile::get_courses_metadata_for_file($sharedfile->get_contenthash(), $course1->id);
+        $courses = coursetofile::get_courses_metadata_for_file($element, $course1->id);
         $this->assertTrue(isset($courses[$course1->id]), 'File should be found in course 1.');
         $this->assertCount(1, $courses);
         $this->assertIsArray($courses[$course1->id]['courseinfo'], 'The courseinfo sync has not been executed yet.');
@@ -109,7 +116,7 @@ class coursetofile_test extends \advanced_testcase {
         $resource2 = $this->getDataGenerator()->create_module('resource', $record);
 
         // Course is added, but with no courseinfo metadata, as sync has not executed yet.
-        $courses = coursetofile::get_courses_metadata_for_file($sharedfile->get_contenthash(), $course1->id);
+        $courses = coursetofile::get_courses_metadata_for_file($element, $course1->id);
         $this->assertTrue(isset($courses[$course1->id]));
         $this->assertTrue(isset($courses[$course2->id]));
         $this->assertCount(2, $courses);
@@ -117,7 +124,7 @@ class coursetofile_test extends \advanced_testcase {
         $this->assertEmpty($courses[$course2->id]['courseinfo']);
 
         $helper->sync_course_info($course2->id);
-        $courses = coursetofile::get_courses_metadata_for_file($sharedfile->get_contenthash(), $course1->id);
+        $courses = coursetofile::get_courses_metadata_for_file($element, $course1->id);
         $this->assertTrue(isset($courses[$course1->id]));
         $this->assertTrue(isset($courses[$course2->id]));
         $this->assertCount(2, $courses);
@@ -136,7 +143,7 @@ class coursetofile_test extends \advanced_testcase {
         $info->coursecode = 'external2';
         $DB->insert_record('local_oer_courseinfo', $info);
 
-        $courses = coursetofile::get_courses_metadata_for_file($sharedfile->get_contenthash(), $course1->id);
+        $courses = coursetofile::get_courses_metadata_for_file($element, $course1->id);
         $this->assertTrue(isset($courses[$course1->id]));
         $this->assertTrue(isset($courses[$course2->id]));
         $this->assertCount(2, $courses);

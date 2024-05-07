@@ -89,15 +89,16 @@ class formhelper {
     /**
      * The role the persons added to the file metadata have.
      *
+     * @param array $roles List of roles supported, supported roles are set in subplugin.
      * @param bool $addnoprefval
      * @return array
      * @throws \coding_exception
      */
-    public static function lom_role_types(bool $addnoprefval = false): array {
-        $values = [
-                'Author' => get_string('author', 'local_oer'),
-                'Publisher' => get_string('publisher', 'local_oer'),
-        ];
+    public static function lom_role_types(array $roles, bool $addnoprefval = false): array {
+        $values = [];
+        foreach ($roles as $role) {
+            $values[$role[0]] = get_string($role[1], $role[2]);
+        }
         return $addnoprefval ? self::add_no_preference_value($values) : $values;
     }
 

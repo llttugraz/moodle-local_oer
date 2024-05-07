@@ -38,7 +38,7 @@ use local_oer\metadata\courseinfo;
  *
  * @coversDefaultClass \local_oer\forms\preference_form
  */
-class preference_form_test extends \advanced_testcase {
+final class preference_form_test extends \advanced_testcase {
     /**
      * Test validation of formular.
      * Also runs through the formular definition, but there is not tested anything special.
@@ -88,7 +88,7 @@ class preference_form_test extends \advanced_testcase {
      * @covers ::update_metadata
      * @covers ::add_values_from_form
      */
-    public function test_update_metadata() {
+    public function test_update_metadata(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

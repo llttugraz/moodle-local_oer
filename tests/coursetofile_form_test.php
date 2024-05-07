@@ -36,7 +36,7 @@ use local_oer\forms\coursetofile_form;
  *
  * @coversDefaultClass \local_oer\forms\coursetofile_form
  */
-class coursetofile_form_test extends \advanced_testcase {
+final class coursetofile_form_test extends \advanced_testcase {
     /**
      * Form for the test.
      *
@@ -55,6 +55,7 @@ class coursetofile_form_test extends \advanced_testcase {
      * Setup courses and formular for tests.
      *
      * @return void
+     * @throws \coding_exception
      * @throws \dml_exception
      * @throws \file_exception
      * @throws \stored_file_creation_exception
@@ -71,7 +72,7 @@ class coursetofile_form_test extends \advanced_testcase {
 
         $customdata = [
                 'courseid' => $course1->id,
-                'contenthash' => $file->get_contenthash(),
+                'identifier' => $helper->generate_identifier($file->get_contenthash()),
         ];
 
         $helper->generate_resource($course2, $this->getDataGenerator());

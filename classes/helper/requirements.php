@@ -27,6 +27,9 @@
 
 namespace local_oer\helper;
 
+use local_oer\filelist;
+use local_oer\modules\element;
+
 /**
  * Class requirements
  */
@@ -35,17 +38,19 @@ class requirements {
      * Test for the needed requirements of the metadata.
      * Some requirements are fixed (title, license, persons).
      * All other requirements can be set in the plugin settings.
-     * Also the classification subplugins can be set as required.
+     * Also, the classification subplugins can be set as required.
      *
-     * @param \stdClass $metadata
+     * @param element $element
      * @return array
+     * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function metadata_fulfills_all_requirements(\stdClass $metadata): array {
+    public static function metadata_fulfills_all_requirements(element $element): array {
         $reqarray = [];
-        $licenseobject = license::get_license_by_shortname($metadata->license);
-        $reqarray['title'] = !empty($metadata->title);
-        $reqarray['license'] = license::test_license_correct_for_upload($metadata->license) || is_null($licenseobject);
+        $metadata = $element->get_stored_metadata();
+        $licenseobject = license::get_license_by_shortname($element->get_license());
+        $reqarray['title'] = !empty($element->get_title());
+        $reqarray['license'] = license::test_license_correct_for_upload($element->get_license()) || is_null($licenseobject);
         $people = json_decode($metadata->persons);
         $reqarray['persons'] = !empty($people->persons);
         $required = explode(',', get_config('local_oer', 'requiredfields'));
@@ -77,7 +82,7 @@ class requirements {
             }
         }
 
-        $release = $metadata->state == 1;
+        $release = $metadata->releasestate == 1;
         $releasable = true;
         foreach ($reqarray as $value) {
             if ($value === false) {
@@ -89,7 +94,7 @@ class requirements {
     }
 
     /**
-     * en the requirements change, the files that already have been set to release have to be tested against the
+     * When the requirements change, the files that already have been set to release have to be tested against the
      * new requirements and the state has to be set to 0 if the file does not meet the new requirements settings.
      * Does not affect already made releases/snapshots as the requirements had other values back then.
      *
@@ -104,29 +109,32 @@ class requirements {
      * @throws \moodle_exception
      */
     public static function reset_releasestate_if_necessary(): void {
-        global $DB, $USER;
-        $files = $DB->get_records('local_oer_files', ['state' => 1], 'id ASC');
+        global $DB;
+        $records = $DB->get_records('local_oer_elements', ['releasestate' => 1], 'id ASC');
         $courses = [];
-        foreach ($files as $file) {
-            [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($file);
+        foreach ($records as $record) {
+            $element = filelist::get_single_file($record->courseid, $record->identifier);
+            if (is_null($element)) {
+                self::reset_release_state($record, $courses);
+                continue;
+            }
+            $element->set_stored_metadata(clone($record));
+            [$reqarray, $releasable, $release] = static::metadata_fulfills_all_requirements($element);
             if (!$release) {
-                $courses[$file->courseid][] = $file;
-                $file->state = 0;
-                $file->usermodified = $USER->id;
-                $file->timemodified = time();
-                $DB->update_record('local_oer_files', $file);
+                self::reset_release_state($record, $courses);
             }
         }
         if (!empty($courses)) {
-            foreach ($courses as $course => $files) {
+            foreach ($courses as $course => $elements) {
                 // Update 19.10.2022 Christian. Check if file exists, do not send message if not.
-                $filelist = \local_oer\filelist::get_course_files($course);
-                foreach ($files as $key => $file) {
-                    if (!isset($filelist[$file->contenthash])) {
-                        unset($files[$key]);
+                $elementlist = \local_oer\filelist::get_course_files($course);
+                foreach ($elements as $identifier => $title) {
+                    if (!$elementlist->find_element('identifier', $identifier)) {
+                        unset($elements[$identifier]);
                     }
                 }
-                if (empty($files)) {
+
+                if (empty($elements)) {
                     continue;
                 }
                 $coursecontext = \context_course::instance($course);
@@ -139,10 +147,27 @@ class requirements {
                 foreach ($users as $userid) {
                     if (has_capability('local/oer:edititems', $coursecontext, $userid->id)) {
                         $user = $DB->get_record('user', ['id' => $userid->id]);
-                        \local_oer\message::send_requirementschanged($user, $files, $course);
+                        \local_oer\message::send_requirementschanged($user, $elements, $course);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Set the release state to 0, so the element is neither marked for release, nor ignored.
+     *
+     * @param \stdClass $record Record of local_oer_elements table.
+     * @param array $courses List of courses where releasestate has been resetted.
+     * @return void
+     * @throws \dml_exception
+     */
+    private static function reset_release_state(\stdClass $record, array &$courses): void {
+        global $USER, $DB;
+        $courses[$record->courseid][$record->identifier] = $record->title;
+        $record->releasestate = 0;
+        $record->usermodified = $USER->id;
+        $record->timemodified = time();
+        $DB->update_record('local_oer_elements', $record);
     }
 }

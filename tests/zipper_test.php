@@ -34,7 +34,7 @@ require_once(__DIR__ . '/helper/testcourse.php');
  *
  * @coversDefaultClass \local_oer\zipper
  */
-class zipper_test extends \advanced_testcase {
+final class zipper_test extends \advanced_testcase {
     /**
      * Test if files are correctly added to one or multiple filepackages.
      *
@@ -45,28 +45,29 @@ class zipper_test extends \advanced_testcase {
      * @throws \dml_exception
      * @throws \moodle_exception
      * @covers ::separate_files_to_packages
-     * @covers ::__construct
      */
-    public function test_separate_files_to_packages() {
+    public function test_separate_files_to_packages(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
+        // MDL-0 TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
         $zipper = new zipper();
         $snapshot = new snapshot($course->id);
-        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true, true);
+        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true);
         $this->assertTrue(empty($packages));
         $this->assertEquals(0, $info['general']['packages']);
         $this->assertEquals(0, $info['general']['fullsize']);
         $size = $helper->set_files_to($course->id, 3, true);
-        $snapshot->create_snapshot_of_course_files();
-        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true, true);
+        $snapshot->create_snapshot_of_course_files(1);
+        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true);
         $this->assertEquals(1, count($packages), 'The amount of packages');
         $this->assertEquals(0, $info['general']['packages'], 'Packages start counting at 0, so 0 should be the correct value');
         $this->assertEquals($size, $info['general']['fullsize'], 'The package size should match the filesizes');
 
-        // TODO: test package separation with lots of big files - look into the old unit test..
+        // MDL-0 TODO: test package separation with lots of big files - look into the old unit test..
     }
 
     /**
@@ -80,22 +81,25 @@ class zipper_test extends \advanced_testcase {
      * @covers ::prepare_files_to_zip
      * @covers ::create_metadata_json_temp
      */
-    public function test_compress_file_package() {
+    public function test_compress_file_package(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
+        // MDL-0 TODO: test is dependent from subplugin.
+        set_config('enabledmodplugins', 'resource', 'local_oer');
+
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
         $size = $helper->set_files_to($course->id, 1, true);
         $zipper = new zipper();
         $snapshot = new snapshot($course->id);
-        $snapshot->create_snapshot_of_course_files();
-        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true, true);
+        $snapshot->create_snapshot_of_course_files(1);
+        [$packages, $info] = $zipper->separate_files_to_packages($course->id, true);
         $this->assertEquals(1, count($packages), 'The amount of packages, should be 1');
         $zipfile = $zipper->compress_file_package($course->id, reset($packages));
         $this->assertNotFalse($zipfile, 'Should be a path to a zipfile');
         $this->assertTrue(file_exists($zipfile), 'There should be a ZIP file in the temp directory');
 
-        // TODO: add some variations?...
+        // MDL-0 TODO: add some variations?...
     }
 }

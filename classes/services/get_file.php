@@ -48,7 +48,7 @@ class get_file extends \external_api {
         return new \external_function_parameters(
                 [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle course id', VALUE_REQUIRED),
-                        'contenthash' => new \external_value(PARAM_ALPHANUM, 'Moodle course id', VALUE_REQUIRED),
+                        'identifier' => new \external_value(PARAM_TEXT, 'Moodle course id', VALUE_REQUIRED),
                 ]
         );
     }
@@ -103,11 +103,11 @@ class get_file extends \external_api {
                 [
                         'id' => new \external_value(PARAM_INT, 'DB id of oer file entry'),
                         'contenthash' => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
+                        'identifier' => new \external_value(PARAM_TEXT, 'Unique identifier for element'),
+                        'idhash' => new \external_value(PARAM_ALPHANUM, 'SHA1 hash of identifier for html ids'),
                         'title' => new \external_value(PARAM_TEXT, 'Title or filename'),
                         'mimetype' => new \external_value(PARAM_TEXT, 'Mimetype'),
                         'icon' => new \external_value(PARAM_RAW, 'File icon'),
-                        'icontype' => new \external_value(PARAM_ALPHA, 'File icon type'),
-                        'iconisimage' => new \external_value(PARAM_BOOL, 'Bool if icon is image'),
                         'timemodified' => new \external_value(PARAM_TEXT, 'Readable time'),
                         'timeuploaded' => new \external_value(PARAM_TEXT, 'Uploaded time'),
                         'timeuploadedts' => new \external_value(PARAM_INT, 'Uploaded timestamp'),
@@ -115,22 +115,25 @@ class get_file extends \external_api {
                         'ignore' => new \external_value(PARAM_BOOL, 'File ignored'),
                         'deleted' => new \external_value(PARAM_BOOL,
                                 'File deleted, orphaned metadata'),
-                        'modules' => new \external_multiple_structure(
+                        'information' => new \external_multiple_structure(
                                 new \external_single_structure(
                                         [
-                                                'moduleurl' => new \external_value(PARAM_URL,
-                                                        'Url to moodle activity'),
-                                                'modulename' => new \external_value(PARAM_TEXT,
-                                                        'Name of course module'),
-                                        ]
-                                )),
-                        'sections' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
-                                                'sectionnum' => new \external_value(PARAM_INT,
-                                                        'Number of section in course'),
-                                                'sectionname' => new \external_value(PARAM_TEXT,
-                                                        'Name of section in course'),
+                                                'area' => new \external_value(PARAM_TEXT,
+                                                        'Area of the information'),
+                                                'fields' => new \external_multiple_structure(
+                                                        new \external_single_structure(
+                                                                [
+                                                                        'infoname' => new \external_value(PARAM_TEXT,
+                                                                                'Name of information'),
+                                                                        'infourl' => new \external_value(PARAM_URL,
+                                                                                'Url to information'),
+                                                                        'infohasurl' => new \external_value(PARAM_BOOL,
+                                                                                'Boolean if url is available'),
+                                                                        'last' => new \external_value(PARAM_BOOL,
+                                                                                'Last element in array, ' .
+                                                                                'relevant for comma in mustache'),
+                                                                ]
+                                                        )),
                                         ]
                                 )),
                         'requirementsmet' => new \external_value(PARAM_BOOL,
@@ -152,6 +155,14 @@ class get_file extends \external_api {
                         'writable' => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                         'coursetofile' => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
                         'wwwroot' => new \external_value(PARAM_URL, 'wwwroot of moodle'),
+                        'origins' => new \external_multiple_structure(
+                                new \external_single_structure(
+                                        [
+                                                'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of element'),
+                                                'originname' => new \external_value(PARAM_TEXT, 'Language string of origin'),
+                                        ]
+                                )
+                        ),
                 ]);
     }
 }

@@ -25,6 +25,8 @@
 
 namespace local_oer;
 
+use local_oer\modules\element;
+
 /**
  * Class message
  */
@@ -34,14 +36,14 @@ class message {
      * This can only happen when the settings for required fields is changed by an administrator.
      *
      * @param \stdClass $user Moodle user object
-     * @param array $files file records from local_oer_files table
+     * @param array $elements array of element titles
      * @param int $courseid Moodle courseid
      * @return void
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public static function send_requirementschanged(\stdClass $user, array $files, int $courseid) {
+    public static function send_requirementschanged(\stdClass $user, array $elements, int $courseid) {
         $course = get_course($courseid);
         $message = new \core\message\message();
         $message->component = 'local_oer';
@@ -54,8 +56,8 @@ class message {
         $fullmessage = '<p>' . get_string('requirementschanged_body', 'local_oer',
                         ['url' => $courseurl->out(), 'course' => $course->fullname]);
         $filelisthtml = '';
-        foreach ($files as $file) {
-            $filelisthtml .= '* ' . $file->title . '<br>';
+        foreach ($elements as $title) {
+            $filelisthtml .= '* ' . $title . '<br>';
         }
         $fullmessage .= $filelisthtml . '</p>';
         $message->fullmessage = $fullmessage;

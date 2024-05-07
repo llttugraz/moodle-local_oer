@@ -19,216 +19,188 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017-2022 Educational Technologies, Graz, University of Technology
+ * @copyright  2017-2023 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_oer;
 
 use local_oer\helper\filestate;
-use local_oer\helper\requirements;
+use local_oer\modules\element;
+use local_oer\modules\elements;
+use local_oer\plugininfo\oermod;
 
 /**
  * Class filelist
  *
- * TODO: I think this class should be refactored. Why is there a constructor which loads the filelist into a member.
- * But also all other methods are static? The methods are too complicated and should be broken down.
+ * Get a list of all elements of a course.
+ * TODO: As the plugin has been extended the name filelist is not accurate anymore.
  */
 class filelist {
     /**
-     * @var array
-     */
-    private $coursefiles = null;
-
-    /**
-     * Constructor
-     *
-     * @param int $courseid
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     */
-    public function __construct($courseid) {
-        $this->coursefiles = self::get_course_files($courseid);
-    }
-
-    /**
-     * Get course files
-     *
-     * @return array
-     */
-    public function get_files() {
-        return $this->coursefiles;
-    }
-
-    /**
      * Load all files from moodle course modules and return all files and modules.
      *
-     * At the moment only mod_folder and mod_resource are supported.
-     * Most of the other modules will probably work out of the box when added, but this has not been tested.
-     * For future updates this part should be extracted to subplugins. So it would be easier to also support 3rd party plugins.
-     *
      * @param int $courseid Moodle courseid
-     * @return array
+     * @return elements
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public static function get_course_files(int $courseid): array {
-        $mod = get_fast_modinfo($courseid);
-        $coursefiles = [];
-
-        $fs = get_file_storage();
-
-        foreach ($mod->cms as $cm) {
-            $skip = false;
-            switch ($cm->modname) {
-                case 'folder':
-                    $component = 'mod_folder';
-                    $area = 'content';
-                    break;
-                case 'resource':
-                    $component = 'mod_resource';
-                    $area = 'content';
-                    break;
-                default:
-                    $component = '';
-                    $area = '';
-                    $skip = true;
-            }
-            if ($skip) {
-                continue;
-            }
-            $files = $fs->get_area_files($cm->context->id, $component, $area, false, 'id ASC', false);
-
-            foreach ($files as $file) {
-                [$state, $editor, $courses, $writable] = filestate::calculate_file_state($file->get_contenthash(), $courseid);
-                $coursefiles[$file->get_contenthash()][] = [
-                        'file' => $file,
-                        'module' => $cm,
-                        'state' => $state,
-                        'editor' => $editor,
-                        'courses' => $courses,
-                        'writable' => $writable,
-                ];
-            }
+    public static function get_course_files(int $courseid): elements {
+        global $DB;
+        // Step 1: gather all elements from subplugins.
+        $plugins = oermod::get_enabled_plugins();
+        $elements = new elements();
+        foreach (array_keys($plugins) as $pluginname) {
+            $elements->merge_elements(oermod::load_elements($pluginname, $courseid));
         }
 
-        return $coursefiles;
+        // Step 2: add stored metadata based on editor course and state for usage in multiple courses.
+        // The information shown is the same in all courses where the file is used.
+        $records = $DB->get_records('local_oer_elements');
+        $storedelements = [];
+        foreach ($records as $record) {
+            $storedelements[$record->identifier] = $record;
+        }
+
+        $visited = [];
+        foreach ($elements as $key => $element) {
+            if (isset($visited[$element->get_identifier()])) {
+                // This element is multiple times in this course, only show it once.
+                $primary = $elements->get_element_by_key($visited[$element->get_identifier()]);
+                foreach ($element->get_origin() as $origin => $languagestring) {
+                    $primary->set_origin($origin, $languagestring[0], $languagestring[1]);
+                }
+                $primary->merge_information($element->get_information());
+                if ($primary->get_type() == element::OERTYPE_MOODLEFILE && !empty($element->get_storedfiles())) {
+                    $primary->set_storedfile($element->get_storedfiles()[0]);
+                }
+                $elements->remove_element($elements->key());
+                continue;
+            }
+            filestate::calculate_state($element, $courseid);
+            if (isset($storedelements[$element->get_identifier()])) {
+                $element->set_stored_metadata($storedelements[$element->get_identifier()]);
+            }
+            $visited[$element->get_identifier()] = $key;
+        }
+
+        return $elements;
     }
 
     /**
      * Load a single file and the module it is added.
      *
      * @param int $courseid Moodle courseid
-     * @param string $contenthash File contenthash
-     * @return array|null
+     * @param string $identifier Element identifier
+     * @return element|null
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public static function get_single_file(int $courseid, string $contenthash): ?array {
-        $files = self::get_course_files($courseid);
-        return $files[$contenthash] ?? null;
+    public static function get_single_file(int $courseid, string $identifier): ?element {
+        $elements = self::get_course_files($courseid);
+        return $elements->find_element('identifier', $identifier) ?? null;
     }
 
     /**
      * Loads a list of all files and their metadata for the frontend.
      *
      * @param int $courseid Moodle courseid
-     * @param string $contenthash File contenthash (optional if only one file should be loaded)
+     * @param string $identifier Element identifier (optional if only one file should be loaded)
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public static function get_simple_filelist(int $courseid, string $contenthash = ''): array {
+    public static function get_simple_filelist(int $courseid, string $identifier = ''): array {
         global $DB, $CFG;
         $overwritemetadata = get_config('local_oer', 'coursetofile');
-        [$icons, $typegroup, $renderer] = self::prepare_file_icon_renderer($courseid);
-        $files = self::get_course_files($courseid);
+        [$icons, $renderer] = icon::prepare_file_icon_renderer($courseid);
+        $elements = self::get_course_files($courseid);
         $list = [];
-        $sections = [];
-        $nothumbnail = count($files) > 20;
+        $originfilter = [];
 
-        foreach ($files as $file) {
-            if (!empty($contenthash) && $file[0]['file']->get_contenthash() != $contenthash) {
+        foreach ($elements as $element) {
+            if (!empty($identifier) && $element->get_identifier() != $identifier) {
                 continue;
             }
 
-            $filesections = [];
-            $modules = [];
+            $info = [];
+            $inforesult = [];
 
-            foreach ($file as $key => $duplicate) {
-                $section = [
-                        'sectionnum' => $duplicate['module']->sectionnum,
-                        'sectionname' => get_section_name($courseid, $duplicate['module']->sectionnum),
-                ];
-                $filesections[] = $section;
-                $sections[$section['sectionnum']] = $section;
-                $modules[] = [
-                        'moduleurl' => !is_null($duplicate['module']->url) ? $duplicate['module']->url->out() : '#',
-                        'modulename' => $duplicate['module']->name ?? 'Module not found',
+            foreach ($element->get_information() as $information) {
+                $info[$information->get_area()][] = [
+                        'infoname' => $information->get_name(),
+                        'infourl' => $information->get_url() ?? '',
+                        'infohasurl' => $information->get_hasurl(),
+                        'last' => false,
                 ];
             }
-            [$icon, $icontype, $iconisimage] = self::select_file_icon_or_thumbnail($file[0]['file'], $renderer, $icons,
-                    $typegroup, $nothumbnail);
+            foreach ($info as $key => $information) {
+                // No dynamic keys for webservice.
+                $inforesult[] = [
+                        'area' => $key,
+                        'fields' => $information,
+                ];
+            }
+            foreach ($inforesult as $key => $info) {
+                $last = array_key_last($info['fields']);
+                $inforesult[$key]['fields'][$last]['last'] = true;
+            }
+
+            $icon = icon::select_file_icon($element->get_mimetype(), $renderer, $icons);
             $preference = $DB->get_record('local_oer_preference', ['courseid' => $courseid]);
-            $entry = [
-                    'id' => 0, // Record does not exist yet.
-                    'contenthash' => $file[0]['file']->get_contenthash(),
-                    'title' => $file[0]['file']->get_filename(),
-                    'mimetype' => $file[0]['file']->get_mimetype(),
-                    'icon' => $icon,
-                    'icontype' => $icontype,
-                    'iconisimage' => $iconisimage,
-                    'timemodified' => '-',
-                    'timeuploaded' => '-',
-                    'timeuploadedts' => 0,
-                    'upload' => 0,
-                    'ignore' => $preference && $preference->state == 2 ? 1 : 0,
-                    'deleted' => 0,
-                    'modules' => $modules,
-                    'sections' => $filesections,
-                    'requirementsmet' => false,
-                    'state' => $file[0]['state'],
-                    'multiple' => count($file[0]['courses']) > 1,
-                    'editor' => $file[0]['editor'],
-                    'courses' => $file[0]['courses'],
-                    'writable' => $file[0]['writable'],
-                    'coursetofile' => $overwritemetadata == 1 && $file[0]['editor'] == $courseid,
-                    'wwwroot' => $CFG->wwwroot, // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
-            ];
-            // First, test if a file entry exist. Overwrite basic fields with file entries.
-            // Search for the editor course, as the information shown is the same in all courses where the file is used.
-            if ($DB->record_exists('local_oer_files',
-                    ['courseid' => $entry['editor'], 'contenthash' => $file[0]['file']->get_contenthash()])) {
-                $record = $DB->get_record('local_oer_files',
-                        [
-                                'courseid' => $entry['editor'],
-                                'contenthash' => $file[0]['file']->get_contenthash(),
-                        ]);
-                [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($record);
-                $timestamps = $DB->get_records('local_oer_snapshot', [
-                        'courseid' => $courseid, 'contenthash' => $file[0]['file']->get_contenthash(),
-                ],
-                        'timecreated DESC', 'id,timecreated', 0, 1);
-                $snapshot = new \stdClass();
-                $snapshot->release = empty($timestamps) ? 0 : reset($timestamps)->timecreated;
-                $entry['id'] = $record->id;
-                $entry['title'] = $record->title;
-                $entry['timemodified'] = $record->timemodified > 0 ? userdate($record->timemodified) : '-';
-                $entry['timeuploaded'] = (!is_null($snapshot->release) && $snapshot->release > 0)
-                        ? userdate($snapshot->release) : '-';
-                $entry['timeuploadedts'] = $snapshot->release;
-                $entry['upload'] = $record->state == 1 ? 1 : 0;
-                $entry['ignore'] = $record->state == 2 ? 1 : 0;
-                $entry['requirementsmet'] = $releasable;
+            $ignore = $preference && $preference->state == 2 ? 1 : 0;
+            $decomposed = identifier::decompose($element->get_identifier());
+            $metadata = $element->get_stored_metadata();
+            $originlist = [];
+            foreach ($element->get_origin() as $origin => $languagestring) {
+                $name = get_string($languagestring[0], $languagestring[1]);
+                $originlist[] = [
+                        'origin' => $origin,
+                        'originname' => $name,
+                ];
+                $originfilter[$origin] = $name;
             }
-            if (!empty($contenthash) && $file[0]['file']->get_contenthash() == $contenthash) {
+            $entry = [
+                    'id' => $metadata->id ?? 0,
+                    'contenthash' => $decomposed->valuetype == 'contenthash' ? $decomposed->value : '',
+                    'identifier' => htmlentities($element->get_identifier()),
+                    'idhash' => hash('SHA1', $element->get_identifier()),
+                    'title' => $element->get_title(),
+                    'mimetype' => $element->get_mimetype(),
+                    'icon' => $icon,
+                    'timemodified' => $metadata->timemodified ?? '-',
+                    'timeuploaded' => $metadata->timereleased ?? '-',
+                    'timeuploadedts' => $metadata->timereleasedts ?? 0,
+                    'upload' => $metadata->upload ?? 0,
+                    'ignore' => $metadata->ignore ?? $ignore,
+                    'deleted' => 0,
+                    'information' => $inforesult,
+                    'requirementsmet' => $metadata->requirementsmet ?? false,
+                    'state' => $element->get_elementstate()->state,
+                    'multiple' => count($element->get_elementstate()->courses) > 1,
+                    'editor' => $element->get_elementstate()->editorid,
+                    'courses' => $element->get_elementstate()->courses,
+                    'writable' => $element->get_elementstate()->writable,
+                    'coursetofile' => $overwritemetadata == 1 && $element->get_elementstate()->editor == $courseid,
+                    'wwwroot' => $CFG->wwwroot, // Add wwwroot, global.config.wwwroot in mustache does not add subfolders.
+                    'origins' => $originlist,
+            ];
+
+            if (!empty($identifier) && $element->get_identifier() == $identifier) {
                 return $entry;
             }
             $list[] = $entry;
         }
-        // TODO: orphaned metadata is missing and has to be added..
-        return [$list, $sections];
+        // MDL-0 TODO: orphaned metadata is missing and has to be added..
+        $originresult = [];
+        foreach ($originfilter as $key => $entry) {
+            $originresult[] = [
+                    'origin' => $key,
+                    'originname' => $entry,
+            ];
+        }
+        return [$list, $originresult];
     }
 
     /**
@@ -236,70 +208,13 @@ class filelist {
      * This is a wrapper that calls get_simple_filelist with the optional contenthash parameter.
      *
      * @param int $courseid Moodle courseid
-     * @param string $contenthash File contenthash
+     * @param string $identifier Element identifier
      * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public static function get_simple_file(int $courseid, string $contenthash) {
-        return self::get_simple_filelist($courseid, $contenthash);
-    }
-
-    /**
-     * Find the correct file icon.
-     * This method uses the icons the moodle filetype page has defined.
-     *
-     * @param int $courseid Moodle courseid
-     * @return array
-     */
-    private static function prepare_file_icon_renderer(int $courseid): array {
-        global $CFG, $PAGE;
-        require_once($CFG->libdir . '/filelib.php');
-        $context = \context_course::instance($courseid);
-        $PAGE->set_context($context);
-        $types = \get_mimetypes_array();
-        $icons = [];
-        $typegroup = [];
-        foreach ($types as $type) {
-            if (isset($type['icon'])) {
-                $icons[$type['type']] = $type['icon'];
-            }
-            if (isset($type['string'])) {
-                $typegroup[$type['type']] = $type['string'];
-            }
-        }
-        $renderer = new \core_renderer($PAGE, 'course');
-        return [$icons, $typegroup, $renderer];
-    }
-
-    /**
-     * When the file is an image, a thumbnail is created.
-     * When the file is not an image, the file icon is loaded instead.
-     *
-     * @param \stored_file $file
-     * @param \core_renderer $renderer
-     * @param array $icons
-     * @param array $typegroup
-     * @param bool $nothumbnail
-     * @return array
-     */
-    private static function select_file_icon_or_thumbnail(\stored_file $file, \core_renderer $renderer, array $icons,
-            array $typegroup, bool $nothumbnail) {
-        $mimetype = $file->get_mimetype();
-        if (isset($typegroup[$mimetype]) && $typegroup[$mimetype] == 'image' && !$nothumbnail) {
-            $icon = $file->generate_image_thumbnail(60, 60);
-            $icontype = strpos($icon, "�PNG\r\n") === 0 ? 'png' : 'jpeg';
-            $iconisimage = true;
-            $icon = base64_encode($icon);
-        } else {
-            $fullicon = $renderer->pix_icon('f/' . $icons[$mimetype], '');
-            $icontype = 'icon';
-            $iconisimage = false;
-            $iconpart = explode('src="', $fullicon);
-            $iconurl = explode('"', $iconpart[1]);
-            $icon = $iconurl[0];
-        }
-        return [$icon, $icontype, $iconisimage];
+    public static function get_simple_file(int $courseid, string $identifier): array {
+        return self::get_simple_filelist($courseid, $identifier);
     }
 }

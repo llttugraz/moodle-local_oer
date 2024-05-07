@@ -32,7 +32,7 @@ use local_oer\metadata\courseinfo_sync;
  *
  * @coversDefaultClass \local_oer\metadata\courseinfo_sync
  */
-class courseinfo_sync_test extends \advanced_testcase {
+final class courseinfo_sync_test extends \advanced_testcase {
     /**
      * A stdClass that can be inserted in courseinfo table for testing purposes.
      *
@@ -79,7 +79,7 @@ class courseinfo_sync_test extends \advanced_testcase {
      * @covers \local_oer\metadata\courseinfo_sync::sync_course
      * @covers \local_oer\metadata\courseinfo_sync::compare_course
      */
-    public function test_sync_course() {
+    public function test_sync_course(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -158,7 +158,7 @@ class courseinfo_sync_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\metadata\courseinfo_sync::compare_customfields
      */
-    public function test_compare_customfields() {
+    public function test_compare_customfields(): void {
         $this->resetAfterTest();
         $sync = new courseinfo_sync();
         [$fields, $update] = $sync->compare_customfields(null, null);

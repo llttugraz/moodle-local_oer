@@ -39,14 +39,14 @@ use local_oer\userlist\userlist;
  *
  * @coversDefaultClass \local_oer\privacy\provider
  */
-class privacy_provider_test extends provider_testcase {
+final class privacy_provider_test extends provider_testcase {
     /**
      * Test get metadata function.
      *
      * @return void
      * @covers ::get_metadata
      */
-    public function test_get_metadata() {
+    public function test_get_metadata(): void {
         $this->resetAfterTest();
         $collection = new collection('local_oer');
         $collection = provider::get_metadata($collection);
@@ -79,7 +79,7 @@ class privacy_provider_test extends provider_testcase {
      * @throws \dml_exception
      * @covers ::get_contexts_for_userid
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->assertEmpty(provider::get_contexts_for_userid($user->id));
@@ -101,7 +101,7 @@ class privacy_provider_test extends provider_testcase {
      * @throws \dml_exception
      * @covers ::export_user_data
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -127,7 +127,7 @@ class privacy_provider_test extends provider_testcase {
      * @throws \dml_exception
      * @covers ::delete_data_for_all_users_in_context
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void {
         $this->resetAfterTest();
         global $DB;
 
@@ -152,7 +152,7 @@ class privacy_provider_test extends provider_testcase {
      * @throws \dml_exception
      * @covers ::delete_data_for_user
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void {
         $this->resetAfterTest();
         global $DB;
 
@@ -181,7 +181,7 @@ class privacy_provider_test extends provider_testcase {
      * @throws \dml_exception
      * @covers ::get_users_in_context
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
         $this->resetAfterTest();
 
         $component = 'local_oer';
@@ -216,7 +216,7 @@ class privacy_provider_test extends provider_testcase {
      * @covers ::delete_data_for_users
      * @covers ::delete_user_data
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void {
         $this->resetAfterTest();
 
         $component = 'local_oer';

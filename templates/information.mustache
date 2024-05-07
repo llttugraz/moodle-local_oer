@@ -1,0 +1,66 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_oer/tags
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * Various data about mappings
+
+    Example context (json):
+    {
+        "information": [
+            {
+                "area": "mod_resource",
+                "fields": [
+                    {
+                        "infourl": "example",
+                        "infoname": "https://example.com",
+                        "infohasurl": true
+                    }
+                ]
+            }
+        ]
+    }
+  }}
+
+<ul class="list-group">
+    {{#information}}
+        <li class="list-group-item border-0 p-0">
+            <small>{{area}}:
+                {{#fields}}
+                    {{#infohasurl}}
+                        <a href="{{infourl}}" target="_blank">{{{infoname}}}</a>{{^last}},{{/last}}
+                    {{/infohasurl}}
+                    {{^infohasurl}}
+                        {{{infoname}}}{{^last}}, {{/last}}
+                    {{/infohasurl}}
+                {{/fields}}
+            </small>
+        </li>
+    {{/information}}
+    {{^information}}
+        <li class="list-group-item border-0 p-0">
+            {{#str}} noinfo, local_oer {{/str}}
+        </li>
+    {{/information}}
+</ul>

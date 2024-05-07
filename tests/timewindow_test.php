@@ -32,7 +32,7 @@ use local_oer\time\time_settings;
  *
  * @coversDefaultClass \local_oer\time\time_settings
  */
-class timewindow_test extends \advanced_testcase {
+final class timewindow_test extends \advanced_testcase {
     /**
      * Test daily release
      *
@@ -40,7 +40,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::set_next_upload_window
      */
-    public function test_daily_upload() {
+    public function test_daily_upload(): void {
         $this->resetAfterTest(true);
         $time = '13:00';
         set_config(time_settings::CONF_RELEASETIME, time_settings::DAY, 'local_oer');
@@ -59,7 +59,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::set_next_upload_window
      */
-    public function test_weekly_upload() {
+    public function test_weekly_upload(): void {
         $this->resetAfterTest(true);
         $time = '11:00';
         set_config(time_settings::CONF_RELEASETIME, time_settings::WEEK, 'local_oer');
@@ -78,7 +78,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::set_next_upload_window
      */
-    public function test_monthly_upload() {
+    public function test_monthly_upload(): void {
         $this->resetAfterTest(true);
         $time = '00:00';
         set_config(time_settings::CONF_RELEASETIME, time_settings::MONTH, 'local_oer');
@@ -97,7 +97,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \dml_exception
      * @covers ::set_next_upload_window
      */
-    public function test_custom_upload() {
+    public function test_custom_upload(): void {
         $this->resetAfterTest(true);
         $time1 = '23:59';
         $time2 = '00:00';
@@ -133,7 +133,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers ::format_difference
      */
-    public function test_format_difference() {
+    public function test_format_difference(): void {
         $this->resetAfterTest(true);
         $now = new \DateTime('now');
         $week = clone $now;
@@ -152,7 +152,7 @@ class timewindow_test extends \advanced_testcase {
      * @throws \moodle_exception
      * @covers ::get_timeslot_output
      */
-    public function test_get_timeslot_output() {
+    public function test_get_timeslot_output(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         require_once(__DIR__ . '/helper/testcourse.php');

@@ -26,13 +26,14 @@
 namespace local_oer;
 
 use local_oer\helper\license;
+use local_oer\plugininfo\oermod;
 
 /**
  * Class license_test
  *
  * @coversDefaultClass \local_oer\helper\license
  */
-class license_test extends \advanced_testcase {
+final class license_test extends \advanced_testcase {
     /**
      * Test license cc check.
      *
@@ -43,7 +44,7 @@ class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::test_license_correct_for_upload
      */
-    public function test_test_license_correct_for_upload() {
+    public function test_test_license_correct_for_upload(): void {
         $this->resetAfterTest();
         $this->assertFalse(license::test_license_correct_for_upload('doesnotexist'));
         $this->assertFalse(license::test_license_correct_for_upload('allrightsreserved'));
@@ -61,7 +62,7 @@ class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::get_license_fullname
      */
-    public function test_get_license_fullname() {
+    public function test_get_license_fullname(): void {
         $this->resetAfterTest();
         $this->assertEquals('Creative Commons - NonCommercial-NoDerivatives 4.0 International',
                 license::get_license_fullname('cc-nc-nd-4.0'),
@@ -75,7 +76,7 @@ class license_test extends \advanced_testcase {
      * @return void
      * @covers \local_oer\helper\license::get_license_by_shortname
      */
-    public function test_get_license_by_shortname() {
+    public function test_get_license_by_shortname(): void {
         $this->resetAfterTest();
         $this->assertIsObject(license::get_license_by_shortname('allrightsreserved'));
         $this->assertNull(license::get_license_by_shortname('doesnotexist'));
@@ -88,14 +89,21 @@ class license_test extends \advanced_testcase {
      * @throws \coding_exception
      * @covers \local_oer\helper\license::get_licenses_select_data
      */
-    public function test_get_license_select_data() {
+    public function test_get_license_select_data(): void {
         $this->resetAfterTest();
-        $list = license::get_licenses_select_data(false);
+        global $CFG;
+        require_once($CFG->libdir . '/licenselib.php');
+        $licences = \license_manager::get_active_licenses_as_array();
+        $supported = [];
+        foreach ($licences as $key => $licence) {
+            $supported[] = $key;
+        }
+        $list = license::get_licenses_select_data(false, $supported);
         $this->assertCount(9, $list, 'Test with the moodle default licenses');
         $this->assertArrayHasKey('cc-4.0', $list, '2023-11-02 Updated because of license change');
         $this->assertArrayHasKey('public', $list);
         $this->assertArrayHasKey('unknown', $list);
-        $list = license::get_licenses_select_data(true);
+        $list = license::get_licenses_select_data(true, $supported);
         $this->assertCount(10, $list, 'Test with the moodle default licenses');
         $this->assertArrayHasKey('nopref', $list);
         $this->assertArrayHasKey('cc-nc-4.0', $list, '2023-11-02 Updated because of license change');
