@@ -205,3 +205,6 @@ moodle-oermod_folder (bundled with local_oer)
 [moodle-oerclassifcation_oefos](https://github.com/llttugraz/moodle-oerclassification_oefos)  
 [moodle-oeruploader_tugraz](https://github.com/llttugraz/moodle-oeruploader_tugraz)
 
+# Accessibility Status
+
+![Accessibility Status](pix/accessibility.png)
