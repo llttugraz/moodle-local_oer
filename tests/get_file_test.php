@@ -64,6 +64,7 @@ final class get_file_test extends \advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         require_once(__DIR__ . '/helper/testcourse.php');
         global $CFG;

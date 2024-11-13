@@ -48,6 +48,7 @@ final class coursecustomfield_test extends \advanced_testcase {
      * @throws \coding_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $this->data['course1'] = $course;

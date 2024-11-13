@@ -39,6 +39,7 @@ final class filelist_test extends \advanced_testcase {
     private $data = [];
 
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
         require_once(__DIR__ . '/helper/testcourse.php');
