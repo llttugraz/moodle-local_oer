@@ -10,7 +10,14 @@ Since the version v2.3.0 subplugins for loading the OER resources are necessary,
 
 # Requirements
 
-* [Moodle 4.1+](https://download.moodle.org/releases/latest/)
+- Supported Moodle Version: 4.1 - 4.5
+- Supported PHP Version:    7.4 - 8.3
+- Supported Databases:      MariaDB, PostgreSQL
+- Supported Moodle Themes:  Boost
+
+This plugin has only been tested under the above system requirements against the specified versions.
+However, it may work under other system requirements and versions as well.
+
 
 # Setup
 
@@ -200,11 +207,40 @@ this pull service, but via upload, an additional plugin can be defined which ena
 
 moodle-oermod_resource (bundled with local_oer)  
 moodle-oermod_folder (bundled with local_oer)  
-[moodle-oermod_opencast](https://github.com/llttugraz/moodle-oermod_opencast)
+[moodle-oermod_opencast](https://github.com/llttugraz/moodle-oermod_opencast)  
 [moodle-oercourseinfo_tugraz](https://github.com/llttugraz/moodle-oercourseinfo_tugraz)  
 [moodle-oerclassifcation_oefos](https://github.com/llttugraz/moodle-oerclassification_oefos)  
 [moodle-oeruploader_tugraz](https://github.com/llttugraz/moodle-oeruploader_tugraz)
 
 # Accessibility Status
 
+In accordance with the [Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/TR/WCAG21/), the following four principles must be fulfilled / taken into account in order to achieve accessibility in our products / services.
+
+| Principle | Description |
+|-----------|-------------|
+| Perceivable    | Information and user interface components must be presentable to users in ways they can perceive.|
+| Operable       | User interface components and navigation must be operable.|
+| Understandable | Information and the operation of the user interface must be understandable.|
+| Robust         | Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.|
+
+The diagram below shows the extent to which this plugin complies with these principles.
+
 ![Accessibility Status](pix/accessibility.png)
+
+## Privacy
+
+The following personal data are stored:
+
+| name         | description                                                      |
+|-------------|-------------------------------------------------------------------|
+' userid      | The ID of the user who is in the list of using OER metadata tools |
+| timecreated | Time when clearance was set                                       |
+| type        | Type of clearance                                                 |
+
+## License
+
+This plugin is licensed under the [GNU GPL v3](https://github.com/llttugraz/moodle-local_lytix?tab=GPL-3.0-1-ov-file).
+
+## Contributors
+
+- **Ortner, Christian** - Developer - [GitHub](https://github.com/chriso123)
