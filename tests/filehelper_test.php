@@ -28,6 +28,7 @@ namespace local_oer;
 defined('MOODLE_INTERNAL') || die();
 
 use local_oer\helper\filehelper;
+use function Sodium\version_string;
 
 require_once(__DIR__ . '/helper/testcourse.php');
 
@@ -78,6 +79,7 @@ final class filehelper_test extends \advanced_testcase {
      * @covers \local_oer\helper\filehelper::get_file_url
      */
     public function test_get_file_url(): void {
+        global $CFG;
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -85,7 +87,11 @@ final class filehelper_test extends \advanced_testcase {
         [, $file] = $testcourse->generate_file('unittest');
         $url = filehelper::get_file_url($file);
         $this->assertIsObject($url);
-        $this->assertEquals('moodle_url', get_class($url));
+        if ($CFG->version < 2024100700) {
+            $this->assertEquals('moodle_url', get_class($url));
+        } else {
+            $this->assertEquals('core\url', get_class($url));
+        }
 
         $urlstring = filehelper::get_file_url($file, true);
         $this->assertIsString($urlstring);
