@@ -31,3 +31,4 @@ $plugin->component = 'local_oer';
 $plugin->release = 'v2.3.0';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [];
+$plugin->supported    = [401, 405];
