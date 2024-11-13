@@ -21,12 +21,16 @@
     <testsuites>
         <testsuite name="local_oer_testsuite">
             <directory suffix="_test.php">tests</directory>
+            <directory suffix="_test.php">modules/resource/tests</directory>
+            <directory suffix="_test.php">modules/folder/tests</directory>
         </testsuite>
     </testsuites>
 
     <coverage>
         <include>
             <directory suffix=".php">classes</directory>
+            <directory suffix=".php">modules/resource/classes</directory>
+            <directory suffix=".php">modules/folder/classes</directory>
         </include>
         <exclude>
             <file>classes/metadata/external_metadata.php</file>
