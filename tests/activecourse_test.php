@@ -54,6 +54,7 @@ final class activecourse_test extends \advanced_testcase {
      * @throws \coding_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
 
         $number = 30;

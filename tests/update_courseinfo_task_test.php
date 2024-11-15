@@ -39,6 +39,7 @@ final class update_courseinfo_task_test extends \advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         require_once(__DIR__ . '/helper/testcourse.php');
     }

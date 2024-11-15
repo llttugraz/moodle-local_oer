@@ -398,9 +398,13 @@ $string['structure'] = 'Structure';
 $string['structure_help'] = 'What is the mode of the course? e.g. lecture, exercise, laboratory ...';
 $string['subpluginsheading'] = 'List of installed subplugins';
 $string['subplugintype_oerclassification'] = 'OER additional classifications';
+$string['subplugintype_oerclassification_plural'] = 'OER classifications';
 $string['subplugintype_oercourseinfo'] = 'OER Additional course information';
+$string['subplugintype_oercourseinfo_plural'] = 'OER courseinfos';
 $string['subplugintype_oermod'] = 'OER data source modules';
+$string['subplugintype_oermod_plural'] = 'OER data source modules';
 $string['subplugintype_oeruploader'] = 'OER Upload released files';
+$string['subplugintype_oeruploader_plural'] = ' Upload released files';
 $string['tags'] = 'Tags';
 $string['tags_help'] = '<p>Additional tags to classify the file.</p>' .
         '<p>Enter the tag and confirm with <strong>Enter</strong>.</p>' .

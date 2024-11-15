@@ -15,20 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Open Educational Resources Plugin
+ * Graz University of Technology specific subplugin for Open Educational Resources Plugin.
  *
- * @package    local_oer
- * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @package    oermod_folder
+ * @author     Gerhard Unger <gerhard.unger@tugraz.at>
+ * @copyright  2024 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace oermod_folder;
 
-$plugin->version = 2024032600;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.3.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
-$plugin->supported    = [401, 405];
+use oermod_folder\privacy\provider;
+
+/**
+ * Class provider_test
+ *
+ * @coversDefaultClass \oermod_folder\privacy\provider
+ */
+final class provider_test extends \advanced_testcase {
+    /**
+     * Test string of language identifier.
+     *
+     * @return void
+     * @covers ::get_reason
+     */
+    public function test_get_reason(): void {
+        $this->resetAfterTest();
+        $this->assertEquals('privacy:metadata', provider::get_reason());
+    }
+}

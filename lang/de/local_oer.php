@@ -428,6 +428,10 @@ $string['state'] = 'Status der Datei';
 $string['structure'] = 'Struktur';
 $string['structure_help'] = 'Was ist der Modus des Kurses? zB. Vorlesung, Übung, Labor ...';
 $string['subpluginsheading'] = 'Liste der installierten Sub-Plugins';
+$string['subplugintype_oerclassification_plural'] = 'OER classifications';
+$string['subplugintype_oercourseinfo_plural'] = 'OER courseinfos';
+$string['subplugintype_oermod_plural'] = 'OER data source modules';
+$string['subplugintype_oeruploader_plural'] = ' Upload released files';
 $string['tags'] = 'Schlagwörter';
 $string['tags_help'] = '<p>Zusätzliche Schlagwörter zur Klassifizierung der Datei.</p>' .
         '<p>Geben Sie ein Schlagwort ein und bestätigen Sie mit ' .

@@ -40,6 +40,7 @@ final class elements_test extends \advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
     }
 

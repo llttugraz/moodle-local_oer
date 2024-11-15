@@ -38,7 +38,6 @@ class testcourse {
     /**
      * Generate a course with resource modules and files.
      *
-     * TODO: add folder modules.
      *
      * @param \testing_data_generator $generator Object for generating testdata
      * @return \stdClass
@@ -50,6 +49,19 @@ class testcourse {
         $this->generate_resource($course, $generator);
         $this->generate_resource($course, $generator);
         $this->generate_resource($course, $generator);
+        return $course;
+    }
+
+    /**
+     * Generate a course with folder module.
+     *
+     *
+     * @param \testing_data_generator $generator Object for generating testdata
+     * @return \stdClass
+     */
+    public function generate_testcourse_with_folder(\testing_data_generator $generator) {
+        $course = $generator->create_course();
+        $this->generate_folder($course, $generator);
         return $course;
     }
 
@@ -251,6 +263,29 @@ class testcourse {
         $record->files = $draftid;
         return $generator->create_module('resource', $record);
     }
+
+    /**
+     * Generate a folder in given course.
+     *
+     * @param \stdClass $course
+     * @param \testing_data_generator $generator
+     * @param string $filename If empty, random filename is generated
+     * @param int|null $draftid If null, moodle is asked for unused draft id
+     * @param string $content If empty, random bytes are written
+     * @return \stdClass
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
+     */
+    public function generate_folder(\stdClass $course, \testing_data_generator $generator, string $filename = '',
+            ?int $draftid = null, string $content = '') {
+        $record = new \stdClass();
+        $record->course = $course;
+
+        [$draftid, $file] = $this->generate_file($filename, $draftid, $content);
+        $record->files = $draftid;
+        return $generator->create_module('folder', $record);
+    }
+
 
     /**
      * Generate a file with moodle file_storage.

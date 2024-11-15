@@ -75,6 +75,7 @@ final class release_test extends \advanced_testcase {
      * @throws \dml_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->prepare_releases_in_snapshot_table();
     }

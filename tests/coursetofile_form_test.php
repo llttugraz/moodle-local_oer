@@ -61,6 +61,7 @@ final class coursetofile_form_test extends \advanced_testcase {
      * @throws \stored_file_creation_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
 

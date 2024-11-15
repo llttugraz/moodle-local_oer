@@ -46,6 +46,7 @@ final class courseinfo_test extends \advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $this->courseid = $course->id;

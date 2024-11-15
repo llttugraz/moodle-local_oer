@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="../../lib/phpunit/phpunit.xsd"
-        bootstrap="../../lib/phpunit/bootstrap.php"
+        xsi:noNamespaceSchemaLocation="../../../../lib/phpunit/phpunit.xsd"
+        bootstrap="../../../../lib/phpunit/bootstrap.php"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
@@ -17,27 +17,15 @@
         beStrictAboutTestsThatDoNotTestAnything="false"
         beStrictAboutOutputDuringTests="true"
 >
-
     <testsuites>
-        <testsuite name="local_oer_testsuite">
+        <testsuite name="oermod_folder">
             <directory suffix="_test.php">tests</directory>
-            <directory suffix="_test.php">modules/resource/tests</directory>
-            <directory suffix="_test.php">modules/folder/tests</directory>
         </testsuite>
     </testsuites>
 
     <coverage>
         <include>
             <directory suffix=".php">classes</directory>
-            <directory suffix=".php">modules/resource/classes</directory>
-            <directory suffix=".php">modules/folder/classes</directory>
         </include>
-        <exclude>
-            <file>classes/metadata/external_metadata.php</file>
-            <file>classes/classification.php</file>
-            <file>classes/plugininfo/oerclassification.php</file>
-            <file>classes/plugininfo/oercourseinfo.php</file>
-            <file>classes/plugininfo/oeruploader.php</file>
-        </exclude>
     </coverage>
 </phpunit>
