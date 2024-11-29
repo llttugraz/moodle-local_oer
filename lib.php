@@ -244,3 +244,29 @@ function local_oer_pluginfile(?\stdClass $course, ?\stdClass $cm, ?\stdClass $co
     }
     throw new \moodle_exception('File not found.');
 }
+
+/**
+ * Callback to handle entries for deleted users.
+ *
+ * @param stdClass $user
+ * @throws dml_exception
+ */
+function local_oer_pre_user_delete(stdClass $user) {
+    global $DB;
+    $DB->delete_records('local_oer_userlist', ['userid' => $user->id]);
+
+    $admindata = get_admin();
+    $adminid = $admindata->id;
+    $tablenames = \local_oer\privacy\provider::get_tablenames_except_userlist();
+    foreach ($tablenames as $tablename) {
+        $records = $DB->get_records($tablename, ['usermodified' => $user->id]);
+        foreach ($records as $record) {
+            if ($record->usermodified != $adminid) {
+                $record->usermodified = $adminid;
+                $DB->update_record($tablename, $record);
+            }
+        }
+    }
+}
+
+
