@@ -1,3 +1,6 @@
+### 2025-02-17 - v2.3.2
+* Add missing german translations
+
 ### 2024-10-31 - v2.3.1
 * Update for compatibility with Moodle 4.5
 * Add tests for included subplugins oermod_folder and oermod_resource
