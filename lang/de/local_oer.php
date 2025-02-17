@@ -504,7 +504,7 @@ $string['type'] = 'Typ';
 $string['updatecourseinfo'] = 'Task zum synchronisieren der Kurs-Metadaten';
 $string['updating'] = 'Wird aktualisiert...';
 $string['upload'] = 'Zur Veröffentlichung freigegeben';
-$string['upload_help'] = 'To mark a file for release some requirements are necessary:' .
+$string['upload_help'] = 'Um eine Datei zur Veröffentlichung freizugeben, sind einige Voraussetzungen erforderlich:' .
         '<ul>' .
         '<li>Der Kontext wurde festgelegt.</li>' .
         '<li>Mindestens eine Person (Autor:in oder Verleger:in) ' .
