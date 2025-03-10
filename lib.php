@@ -58,7 +58,7 @@ function local_oer_extend_navigation_course(navigation_node $parentnode, stdClas
 function local_oer_extend_navigation(global_navigation $navigation) {
     global $PAGE;
     $context = context_course::instance($PAGE->course->id);
-    if (has_capability('local/oer:viewitems', $context)) {
+    if (has_capability('local/oer:viewitems', $context) && ($PAGE->context->contextlevel == CONTEXT_COURSE)) {
         $coursenode = $navigation->find($PAGE->course->id, navigation_node::TYPE_COURSE);
         $beforenode = $coursenode->find('localboostnavigationcoursesections', global_navigation::TYPE_UNKNOWN);
         $beforekey = $beforenode ? $beforenode->key : null;
