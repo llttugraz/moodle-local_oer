@@ -1,3 +1,6 @@
+### 2025-03-11 - v2.3.3
+* Add course context check in navigation
+
 ### 2025-02-17 - v2.3.2
 * Add missing german translations
 
