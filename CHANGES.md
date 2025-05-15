@@ -1,5 +1,7 @@
 ### 2025-05-15 - v2.3.4
 * Add a view with a list of OER creators
+* Make filetype icons bigger
+* Fixed display issues with long file names and reset button position
 
 ### 2025-03-11 - v2.3.3
 * Add course context check in navigation
