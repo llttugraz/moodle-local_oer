@@ -246,6 +246,8 @@ $string['objectives_help'] = 'What are the main goals of this course.';
 $string['oer:edititems'] = 'Edit file metadata in oer plugin';
 $string['oer:manage'] = 'Manage OER settings';
 $string['oer:viewitems'] = 'View files and metadata in oer plugin';
+$string['oer_creators_long']  = 'Open Educational Resources (OER) Creators';
+$string['oer_creators_short']  = 'OER Creators';
 $string['oer_intro'] = '<blockquote>' .
         '<p>"Open Educational Resources (OER) sind freie Bildungsmaterialien,' .
         ' d.h. Lehr- und Lernmaterialien, die frei zugänglich sind und dank entsprechender ' .

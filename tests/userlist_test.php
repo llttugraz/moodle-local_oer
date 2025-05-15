@@ -81,4 +81,41 @@ final class userlist_test extends \advanced_testcase {
         $this->assertFalse(userlist::user_is_allowed($user->id));
         $this->assertTrue(userlist::user_is_allowed($user2->id));
     }
+
+    /**
+     * Test creators_list function
+     *
+     * @return void
+     * @throws \dml_exception
+     * @covers \local_oer\userlist\userlist::creators_list
+     */
+    public function test_creators_list(): void {
+        $this->resetAfterTest();
+        global $DB, $USER, $CFG;
+
+        $users = [];
+        for ($i = 0; $i < 5; $i++) {
+            $user = $this->getDataGenerator()->create_user();
+
+            $entry = new \stdClass();
+            $entry->userid = $user->id;
+            $entry->type = $i != 4 ? userlist::TYPE_A : userlist::TYPE_D;
+            $entry->timecreated = time();
+            $entry->usermodified = $USER->id;
+            $entry->timemodified = time();
+            $entry->id = $DB->insert_record('local_oer_userlist', $entry);
+
+            $users[] = $user;
+        }
+
+        $CFG->siteadmins .= ',' . $users[0]->id;
+
+        $list = userlist::creators_list();
+
+        $this->assertCount(1, $list);
+        $this->assertCount(3, $list['creators']);
+        for ($i = 1; $i < 4; $i++) {
+            $this->assertContains(fullname($users[$i]), $list['creators']);;
+        }
+    }
 }

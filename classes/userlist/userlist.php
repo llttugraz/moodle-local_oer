@@ -52,4 +52,26 @@ class userlist {
         $exist = $DB->record_exists('local_oer_userlist', ['userid' => $userid, 'type' => $type]);
         return $type == self::TYPE_A ? $exist : !$exist;
     }
+
+    /**
+     * List of creators
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function creators_list(): array {
+        global $DB;
+        $allowedusers = $DB->get_records('local_oer_userlist', ['type' => self::TYPE_A]);
+        $list = [];
+
+        foreach ($allowedusers as $alloweduser) {
+            if (is_siteadmin($alloweduser->userid)) {
+                continue;
+            }
+            if ($user = get_complete_user_data('id', $alloweduser->userid)) {
+                $list['creators'][] = fullname($user);
+            }
+        }
+        return $list;
+    }
 }
