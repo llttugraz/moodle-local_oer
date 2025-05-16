@@ -44,8 +44,16 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 {{{clarification}}}
 
-<ul class="creators-list">
+<div class="container">
     {{#creators}}
-        <li class="creator-item">{{.}}</li>
+        <div class="row mb-3 align-items-stretch">
+            {{#.}}
+                <div class="col-sm-4">
+                    <div class="p-3 h-100 border rounded d-flex align-items-center justify-content-start">
+                        {{.}}
+                    </div>
+                </div>
+            {{/.}}
+        </div>
     {{/creators}}
-</ul>
+</div>

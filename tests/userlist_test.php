@@ -113,9 +113,16 @@ final class userlist_test extends \advanced_testcase {
         $list = userlist::creators_list();
 
         $this->assertCount(1, $list);
-        $this->assertCount(3, $list['creators']);
+        $this->assertCount(2, $list['creators']);
+        $this->assertCount(2, $list['creators'][0]);
+        $this->assertCount(1, $list['creators'][1]);
+        $usertosort = [];
         for ($i = 1; $i < 4; $i++) {
-            $this->assertContains(fullname($users[$i]), $list['creators']);;
+            $usertosort[] = fullname($users[$i]);
         }
+        sort($usertosort);
+        $this->assertEquals($usertosort[0], $list['creators'][0][0]);
+        $this->assertEquals($usertosort[1], $list['creators'][0][1]);
+        $this->assertEquals($usertosort[2], $list['creators'][1][0]);
     }
 }

@@ -72,6 +72,8 @@ class userlist {
                 $list['creators'][] = fullname($user);
             }
         }
+        sort($list['creators']);
+        $list['creators'] = array_chunk($list['creators'], 2);
         return $list;
     }
 }
