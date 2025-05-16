@@ -119,6 +119,8 @@ $string['coursetofile_info'] = 'In diesem Formular sind alle Kurs-Metadaten aufg
         'welche für diese Datei zur Verfügung stehen. Hier können ' .
         'sie die Kurseinstellungen, welche Kurs-Metadaten bei dieser ' .
         'Datei angehängt werden, überschreiben.';
+$string['creatorsviewinfo'] = 'Erläuterung zur Ansicht der Ersteller:innen';
+$string['creatorsviewinfo_description'] = 'Text, der die in der Übersicht der OER-Ersteller:innen angezeigten Informationen erläutert.';
 $string['custom'] = 'Benutzerdefinierte Zeit';
 $string['customdates'] = 'Benutzerdefinierte Zeitpunkte';
 $string['customdates_error'] = 'Falsches Format! <br>';
@@ -278,6 +280,8 @@ $string['oer_intro'] = '<blockquote>' .
         '</blockquote>';
 $string['oer_link'] = 'OER';
 $string['oer_settings'] = 'Plugin Einstellungen';
+$string['oerhelptextsheading'] = 'Hilfetexte';
+$string['oerhelptextsheading_desc'] = 'Einstellungen für verschiedene Hilfetexte';
 $string['oermetadataheading'] = 'Einstellungen zu Metadaten';
 $string['oermetadataheading_desc'] = 'Einige Einstellungen für Metadaten wie die Auswahl eines ' .
         'zusätzlichen Subplugins. ';
@@ -516,6 +520,9 @@ $string['upload_help'] = 'Um eine Datei zur Veröffentlichung freizugeben, sind 
         '</ul>';
 $string['uploaded'] = 'Veröffentlicht am:';
 $string['uploadignoreerror'] = 'Zur Freigabe markieren und Ignorieren können nicht gleichzeitig eingeschaltet sein!';
+$string['uploadinfotext'] = 'Informationen zum Hochladen';
+$string['uploadinfotext_description'] = 'Text, der Nutzer:innen über Zweck und Lizenzierung hochgeladener Lehrmaterialien informiert.<br>
+                                         Wenn nicht angegeben, wird der Standardtext aus Sprachdateien verwendet.';
 $string['uselicensereplacement'] = 'Lizenz Kurznamen ersetzen';
 $string['uselicensereplacement_description'] = 'Wenn diese Option aktiviert ist, steht ein Textfeld zur Verfügung, ' .
         'in dem Alternativen für Moodle-Lizenzkurznamen definiert ' .

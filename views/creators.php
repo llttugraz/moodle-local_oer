@@ -36,6 +36,7 @@ $PAGE->set_title(get_string('oer_creators_short', 'local_oer'));
 $PAGE->set_pagelayout('standard');
 
 $data = \local_oer\userlist\userlist::creators_list();
+$data['clarification'] = format_text(get_config('local_oer', 'creatorsviewinfo'), FORMAT_HTML);
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_oer/creators', $data);
