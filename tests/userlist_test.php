@@ -118,11 +118,13 @@ final class userlist_test extends \advanced_testcase {
         $this->assertCount(1, $list['creators'][1]);
         $usertosort = [];
         for ($i = 1; $i < 4; $i++) {
-            $usertosort[] = fullname($users[$i]);
+            $usertosort[] = $users[$i];
         }
-        sort($usertosort);
-        $this->assertEquals($usertosort[0], $list['creators'][0][0]);
-        $this->assertEquals($usertosort[1], $list['creators'][0][1]);
-        $this->assertEquals($usertosort[2], $list['creators'][1][0]);
+        usort($usertosort, function($a, $b) {
+            return strcasecmp($a->lastname, $b->lastname);
+        });
+        $this->assertEquals(fullname($usertosort[0]), $list['creators'][0][0]);
+        $this->assertEquals(fullname($usertosort[1]), $list['creators'][0][1]);
+        $this->assertEquals(fullname($usertosort[2]), $list['creators'][1][0]);
     }
 }

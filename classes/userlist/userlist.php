@@ -62,18 +62,30 @@ class userlist {
     public static function creators_list(): array {
         global $DB;
         $allowedusers = $DB->get_records('local_oer_userlist', ['type' => self::TYPE_A]);
-        $list = [];
+        $users = [];
 
         foreach ($allowedusers as $alloweduser) {
             if (is_siteadmin($alloweduser->userid)) {
                 continue;
             }
             if ($user = get_complete_user_data('id', $alloweduser->userid)) {
-                $list['creators'][] = fullname($user);
+                $users[] = $user;
             }
         }
-        sort($list['creators']);
-        $list['creators'] = array_chunk($list['creators'], 2);
-        return $list;
+        usort($users, function($a, $b) {
+            return strcasecmp($a->lastname, $b->lastname);
+        });
+
+        $creators = array_map('fullname', $users);
+
+        $half = ceil((count($creators)) / 2);
+
+        return [
+            'creators' => [
+                array_slice($creators, 0, $half),
+                array_slice($creators, $half),
+            ]
+        ];
+
     }
 }

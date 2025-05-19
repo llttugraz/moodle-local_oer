@@ -45,15 +45,15 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 {{{clarification}}}
 
 <div class="container">
-    {{#creators}}
-        <div class="row mb-3 align-items-stretch">
-            {{#.}}
-                <div class="col-sm-4">
-                    <div class="p-3 h-100 border rounded d-flex align-items-center justify-content-start">
+    <div class="row">
+        {{#creators}}
+            <div class="col-3">
+                {{#.}}
+                    <div class="p-0 mb-1 rounded">
                         {{.}}
                     </div>
-                </div>
-            {{/.}}
-        </div>
-    {{/creators}}
+                {{/.}}
+            </div>
+        {{/creators}}
+    </div>
 </div>
