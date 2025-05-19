@@ -84,7 +84,7 @@ class userlist {
             'creators' => [
                 array_slice($creators, 0, $half),
                 array_slice($creators, $half),
-            ]
+            ],
         ];
 
     }
