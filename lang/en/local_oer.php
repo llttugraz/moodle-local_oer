@@ -107,6 +107,8 @@ $string['coursetofile_description'] = 'In courses, the course metadata can be ed
 $string['coursetofile_info'] = 'In this form course metadata is listed which is available ' .
         'for this file. Here you can override the course settings, ' .
         'which course metadata will be attached to this file.';
+$string['creatorsviewinfo'] = 'Clarification for creators view';
+$string['creatorsviewinfo_description'] = 'Text that clarifies the information shown in a view that lists OER creators.';
 $string['custom'] = 'Custom time';
 $string['customdates'] = 'Release dates';
 $string['customdates_error'] = 'Wrong Format! <br>';
@@ -246,6 +248,8 @@ $string['objectives_help'] = 'What are the main goals of this course.';
 $string['oer:edititems'] = 'Edit file metadata in oer plugin';
 $string['oer:manage'] = 'Manage OER settings';
 $string['oer:viewitems'] = 'View files and metadata in oer plugin';
+$string['oer_creators_long']  = 'Open Educational Resources (OER) Creators';
+$string['oer_creators_short']  = 'OER Creators';
 $string['oer_intro'] = '<blockquote>' .
         '<p>"Open Educational Resources (OER) sind freie Bildungsmaterialien,' .
         ' d.h. Lehr- und Lernmaterialien, die frei zugänglich sind und dank entsprechender ' .
@@ -255,6 +259,8 @@ $string['oer_intro'] = '<blockquote>' .
         '</blockquote>';
 $string['oer_link'] = 'OER';
 $string['oer_settings'] = 'Plugin settings';
+$string['oerhelptextsheading'] = 'Help texts';
+$string['oerhelptextsheading_desc'] = 'Settings for different help texts';
 $string['oermetadataheading'] = 'Metadata settings';
 $string['oermetadataheading_desc'] = 'Some settings for metadata related things like the selection of additional subplugin.';
 $string['oerreleaseheading'] = 'Release settings';
@@ -483,6 +489,9 @@ $string['upload_help'] = 'To mark a file for release some requirements are neces
         '</ul>';
 $string['uploaded'] = 'Released on:';
 $string['uploadignoreerror'] = 'Mark for release and ignore cannot be set at the same time!';
+$string['uploadinfotext'] = 'Upload information';
+$string['uploadinfotext_description'] = 'Text shown to users explaining the purpose and licensing of uploaded teaching materials.<br>
+                                         If not set, the default text from language files is used.';
 $string['uploadtimebutton'] = 'Set snapshot/release time';
 $string['uselicensereplacement'] = 'License shortname replacement';
 $string['uselicensereplacement_description'] = 'When enabled, a textarea is available where replacement ' .

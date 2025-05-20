@@ -127,6 +127,20 @@ if ($hassiteconfig) {
             $licensereplacedefault));
     $settings->hide_if('local_oer/licensereplacement', 'local_oer/uselicensereplacement');
 
+    $settings->add(new admin_setting_heading('oerhelptexts',
+        new lang_string('oerhelptextsheading', 'local_oer'),
+        new lang_string('oerhelptextsheading_desc', 'local_oer')));
+
+    $settings->add(new admin_setting_confightmleditor('local_oer/creatorsviewinfo',
+        new lang_string('creatorsviewinfo', 'local_oer'),
+        new lang_string('creatorsviewinfo_description', 'local_oer'),
+        ''));
+
+    $settings->add(new admin_setting_confightmleditor('local_oer/uploadinfotext',
+        new lang_string('uploadinfotext', 'local_oer'),
+        new lang_string('uploadinfotext_description', 'local_oer'),
+        ''));
+
     $settings->add(new admin_setting_heading('oerrelease',
             new lang_string('oerreleaseheading', 'local_oer'),
             new lang_string('oerreleaseheading_desc', 'local_oer')));

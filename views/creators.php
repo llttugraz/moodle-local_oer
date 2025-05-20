@@ -18,17 +18,26 @@
  * Open Educational Resources Plugin
  *
  * @package    local_oer
- * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2025 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+// @codingStandardsIgnoreLine
+require('../../../config.php');
 
-$plugin->version = 2025051500;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.3.4';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
-$plugin->supported    = [401, 405];
+$context = context_system::instance();
+global $PAGE, $OUTPUT;
+$PAGE->set_context($context);
+
+$url = new moodle_url('/local/oer/views/creators.php');
+$PAGE->set_url($url);
+$PAGE->set_context($context);
+$PAGE->set_title(get_string('oer_creators_short', 'local_oer'));
+$PAGE->set_pagelayout('standard');
+
+$data = \local_oer\userlist\userlist::creators_list();
+$data['clarification'] = format_text(get_config('local_oer', 'creatorsviewinfo'), FORMAT_HTML);
+
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('local_oer/creators', $data);
+echo $OUTPUT->footer();

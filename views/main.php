@@ -59,6 +59,12 @@ if (optional_param('download_zip', false, PARAM_BOOL)) {
     $zipper->download_zip_file($courseid);
 }
 
+if ($uploadinfotext = get_config('local_oer', 'uploadinfotext')) {
+    $uploadinfotext = format_text($uploadinfotext, FORMAT_HTML);
+} else {
+    $uploadinfotext = get_string('allowed', 'local_oer');
+}
+
 $data = [
         'courseid' => $courseid,
         'context' => $context->id,
@@ -69,6 +75,7 @@ $data = [
         'notallowed' => get_config('local_oer', 'notallowedtext'),
         'releaseinfo' => \local_oer\time\time_settings::get_timeslot_output(1),
         'isadmin' => is_siteadmin(), // Used for ZIP Download button, eventually add a new capability.
+        'uploadinfotext' => $uploadinfotext,
 ];
 
 echo $OUTPUT->header();
