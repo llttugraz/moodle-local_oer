@@ -120,7 +120,7 @@ final class userlist_test extends \advanced_testcase {
         for ($i = 1; $i < 4; $i++) {
             $usertosort[] = $users[$i];
         }
-        usort($usertosort, function($a, $b) {
+        usort($usertosort, function ($a, $b) {
             return strcasecmp($a->lastname, $b->lastname);
         });
         $this->assertEquals(fullname($usertosort[0]), $list['creators'][0][0]);

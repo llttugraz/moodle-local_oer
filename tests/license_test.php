@@ -48,10 +48,14 @@ final class license_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->assertFalse(license::test_license_correct_for_upload('doesnotexist'));
         $this->assertFalse(license::test_license_correct_for_upload('allrightsreserved'));
-        $this->assertFalse(license::test_license_correct_for_upload('cc-nc-sa'),
-                'This test has been set to assert false on 2023-11-02 due to license change');
-        $this->assertTrue(license::test_license_correct_for_upload('cc-nc-sa-4.0'),
-                'Introduced on 2023-11-02 because of license change');
+        $this->assertFalse(
+            license::test_license_correct_for_upload('cc-nc-sa'),
+            'This test has been set to assert false on 2023-11-02 due to license change'
+        );
+        $this->assertTrue(
+            license::test_license_correct_for_upload('cc-nc-sa-4.0'),
+            'Introduced on 2023-11-02 because of license change'
+        );
         $this->assertTrue(license::test_license_correct_for_upload('public'));
     }
 
@@ -64,9 +68,11 @@ final class license_test extends \advanced_testcase {
      */
     public function test_get_license_fullname(): void {
         $this->resetAfterTest();
-        $this->assertEquals('Creative Commons - NonCommercial-NoDerivatives 4.0 International',
-                license::get_license_fullname('cc-nc-nd-4.0'),
-                '2023-11-02 Updated because of license change');
+        $this->assertEquals(
+            'Creative Commons - NonCommercial-NoDerivatives 4.0 International',
+            license::get_license_fullname('cc-nc-nd-4.0'),
+            '2023-11-02 Updated because of license change'
+        );
         $this->assertEquals(get_string('licensenotfound', 'local_oer'), license::get_license_fullname('nope'));
     }
 

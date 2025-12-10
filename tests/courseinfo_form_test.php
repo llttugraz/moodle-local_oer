@@ -144,8 +144,12 @@ final class courseinfo_form_test extends \advanced_testcase {
                         ],
                 ],
         ];
-        $DB->set_field('local_oer_courseinfo', 'customfields', json_encode($customfields),
-                ['coursecode' => 'moodlecourse-' . $course->id]);
+        $DB->set_field(
+            'local_oer_courseinfo',
+            'customfields',
+            json_encode($customfields),
+            ['coursecode' => 'moodlecourse-' . $course->id]
+        );
 
         $customdata = [
                 'courseid' => $course->id,
@@ -179,13 +183,17 @@ final class courseinfo_form_test extends \advanced_testcase {
         $this->assertArrayHasKey('coursename_moodlecourse-' . $course->id . 'group', $result);
         $this->assertEquals(get_string('required'), $result['coursename_moodlecourse-' . $course->id . 'group']);
 
-        $formdata['structure_moodlecourse-' . $course->id] = str_repeat('a', 256);;
+        $formdata['structure_moodlecourse-' . $course->id] = str_repeat('a', 256);
+        ;
         $formdata['structure_edited_moodlecourse-' . $course->id] = 1;
-        $formdata['organisation_moodlecourse-' . $course->id] = str_repeat('a', 256);;
+        $formdata['organisation_moodlecourse-' . $course->id] = str_repeat('a', 256);
+        ;
         $formdata['organisation_edited_moodlecourse-' . $course->id] = 1;
-        $formdata['lecturer_moodlecourse-' . $course->id] = str_repeat('a', 256);;
+        $formdata['lecturer_moodlecourse-' . $course->id] = str_repeat('a', 256);
+        ;
         $formdata['lecturer_edited_moodlecourse-' . $course->id] = 1;
-        $formdata['language_moodlecourse-' . $course->id] = str_repeat('a', 5);;
+        $formdata['language_moodlecourse-' . $course->id] = str_repeat('a', 5);
+        ;
         $formdata['language_edited_moodlecourse-' . $course->id] = 1;
 
         $formdata['ignored_moodlecourse-' . $course->id] = 0;

@@ -179,8 +179,11 @@ class filestate {
                 // So it will be inherited to the first course in the list.
                 $editorid = array_key_first($courses);
                 $DB->set_field('local_oer_elements', 'courseid', $editorid, ['identifier' => $element->get_identifier()]);
-                logger::add($editorid, logger::LOGERROR,
-                        'Inherited file ' . $element->get_identifier() . ' from course ' . $oerelement->courseid);
+                logger::add(
+                    $editorid,
+                    logger::LOGERROR,
+                    'Inherited file ' . $element->get_identifier() . ' from course ' . $oerelement->courseid
+                );
             }
             $courses[$editorid]['editor'] = true;
         }
@@ -311,19 +314,26 @@ class filestate {
                 $alert = 'info';
         }
 
-        return $OUTPUT->render_from_template('local_oer/notwritable',
-                [
+        return $OUTPUT->render_from_template(
+            'local_oer/notwritable',
+            [
                         'header' => get_string('metadatanotwritable', 'local_oer'),
                         'alert' => $alert,
-                        'reason' => get_string('metadatanotwritable' . $state,
-                                'local_oer'),
-                        'support' => get_string('contactsupport', 'local_oer',
-                                ['support' => $support->email]),
+                        'reason' => get_string(
+                            'metadatanotwritable' . $state,
+                            'local_oer'
+                        ),
+                        'support' => get_string(
+                            'contactsupport',
+                            'local_oer',
+                            ['support' => $support->email]
+                        ),
                         'multiple' => count($element->get_elementstate()->courses) > 1,
                         'courses' => array_values($element->get_elementstate()->courses),
                         'showmetadata' => true, // MDL-0 TODO: this flag can be removed as STATE_FILE_ERROR does not exist anymore.
                         'metadata' => $metadata,
                         'wwwroot' => $CFG->wwwroot,
-                ]);
+            ]
+        );
     }
 }

@@ -54,8 +54,12 @@ class logger {
      * @return void
      * @throws \dml_exception
      */
-    public static function add(int $courseid, string $type = self::LOGSUCCESS, string $message = '',
-            string $component = 'local_oer') {
+    public static function add(
+        int $courseid,
+        string $type = self::LOGSUCCESS,
+        string $message = '',
+        string $component = 'local_oer'
+    ) {
         global $DB, $USER;
         $msg = new \stdClass();
         $msg->courseid = $courseid;

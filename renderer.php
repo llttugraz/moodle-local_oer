@@ -37,8 +37,10 @@ class local_oer_renderer extends plugin_renderer_base {
      * @throws coding_exception
      */
     public function oer_user_selector(&$options) {
-        $formcontent = html_writer::empty_tag('input',
-                ['name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden']);
+        $formcontent = html_writer::empty_tag(
+            'input',
+            ['name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden']
+        );
 
         $table = new html_table();
         $table->size = ['45%', '10%', '45%'];
@@ -57,32 +59,42 @@ class local_oer_renderer extends plugin_renderer_base {
         }
 
         // Create the add and remove button.
-        $addinput = html_writer::empty_tag('input',
-                [
+        $addinput = html_writer::empty_tag(
+            'input',
+            [
                         'name' => 'add', 'id' => 'add', 'type' => 'submit',
                         'value' => $addarrow . ' ' . get_string('add'),
                         'title' => get_string('add'),
-                ]);
+            ]
+        );
         $addbutton = html_writer::tag('div', $addinput, ['id' => 'addcontrols']);
-        $removeinput = html_writer::empty_tag('input',
-                [
+        $removeinput = html_writer::empty_tag(
+            'input',
+            [
                         'name' => 'remove', 'id' => 'remove', 'type' => 'submit',
                         'value' => $removearrow . ' ' . get_string('remove'),
                         'title' => get_string('remove'),
-                ]);
+            ]
+        );
         $removebutton = html_writer::tag('div', $removeinput, ['id' => 'removecontrols']);
 
         // Create the three cells.
-        $label = html_writer::tag('label', get_string('oerusers', 'local_oer'),
-                ['for' => 'removeselect']);
+        $label = html_writer::tag(
+            'label',
+            get_string('oerusers', 'local_oer'),
+            ['for' => 'removeselect']
+        );
         $label = html_writer::tag('p', $label);
         $authoriseduserscell = new html_table_cell($label .
                 $options->alloweduserselector->display(true));
         $authoriseduserscell->id = 'existingcell';
         $buttonscell = new html_table_cell($addbutton . html_writer::empty_tag('br') . $removebutton);
         $buttonscell->id = 'buttonscell';
-        $label = html_writer::tag('label', get_string('potusers', 'local_oer'),
-                ['for' => 'addselect']);
+        $label = html_writer::tag(
+            'label',
+            get_string('potusers', 'local_oer'),
+            ['for' => 'addselect']
+        );
         $label = html_writer::tag('p', $label);
         $otheruserscell = new html_table_cell($label .
                 $options->potentialuserselector->display(true));
@@ -96,8 +108,11 @@ class local_oer_renderer extends plugin_renderer_base {
         $formcontent = html_writer::tag('div', $formcontent);
 
         $actionurl = new moodle_url('/local/oer/views/manage.php');
-        $html = html_writer::tag('form', $formcontent,
-                ['id' => 'assignform', 'action' => $actionurl, 'method' => 'post']);
+        $html = html_writer::tag(
+            'form',
+            $formcontent,
+            ['id' => 'assignform', 'action' => $actionurl, 'method' => 'post']
+        );
         return $html;
     }
 }

@@ -70,4 +70,3 @@ if ($identifier) {
 }
 
 echo json_encode($result);
-

@@ -74,7 +74,7 @@ final class user_selector_test extends \advanced_testcase {
         shuffle($list);
         foreach ($list as $user) {
             $created = $this->getDataGenerator()->create_user(
-                    [
+                [
                             'firstname' => $user[0],
                             'lastname' => $user[1],
                             'email' => $user[2],
@@ -103,20 +103,23 @@ final class user_selector_test extends \advanced_testcase {
         // This will result in too many users string, but the empty case.
         $result = $selector->find_users('');
         $this->assertEquals(
-                [
+            [
                         get_string('toomanyuserstoshow', '', 200) => [],
                         get_string('pleaseusesearch') => [],
                 ],
-                $result, 'The result 200 are the 200 users on the allowed list.');
+            $result,
+            'The result 200 are the 200 users on the allowed list.'
+        );
 
         // Searchstring 'Claude', expected 100 results.
         $result = $selector->find_users('Claude');
         $this->assertEquals(
-                [
+            [
                         get_string('toomanyusersmatchsearch', '', ['count' => 100, 'search' => 'Claude']) => [],
                         get_string('pleasesearchmore') => [],
                 ],
-                $result);
+            $result
+        );
         $result = $selector->find_users('Fay1');
         $this->assertCount(12, $result['Authorised users']);
         $delete = end($result['Authorised users']);

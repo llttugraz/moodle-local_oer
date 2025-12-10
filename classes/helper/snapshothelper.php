@@ -58,8 +58,11 @@ class snapshothelper {
             $snapshot->create_snapshot_of_course_files($releasenumber);
         }
         $after = $DB->count_records('local_oer_snapshot');
-        logger::add(0, logger::LOGSUCCESS,
-                'Created snapshots of ' . count($courses) . ' course(s) and ' . ($after - $before) . ' file(s).');
+        logger::add(
+            0,
+            logger::LOGSUCCESS,
+            'Created snapshots of ' . count($courses) . ' course(s) and ' . ($after - $before) . ' file(s).'
+        );
     }
 
     /**
@@ -85,8 +88,11 @@ class snapshothelper {
      */
     public static function get_element_history(string $identifier): array {
         global $DB;
-        return $DB->get_records('local_oer_snapshot', ['identifier' => $identifier],
-                'timecreated DESC');
+        return $DB->get_records(
+            'local_oer_snapshot',
+            ['identifier' => $identifier],
+            'timecreated DESC'
+        );
     }
 
     /**
@@ -98,7 +104,10 @@ class snapshothelper {
      */
     public static function get_snapshot_by_releasenumber(int $releasenumber) {
         global $DB;
-        return $DB->get_records('local_oer_snapshot', ['releasenumber' => $releasenumber],
-                'timecreated DESC');
+        return $DB->get_records(
+            'local_oer_snapshot',
+            ['releasenumber' => $releasenumber],
+            'timecreated DESC'
+        );
     }
 }

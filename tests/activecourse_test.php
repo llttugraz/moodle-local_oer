@@ -95,8 +95,13 @@ final class activecourse_test extends \advanced_testcase {
             $entry = new \stdClass();
             $entry->courseid = $courseid;
             $contenthash = hash('sha1', $courseid . $i . rand(1, 100000)); // String concatenation intended.
-            $entry->identifier = identifier::compose('moodle',
-                    $CFG->wwwroot, 'file', 'contenthash', $contenthash);
+            $entry->identifier = identifier::compose(
+                'moodle',
+                $CFG->wwwroot,
+                'file',
+                'contenthash',
+                $contenthash
+            );
             $entry->title = "File $i for $courseid";
             $entry->description = "Unit test file $i in course $courseid";
             $entry->context = 1;

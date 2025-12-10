@@ -61,7 +61,7 @@ final class coursecustomfield_test extends \advanced_testcase {
         $customcat3 = $this->getDataGenerator()->create_custom_field_category(['name' => 'Third Category']);
         $this->data['cat3'] = $customcat3;
         $field1cat1 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'semester',
                         'shortname' => 'sem',
                         'type' => 'text',
@@ -70,10 +70,11 @@ final class coursecustomfield_test extends \advanced_testcase {
                                 'visibility' => 0,
                                 'defaultvalue' => 'nosemester',
                         ],
-                ]);
+            ]
+        );
         $this->data['field1cat1'] = $field1cat1;
         $field2cat1 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'additionaltextarea',
                         'shortname' => 'ata',
                         'type' => 'textarea',
@@ -82,10 +83,11 @@ final class coursecustomfield_test extends \advanced_testcase {
                                 'visibility' => 1,
                                 'defaultvalue' => 'emptytext',
                         ],
-                ]);
+            ]
+        );
         $this->data['field2cat1'] = $field2cat1;
         $field3cat1 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'checkboxfield',
                         'shortname' => 'cf',
                         'type' => 'checkbox',
@@ -94,10 +96,11 @@ final class coursecustomfield_test extends \advanced_testcase {
                                 'visibility' => 2,
                                 'defaultvalue' => 0,
                         ],
-                ]);
+            ]
+        );
         $this->data['field3cat1'] = $field3cat1;
         $field4cat1 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'dateofsomething',
                         'shortname' => 'dos',
                         'type' => 'date',
@@ -106,10 +109,11 @@ final class coursecustomfield_test extends \advanced_testcase {
                                 'visibility' => 0,
                             // Date does not have a default value.
                         ],
-                ]);
+            ]
+        );
         $this->data['field4cat1'] = $field4cat1;
         $field5cat1 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'selectfield',
                         'shortname' => 'sf',
                         'type' => 'select',
@@ -119,10 +123,11 @@ final class coursecustomfield_test extends \advanced_testcase {
                                 'defaultvalue' => 'def',
                                 'options' => "abc\r\ndef\r\nghi",
                         ],
-                ]);
+            ]
+        );
         $this->data['field5cat1'] = $field5cat1;
         $field1cat2 = $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'dateofanotherthing',
                         'shortname' => 'doat',
                         'type' => 'date',
@@ -130,7 +135,8 @@ final class coursecustomfield_test extends \advanced_testcase {
                         'configdata' => [
                                 'visibility' => 2,
                         ],
-                ]);
+            ]
+        );
         $this->data['field1cat2'] = $field1cat2;
 
         $handler = \core_course\customfield\course_handler::create();

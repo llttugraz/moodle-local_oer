@@ -30,7 +30,7 @@ namespace local_oer\modules;
  *
  * Data-structure for a list of \module\element of any type. Every module sub-plugin has to return this class.
  */
-class elements implements \Iterator, \Countable {
+class elements implements \Countable, \Iterator {
     /**
      * List of elements.
      *

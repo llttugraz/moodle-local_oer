@@ -53,16 +53,16 @@ final class requirement_test extends \advanced_testcase {
 
         // No additional fields are added. Initially all values except title and license have a 'false' state.
         $element = self::get_element(
-                'test1',
-                '',
-                'cc-4.0',
-                '',
-                0,
-                '',
-                '0',
-                0,
-                '',
-                0
+            'test1',
+            '',
+            'cc-4.0',
+            '',
+            0,
+            '',
+            '0',
+            0,
+            '',
+            0
         );
         [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertArrayHasKey('title', $reqarray);
@@ -76,8 +76,10 @@ final class requirement_test extends \advanced_testcase {
         [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertFalse($releasable);
         $this->assertFalse($release);
-        $element->set_stored_metadata_field('persons',
-                '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}]}');
+        $element->set_stored_metadata_field(
+            'persons',
+            '{"persons":[{"role":"Author","lastname":"Ortner","firstname":"Christian"}]}'
+        );
         [$reqarray, $releasable, $release] = requirements::metadata_fulfills_all_requirements($element);
         $this->assertTrue($releasable);
         $this->assertTrue($release);
@@ -155,16 +157,17 @@ final class requirement_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private static function get_element(string $title,
-            string $description,
-            string $license,
-            string $persons,
-            int $context,
-            string $tags,
-            string $language,
-            int $resourcetype,
-            string $oefos,
-            int $state
+    private static function get_element(
+        string $title,
+        string $description,
+        string $license,
+        string $persons,
+        int $context,
+        string $tags,
+        string $language,
+        int $resourcetype,
+        string $oefos,
+        int $state
     ): element {
         global $CFG;
         $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);

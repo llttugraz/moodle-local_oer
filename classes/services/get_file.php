@@ -46,7 +46,7 @@ class get_file extends \external_api {
      */
     public static function service_parameters() {
         return new \external_function_parameters(
-                [
+            [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle course id', VALUE_REQUIRED),
                         'identifier' => new \external_value(PARAM_TEXT, 'Moodle course id', VALUE_REQUIRED),
                 ]
@@ -60,11 +60,12 @@ class get_file extends \external_api {
      */
     public static function service_returns() {
         return new \external_single_structure(
-                [
+            [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
                         'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
                         'file' => self::external_file_return_value(),
-                ]);
+            ]
+        );
     }
 
     /**
@@ -100,7 +101,7 @@ class get_file extends \external_api {
      */
     public static function external_file_return_value() {
         return new \external_single_structure(
-                [
+            [
                         'id' => new \external_value(PARAM_INT, 'DB id of oer file entry'),
                         'contenthash' => new \external_value(PARAM_ALPHANUM, 'Contenthash of file'),
                         'identifier' => new \external_value(PARAM_TEXT, 'Unique identifier for element'),
@@ -113,56 +114,77 @@ class get_file extends \external_api {
                         'timeuploadedts' => new \external_value(PARAM_INT, 'Uploaded timestamp'),
                         'upload' => new \external_value(PARAM_BOOL, 'File ready for upload'),
                         'ignore' => new \external_value(PARAM_BOOL, 'File ignored'),
-                        'deleted' => new \external_value(PARAM_BOOL,
-                                'File deleted, orphaned metadata'),
+                        'deleted' => new \external_value(
+                            PARAM_BOOL,
+                            'File deleted, orphaned metadata'
+                        ),
                         'information' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
-                                                'area' => new \external_value(PARAM_TEXT,
-                                                        'Area of the information'),
+                            new \external_single_structure(
+                                [
+                                                'area' => new \external_value(
+                                                    PARAM_TEXT,
+                                                    'Area of the information'
+                                                ),
                                                 'fields' => new \external_multiple_structure(
-                                                        new \external_single_structure(
-                                                                [
-                                                                        'infoname' => new \external_value(PARAM_TEXT,
-                                                                                'Name of information'),
-                                                                        'infourl' => new \external_value(PARAM_URL,
-                                                                                'Url to information'),
-                                                                        'infohasurl' => new \external_value(PARAM_BOOL,
-                                                                                'Boolean if url is available'),
-                                                                        'last' => new \external_value(PARAM_BOOL,
-                                                                                'Last element in array, ' .
-                                                                                'relevant for comma in mustache'),
+                                                    new \external_single_structure(
+                                                        [
+                                                                        'infoname' => new \external_value(
+                                                                            PARAM_TEXT,
+                                                                            'Name of information'
+                                                                        ),
+                                                                        'infourl' => new \external_value(
+                                                                            PARAM_URL,
+                                                                            'Url to information'
+                                                                        ),
+                                                                        'infohasurl' => new \external_value(
+                                                                            PARAM_BOOL,
+                                                                            'Boolean if url is available'
+                                                                        ),
+                                                                        'last' => new \external_value(
+                                                                            PARAM_BOOL,
+                                                                            'Last element in array, ' .
+                                                                            'relevant for comma in mustache'
+                                                                        ),
                                                                 ]
-                                                        )),
+                                                    )
+                                                ),
                                         ]
-                                )),
-                        'requirementsmet' => new \external_value(PARAM_BOOL,
-                                'Boolean if all requirements for release are fulfilled'),
+                            )
+                        ),
+                        'requirementsmet' => new \external_value(
+                            PARAM_BOOL,
+                            'Boolean if all requirements for release are fulfilled'
+                        ),
                         'state' => new \external_value(PARAM_INT, 'State of file as defined in filestate class.'),
                         'multiple' => new \external_value(PARAM_BOOL, 'File is used in multiple courses'),
                         'editor' => new \external_value(PARAM_INT, 'Courseid where file is edited.'),
                         'courses' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
+                            new \external_single_structure(
+                                [
                                                 'id' => new \external_value(PARAM_INT, 'Id of course where file is used'),
-                                                'name' => new \external_value(PARAM_TEXT,
-                                                        'Name of course where file is used'),
-                                                'editor' => new \external_value(PARAM_BOOL,
-                                                        'True if the file is edited in this course'),
+                                                'name' => new \external_value(
+                                                    PARAM_TEXT,
+                                                    'Name of course where file is used'
+                                                ),
+                                                'editor' => new \external_value(
+                                                    PARAM_BOOL,
+                                                    'True if the file is edited in this course'
+                                                ),
                                         ]
-                                )
+                            )
                         ),
                         'writable' => new \external_value(PARAM_BOOL, 'The metadata is writable in the current context'),
                         'coursetofile' => new \external_value(PARAM_BOOL, 'Setting is activated and this course is the editor'),
                         'wwwroot' => new \external_value(PARAM_URL, 'wwwroot of moodle'),
                         'origins' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
+                            new \external_single_structure(
+                                [
                                                 'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Origin of element'),
                                                 'originname' => new \external_value(PARAM_TEXT, 'Language string of origin'),
                                         ]
-                                )
+                            )
                         ),
-                ]);
+            ]
+        );
     }
 }

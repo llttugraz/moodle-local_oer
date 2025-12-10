@@ -46,7 +46,7 @@ class get_files extends \external_api {
      */
     public static function service_parameters() {
         return new \external_function_parameters(
-                [
+            [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle course id', VALUE_REQUIRED),
                 ]
         );
@@ -59,18 +59,20 @@ class get_files extends \external_api {
      */
     public static function service_returns() {
         return new \external_single_structure(
-                [
+            [
                         'courseid' => new \external_value(PARAM_INT, 'Moodle courseid'),
                         'context' => new \external_value(PARAM_INT, 'Moodle course context id'),
                         'origin' => new \external_multiple_structure(
-                                new \external_single_structure(
-                                        [
+                            new \external_single_structure(
+                                [
                                                 'origin' => new \external_value(PARAM_ALPHANUMEXT, 'Shortname of origin'),
                                                 'originname' => new \external_value(PARAM_TEXT, 'Language string of origin'),
                                         ]
-                                )),
+                            )
+                        ),
                         'files' => new \external_multiple_structure(get_file::external_file_return_value()),
-                ]);
+            ]
+        );
     }
 
     /**

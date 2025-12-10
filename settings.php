@@ -28,14 +28,18 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category('oersettings', new lang_string('oer_link', 'local_oer'), false));
     $settings = new admin_settingpage('local_oer', new lang_string('oer_settings', 'local_oer'));
-    $settings->add(new admin_setting_heading('oermetadata',
-            new lang_string('oermetadataheading', 'local_oer'),
-            new lang_string('oermetadataheading_desc', 'local_oer')));
+    $settings->add(new admin_setting_heading(
+        'oermetadata',
+        new lang_string('oermetadataheading', 'local_oer'),
+        new lang_string('oermetadataheading_desc', 'local_oer')
+    ));
 
-    $settings->add(new admin_setting_configcheckbox('local_oer/coursecustomfields',
-            new lang_string('coursecustomfields', 'local_oer'),
-            new lang_string('coursecustomfields_description', 'local_oer'),
-            '0'));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/coursecustomfields',
+        new lang_string('coursecustomfields', 'local_oer'),
+        new lang_string('coursecustomfields_description', 'local_oer'),
+        '0'
+    ));
 
     $visibletoall = new lang_string('customfield_visibletoall', 'core_course');
     $visibletoteachers = new lang_string('customfield_visibletoteachers', 'core_course');
@@ -46,10 +50,13 @@ if ($hassiteconfig) {
             \core_course\customfield\course_handler::NOTVISIBLE => $notvisible,
     ];
 
-    $settings->add(new admin_setting_configselect('local_oer/coursecustomfieldsvisibility',
-            new lang_string('coursecustomfieldsvisibility', 'local_oer'),
-            new lang_string('coursecustomfieldsvisibility_description', 'local_oer'),
-            \core_course\customfield\course_handler::VISIBLETOALL, $visibilityoptions));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/coursecustomfieldsvisibility',
+        new lang_string('coursecustomfieldsvisibility', 'local_oer'),
+        new lang_string('coursecustomfieldsvisibility_description', 'local_oer'),
+        \core_course\customfield\course_handler::VISIBLETOALL,
+        $visibilityoptions
+    ));
     $settings->hide_if('local_oer/coursecustomfieldsvisibility', 'local_oer/coursecustomfields');
 
     $customfields = \local_oer\metadata\coursecustomfield::get_course_customfields(-1);
@@ -61,7 +68,7 @@ if ($hassiteconfig) {
                 case \core_course\customfield\course_handler::VISIBLETOTEACHERS:
                     $visibility = $visibletoteachers;
                     break;
-                case  \core_course\customfield\course_handler::NOTVISIBLE:
+                case \core_course\customfield\course_handler::NOTVISIBLE:
                     $visibility = $notvisible;
             }
             $customselect[$category['id'] . ':' . $field['id']] = $field['fullname'] . ' (' . $category['name'] . ' ' .
@@ -72,24 +79,32 @@ if ($hassiteconfig) {
     // When no customfields are present to be shown in this multiselect, it will block the upgradesettings.php page on updates.
     // So the setting is not shown if there is nothing to do with it.
     if (!empty($customselect)) {
-        $settings->add(new admin_setting_configmultiselect('local_oer/coursecustomfieldsignored',
-                new lang_string('coursecustomfieldsignored', 'local_oer'),
-                new lang_string('coursecustomfieldsignored_description', 'local_oer'),
-                [], $customselect));
+        $settings->add(new admin_setting_configmultiselect(
+            'local_oer/coursecustomfieldsignored',
+            new lang_string('coursecustomfieldsignored', 'local_oer'),
+            new lang_string('coursecustomfieldsignored_description', 'local_oer'),
+            [],
+            $customselect
+        ));
         $settings->hide_if('local_oer/coursecustomfieldsignored', 'local_oer/coursecustomfields');
     }
 
     $plugins = \local_oer\plugininfo\oercourseinfo::get_enabled_plugins();
     $select = array_merge(['no_value' => new lang_string('no_value', 'local_oer')], $plugins);
-    $settings->add(new admin_setting_configselect('local_oer/metadataaggregator',
-            new lang_string('metadataaggregator', 'local_oer'),
-            new lang_string('metadataaggregator_description', 'local_oer'),
-            'no_value', $select));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/metadataaggregator',
+        new lang_string('metadataaggregator', 'local_oer'),
+        new lang_string('metadataaggregator_description', 'local_oer'),
+        'no_value',
+        $select
+    ));
 
-    $settings->add(new admin_setting_configcheckbox('local_oer/coursetofile',
-            new lang_string('coursetofile', 'local_oer'),
-            new lang_string('coursetofile_description', 'local_oer'),
-            '0'));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/coursetofile',
+        new lang_string('coursetofile', 'local_oer'),
+        new lang_string('coursetofile_description', 'local_oer'),
+        '0'
+    ));
 
     $requiredchoices = [
             'description' => 'abstract',
@@ -103,47 +118,62 @@ if ($hassiteconfig) {
         $requiredchoices['oerclassification_' . $key] = $key;
     }
 
-    $reqsetting = new admin_setting_configmultiselect('local_oer/requiredfields',
-            new lang_string('requiredfields', 'local_oer'),
-            new lang_string('requiredfields_desc', 'local_oer'),
-            [], $requiredchoices);
+    $reqsetting = new admin_setting_configmultiselect(
+        'local_oer/requiredfields',
+        new lang_string('requiredfields', 'local_oer'),
+        new lang_string('requiredfields_desc', 'local_oer'),
+        [],
+        $requiredchoices
+    );
     $reqsetting->set_updatedcallback('local_oer_reset_releasestate_if_necessary');
 
     $settings->add($reqsetting);
 
-    $settings->add(new admin_setting_configcheckbox('local_oer/uselicensereplacement',
-            new lang_string('uselicensereplacement', 'local_oer'),
-            new lang_string('uselicensereplacement_description', 'local_oer'),
-            '0'));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/uselicensereplacement',
+        new lang_string('uselicensereplacement', 'local_oer'),
+        new lang_string('uselicensereplacement_description', 'local_oer'),
+        '0'
+    ));
     $licensereplacedefault = "cc-4.0=>CC BY 4.0\r\n" .
             "cc-nd-4.0=>CC BY-ND 4.0\r\n" .
             "cc-nc-nd-4.0=>CC BY-NC-ND 4.0\r\n" .
             "cc-nc-4.0=>CC BY-NC 4.0\r\n" .
             "cc-nc-sa-4.0=>CC BY-NC-SA 4.0\r\n" .
             "cc-sa-4.0=>CC BY-SA 4.0\r\n";
-    $settings->add(new admin_setting_configtextarea('local_oer/licensereplacement',
-            new lang_string('licensereplacement', 'local_oer'),
-            new lang_string('licensereplacement_description', 'local_oer'),
-            $licensereplacedefault));
+    $settings->add(new admin_setting_configtextarea(
+        'local_oer/licensereplacement',
+        new lang_string('licensereplacement', 'local_oer'),
+        new lang_string('licensereplacement_description', 'local_oer'),
+        $licensereplacedefault
+    ));
     $settings->hide_if('local_oer/licensereplacement', 'local_oer/uselicensereplacement');
 
-    $settings->add(new admin_setting_heading('oerhelptexts',
+    $settings->add(new admin_setting_heading(
+        'oerhelptexts',
         new lang_string('oerhelptextsheading', 'local_oer'),
-        new lang_string('oerhelptextsheading_desc', 'local_oer')));
+        new lang_string('oerhelptextsheading_desc', 'local_oer')
+    ));
 
-    $settings->add(new admin_setting_confightmleditor('local_oer/creatorsviewinfo',
+    $settings->add(new admin_setting_confightmleditor(
+        'local_oer/creatorsviewinfo',
         new lang_string('creatorsviewinfo', 'local_oer'),
         new lang_string('creatorsviewinfo_description', 'local_oer'),
-        ''));
+        ''
+    ));
 
-    $settings->add(new admin_setting_confightmleditor('local_oer/uploadinfotext',
+    $settings->add(new admin_setting_confightmleditor(
+        'local_oer/uploadinfotext',
         new lang_string('uploadinfotext', 'local_oer'),
         new lang_string('uploadinfotext_description', 'local_oer'),
-        ''));
+        ''
+    ));
 
-    $settings->add(new admin_setting_heading('oerrelease',
-            new lang_string('oerreleaseheading', 'local_oer'),
-            new lang_string('oerreleaseheading_desc', 'local_oer')));
+    $settings->add(new admin_setting_heading(
+        'oerrelease',
+        new lang_string('oerreleaseheading', 'local_oer'),
+        new lang_string('oerreleaseheading_desc', 'local_oer')
+    ));
 
     $zipperselect = [
             0 => new lang_string('zipnorestriction', 'local_oer'),
@@ -152,44 +182,61 @@ if ($hassiteconfig) {
             104857600 => \local_oer\helper\filehelper::get_readable_filesize(104857600),
             1048576000 => \local_oer\helper\filehelper::get_readable_filesize(1048576000),
     ];
-    $settings->add(new admin_setting_configselect('local_oer/zipperfilesize',
-            new lang_string('zipperfilesize', 'local_oer'),
-            new lang_string('zipperfilesize_description', 'local_oer'),
-            104857600, $zipperselect));
-    $settings->add(new admin_setting_configcheckbox('local_oer/allowedlist',
-            new lang_string('cb_allowedlist', 'local_oer'),
-            new lang_string('cb_allowedlist_desc', 'local_oer'),
-            '1'));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/zipperfilesize',
+        new lang_string('zipperfilesize', 'local_oer'),
+        new lang_string('zipperfilesize_description', 'local_oer'),
+        104857600,
+        $zipperselect
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/allowedlist',
+        new lang_string('cb_allowedlist', 'local_oer'),
+        new lang_string('cb_allowedlist_desc', 'local_oer'),
+        '1'
+    ));
     $notalloweddefault = '<h3>Access not permitted</h3>' .
             '<p>Please contact your moodle administrator if you think this is an error.</p>';
-    $settings->add(new admin_setting_confightmleditor('local_oer/notallowedtext',
-            new lang_string('notallowedtext', 'local_oer'),
-            new lang_string('notallowedtext_desc', 'local_oer'),
-            $notalloweddefault));
-    $settings->add(new admin_setting_configcheckbox('local_oer/pullservice',
-            new lang_string('pullservice', 'local_oer'),
-            new lang_string('pullservice_desc', 'local_oer'),
-            '0'));
-    $settings->add(new \local_oer\time\oer_config_link('local_oer/configtime',
-            new lang_string('configtime', 'local_oer'),
-            new moodle_url('/local/oer/views/time_config.php')));
+    $settings->add(new admin_setting_confightmleditor(
+        'local_oer/notallowedtext',
+        new lang_string('notallowedtext', 'local_oer'),
+        new lang_string('notallowedtext_desc', 'local_oer'),
+        $notalloweddefault
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/pullservice',
+        new lang_string('pullservice', 'local_oer'),
+        new lang_string('pullservice_desc', 'local_oer'),
+        '0'
+    ));
+    $settings->add(new \local_oer\time\oer_config_link(
+        'local_oer/configtime',
+        new lang_string('configtime', 'local_oer'),
+        new moodle_url('/local/oer/views/time_config.php')
+    ));
 
     $plugins = \local_oer\plugininfo\oeruploader::get_enabled_plugins();
     $select = array_merge(['pullservice' => new lang_string('pullservice', 'local_oer')], $plugins);
-    $settings->add(new admin_setting_configselect('local_oer/releaseplugin',
-            new lang_string('releaseplugin', 'local_oer'),
-            new lang_string('releaseplugin_description', 'local_oer'),
-            'pullservice', $select));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/releaseplugin',
+        new lang_string('releaseplugin', 'local_oer'),
+        new lang_string('releaseplugin_description', 'local_oer'),
+        'pullservice',
+        $select
+    ));
 
     $applicationprofiles = [
             'v1.0.0' => 'Application profile v1.0.0',
             'v2.0.0' => 'Application profile v2.0.0',
     ];
 
-    $settings->add(new admin_setting_configselect('local_oer/applicationprofile',
-            new lang_string('applicationprofile', 'local_oer'),
-            new lang_string('applicationprofile_description', 'local_oer'),
-            'v2.0.0', $applicationprofiles));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/applicationprofile',
+        new lang_string('applicationprofile', 'local_oer'),
+        new lang_string('applicationprofile_description', 'local_oer'),
+        'v2.0.0',
+        $applicationprofiles
+    ));
 
     if ($ADMIN->fulltree) {
         require_once(__DIR__ . '/adminlib.php');
@@ -198,8 +245,10 @@ if ($hassiteconfig) {
 
     $ADMIN->add('oersettings', $settings);
     unset($settings);
-    $ADMIN->add('localplugins',
-            new admin_category('localoersubpluginssettings', new lang_string('pluginname', 'local_oer'), true));
+    $ADMIN->add(
+        'localplugins',
+        new admin_category('localoersubpluginssettings', new lang_string('pluginname', 'local_oer'), true)
+    );
     foreach (core_plugin_manager::instance()->get_plugins_of_type('oermod') as $plugin) {
         $plugin->load_settings($ADMIN, 'localoersubpluginssettings', $hassiteconfig);
     }
@@ -217,18 +266,24 @@ if ($hassiteconfig) {
     $ADMIN->add('root', new admin_category('oersettings', new lang_string('oer_link', 'local_oer'), false));
 }
 
-$ADMIN->add('oersettings', new admin_externalpage('oer_allowedlist',
-        new lang_string('manage_oer', 'local_oer'),
-        new moodle_url('/local/oer/views/manage.php'),
-        'local/oer:manage'));
-$ADMIN->add('oersettings', new admin_externalpage('oer_logs',
-        new lang_string('log_oer', 'local_oer'),
-        new moodle_url('/local/oer/views/log.php'),
-        'local/oer:manage'));
-$ADMIN->add('oersettings', new admin_externalpage('oer_releasehistory',
-        new lang_string('releasehistory', 'local_oer'),
-        new moodle_url('/local/oer/views/releasehistory.php'),
-        'local/oer:manage'));
+$ADMIN->add('oersettings', new admin_externalpage(
+    'oer_allowedlist',
+    new lang_string('manage_oer', 'local_oer'),
+    new moodle_url('/local/oer/views/manage.php'),
+    'local/oer:manage'
+));
+$ADMIN->add('oersettings', new admin_externalpage(
+    'oer_logs',
+    new lang_string('log_oer', 'local_oer'),
+    new moodle_url('/local/oer/views/log.php'),
+    'local/oer:manage'
+));
+$ADMIN->add('oersettings', new admin_externalpage(
+    'oer_releasehistory',
+    new lang_string('releasehistory', 'local_oer'),
+    new moodle_url('/local/oer/views/releasehistory.php'),
+    'local/oer:manage'
+));
 
 if (!function_exists('local_oer_reset_releasestate_if_necessary')) {
     /**

@@ -57,8 +57,11 @@ class module implements \local_oer\modules\module {
                 $element->set_origin('mod_folder', 'pluginname', 'mod_folder');
                 $element->set_title($file->get_filename());
                 $identifier = \local_oer\identifier::compose(
-                        'moodle', $CFG->wwwroot, 'file',
-                        'contenthash', $file->get_contenthash()
+                    'moodle',
+                    $CFG->wwwroot,
+                    'file',
+                    'contenthash',
+                    $file->get_contenthash()
                 );
                 $element->set_identifier($identifier);
                 $element->set_source(filehelper::get_file_url($file, true));

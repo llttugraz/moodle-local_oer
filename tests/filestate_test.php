@@ -88,24 +88,44 @@ final class filestate_test extends \advanced_testcase {
         $DB->delete_records('local_oer_elements', ['courseid' => $course2->id]);
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
-        $this->assert_file_state($element, $course1->id,
-                filestate::STATE_FILE_NOT_EDITED, 0,
-                2, true);
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_NOT_EDITED, 0,
-                2, true);
+        $this->assert_file_state(
+            $element,
+            $course1->id,
+            filestate::STATE_FILE_NOT_EDITED,
+            0,
+            2,
+            true
+        );
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_NOT_EDITED,
+            0,
+            2,
+            true
+        );
 
         // Tests for state 2 (STATE_FILE_EDITED).
         // The element has already been edited in course1, therefore course2 does not get write capability for the file.
         $testcourse->set_file_to_non_release($course1->id, $element);
         $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
-        $this->assert_file_state($element, $course1->id,
-                filestate::STATE_FILE_EDITED, $course1->id,
-                2, true);
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_EDITED, $course1->id,
-                2, false);
+        $this->assert_file_state(
+            $element,
+            $course1->id,
+            filestate::STATE_FILE_EDITED,
+            $course1->id,
+            2,
+            true
+        );
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_EDITED,
+            $course1->id,
+            2,
+            false
+        );
 
         // Tests for state 3 (STATE_FILE_RELEASED).
         // The element has been released. So it can not be edited by any of the courses.
@@ -117,35 +137,65 @@ final class filestate_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('local_oer_elements', ['courseid' => $course1->id]));
         $this->assertFalse($DB->record_exists('local_oer_elements', ['courseid' => $course2->id]));
         $this->assertTrue($DB->record_exists('local_oer_snapshot', ['identifier' => $element->get_identifier()]));
-        $this->assert_file_state($element, $course1->id,
-                filestate::STATE_FILE_RELEASED, $course1->id,
-                2, false);
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_RELEASED, $course1->id,
-                2, false);
+        $this->assert_file_state(
+            $element,
+            $course1->id,
+            filestate::STATE_FILE_RELEASED,
+            $course1->id,
+            2,
+            false
+        );
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_RELEASED,
+            $course1->id,
+            2,
+            false
+        );
 
         // Test inheritance.
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_RELEASED, $course1->id,
-                2, false);
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_RELEASED,
+            $course1->id,
+            2,
+            false
+        );
         delete_course($course1->id, false);
         // After the deletion of course 1 the file metadata will be inherited to course 2.
         // So course 2 has to be the editorid from now on.
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_RELEASED, $course2->id,
-                1, false);
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_RELEASED,
+            $course2->id,
+            1,
+            false
+        );
         $DB->delete_records('local_oer_snapshot', ['identifier' => $element->get_identifier()]);
-        $this->assert_file_state($element, $course2->id,
-                filestate::STATE_FILE_EDITED, $course2->id,
-                1, true);
+        $this->assert_file_state(
+            $element,
+            $course2->id,
+            filestate::STATE_FILE_EDITED,
+            $course2->id,
+            1,
+            true
+        );
 
         // Test if exception is thrown.
         $this->expectException('\coding_exception');
         $this->expectExceptionMessage('Something really unexpected happened, ' .
                 'a file contenthash (123' .
                 ') has been searched that is not used anywhere');
-        $identifier = identifier::compose('moodle', $CFG->wwwroot,
-                'file', 'contenthash', '123');
+        $identifier = identifier::compose(
+            'moodle',
+            $CFG->wwwroot,
+            'file',
+            'contenthash',
+            '123'
+        );
         $element->set_identifier($identifier);
         filestate::calculate_state($element, $course1->id);
     }
@@ -163,8 +213,14 @@ final class filestate_test extends \advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    private function assert_file_state(element $element, $courseid, $expectedstate, $expectededitor, $expectedcoursecount,
-            $expectedwritable): void {
+    private function assert_file_state(
+        element $element,
+        $courseid,
+        $expectedstate,
+        $expectededitor,
+        $expectedcoursecount,
+        $expectedwritable
+    ): void {
         filestate::calculate_state($element, $courseid);
         $this->assertEquals($expectedstate, $element->get_elementstate()->state);
         $this->assertEquals($expectededitor, $element->get_elementstate()->editorid);

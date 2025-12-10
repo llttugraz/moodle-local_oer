@@ -218,10 +218,12 @@ class testcourse {
      */
     private function update_db(\stdClass $metadata) {
         global $DB;
-        if ($record = $DB->get_record('local_oer_elements', [
+        if (
+            $record = $DB->get_record('local_oer_elements', [
                 'courseid' => $metadata->courseid,
                 'identifier' => $metadata->identifier,
-        ])) {
+            ])
+        ) {
             $metadata->id = $record->id;
             $DB->update_record('local_oer_elements', $metadata);
         } else {
@@ -255,8 +257,13 @@ class testcourse {
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function generate_resource(\stdClass $course, \testing_data_generator $generator, string $filename = '',
-            ?int $draftid = null, string $content = '') {
+    public function generate_resource(
+        \stdClass $course,
+        \testing_data_generator $generator,
+        string $filename = '',
+        ?int $draftid = null,
+        string $content = ''
+    ) {
         $record = new \stdClass();
         $record->course = $course;
         [$draftid, $file] = $this->generate_file($filename, $draftid, $content);
@@ -276,8 +283,13 @@ class testcourse {
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      */
-    public function generate_folder(\stdClass $course, \testing_data_generator $generator, string $filename = '',
-            ?int $draftid = null, string $content = '') {
+    public function generate_folder(
+        \stdClass $course,
+        \testing_data_generator $generator,
+        string $filename = '',
+        ?int $draftid = null,
+        string $content = ''
+    ) {
         $record = new \stdClass();
         $record->course = $course;
 

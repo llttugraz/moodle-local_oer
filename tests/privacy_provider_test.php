@@ -184,7 +184,6 @@ final class privacy_provider_test extends provider_testcase {
         $admindata = get_admin();
         $oerlist = $DB->get_records('local_oer_elements', ['usermodified' => $admindata->id]);
         $this->assertCount(1, $oerlist);
-
     }
 
     /**
@@ -228,7 +227,6 @@ final class privacy_provider_test extends provider_testcase {
         $this->assertCount(0, $oerlist);
         $oerlist = $DB->get_records('local_oer_elements');
         $this->assertCount(1, $oerlist);
-
     }
 
     /**

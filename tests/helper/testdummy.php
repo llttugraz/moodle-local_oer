@@ -15,26 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * OER subplugin for loading mod_resource files
+ * Open Educational Resources Plugin
  *
- * @package    oermod_resource
+ * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2023 Educational Technologies, Graz, University of Technology
+ * @copyright  2022-2025 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace oermod_resource\privacy;
+namespace local_oer;
+
+use local_oer\release\releasedata;
 
 /**
- * Class provider
+ * Instantiate an unaltered version of abstract class releasedata.
  */
-class provider implements \core_privacy\local\metadata\null_provider {
-    /**
-     * Null provider, does not store any data.
-     *
-     * @return  string
-     */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
-    }
+class testdummy extends releasedata {
+    // Does not extend parent.
 }

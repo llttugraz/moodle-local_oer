@@ -27,16 +27,8 @@ namespace local_oer;
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_oer\release\releasedata;
-
 require_once(__DIR__ . '/../helper/testcourse.php');
-
-/**
- * Instantiate an unaltered version of abstract class releasedata.
- */
-class testdummy extends releasedata {
-    // Does not extend parent.
-}
+require_once(__DIR__ . '/../helper/testdummy.php');
 
 /**
  * Test for the releasedata data structure.
