@@ -8,7 +8,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:18
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -30,30 +30,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
-        moodle-branch: [ 'MOODLE_401_STABLE', 'MOODLE_402_STABLE', 'MOODLE_403_STABLE', 'MOODLE_404_STABLE', 'MOODLE_405_STABLE' ]
+        php: [ '8.2', '8.3', '8.4' ]
+        moodle-branch: [ 'MOODLE_405_STABLE', 'MOODLE_500_STABLE', 'MOODLE_501_STABLE' ]
         database: [ pgsql, mariadb ]
         exclude:
-          - php: '7.4'
-            moodle-branch: 'MOODLE_402_STABLE'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_403_STABLE'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_404_STABLE'
-          - php: '7.4'
+          - php: '8.4'
             moodle-branch: 'MOODLE_405_STABLE'
-          - php: '8.0'
-            moodle-branch: 'MOODLE_404_STABLE'
-          - php: '8.0'
-            moodle-branch: 'MOODLE_405_STABLE'
-          - php: '8.2'
-            moodle-branch: 'MOODLE_401_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_401_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_402_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_403_STABLE'
 
     steps:
       - name: Check out repository code
