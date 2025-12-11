@@ -4,5 +4,11 @@
     "oeruploader": "local/oer/uploader",
     "oerclassification": "local/oer/classification",
     "oermod": "local/oer/modules"
+  },
+  "subplugintypes": {
+    "oercourseinfo": "metadata",
+    "oeruploader": "uploader",
+    "oerclassification": "classification",
+    "oermod": "modules"
   }
 }
