@@ -10,7 +10,7 @@ Since the version v2.3.0 subplugins for loading the OER resources are necessary,
 
 # Requirements
 
-- Supported Moodle Version: 4.5 - 4.1
+- Supported Moodle Version: 4.5 - 5.1
 - Supported PHP Version:    8.1 - 8.4
 - Supported Databases:      MariaDB, PostgreSQL
 - Supported Moodle Themes:  Boost
