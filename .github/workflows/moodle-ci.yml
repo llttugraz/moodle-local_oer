@@ -111,7 +111,17 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --coverage-text --fail-on-warning
+        run: |
+          # In PHP Unit 11 the coverage information is inside a source tag instead of coverage.
+          # To use the same xml file for Moodle 4.5 and Moodle 5.0+ the tag is changed directly here.
+          
+          if [[ "${{ matrix.moodle-branch }}" == "MOODLE_500_STABLE" || "${{ matrix.moodle-branch }}" == "MOODLE_501_STABLE" ]]; then
+            echo "Moodle 5.x detected: Patching phpunit.xml for PHPUnit 11 compatibility..."
+            sed -i 's/<coverage>/<source>/g' moodle/local/oer/phpunit.xml
+            sed -i 's/<\/coverage>/<\/source>/g' moodle/local/oer/phpunit.xml
+          fi
+          
+          moodle-plugin-ci phpunit --coverage-text --fail-on-warning
 
       - name: Behat features
         if: ${{ always() }}
