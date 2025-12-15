@@ -118,8 +118,10 @@ final class get_files_test extends \advanced_testcase {
         $this->assertEquals($this->value, get_class($returnvalue->keys['origin']->content->keys['origin']));
         $this->assertEquals(PARAM_ALPHANUMEXT, $returnvalue->keys['origin']->content->keys['origin']->type);
         $this->assertArrayHasKey('originname', $returnvalue->keys['origin']->content->keys);
-        $this->assertEquals($this->value,
-                get_class($returnvalue->keys['origin']->content->keys['originname']));
+        $this->assertEquals(
+            $this->value,
+            get_class($returnvalue->keys['origin']->content->keys['originname'])
+        );
         $this->assertEquals(PARAM_TEXT, $returnvalue->keys['origin']->content->keys['originname']->type);
 
         // The main difference to get_file is the multiple structure for the files values.

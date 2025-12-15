@@ -66,19 +66,31 @@ class time_form extends \moodleform {
             $hour["$h:00"] = "$h:00";
         }
 
-        $mform->addElement('select', time_settings::CONF_RELEASETIME, get_string(time_settings::CONF_RELEASETIME, $component),
-                $selectreleasetime);
+        $mform->addElement(
+            'select',
+            time_settings::CONF_RELEASETIME,
+            get_string(time_settings::CONF_RELEASETIME, $component),
+            $selectreleasetime
+        );
         $mform->setDefault(time_settings::CONF_RELEASETIME, time_settings::MONTH);
         $mform->addHelpButton(time_settings::CONF_RELEASETIME, time_settings::CONF_RELEASETIME, $component);
 
-        $mform->addElement('select', time_settings::CONF_RELEASEHOUR,
-                get_string(time_settings::CONF_RELEASEHOUR, $component), $hour);
+        $mform->addElement(
+            'select',
+            time_settings::CONF_RELEASEHOUR,
+            get_string(time_settings::CONF_RELEASEHOUR, $component),
+            $hour
+        );
         $mform->setDefault(time_settings::CONF_RELEASEHOUR, '04:00');
         $mform->addHelpButton(time_settings::CONF_RELEASEHOUR, time_settings::CONF_RELEASEHOUR, $component);
 
         $mform->addElement('text', time_settings::CONF_CUSTOMDATES, get_string(time_settings::CONF_CUSTOMDATES, $component));
-        $mform->disabledIf(time_settings::CONF_CUSTOMDATES, time_settings::CONF_RELEASETIME, $condition = 'neq',
-                $value = time_settings::CUSTOM);
+        $mform->disabledIf(
+            time_settings::CONF_CUSTOMDATES,
+            time_settings::CONF_RELEASETIME,
+            $condition = 'neq',
+            $value = time_settings::CUSTOM
+        );
         $mform->setType(time_settings::CONF_CUSTOMDATES, PARAM_RAW);
         $mform->addHelpButton(time_settings::CONF_CUSTOMDATES, time_settings::CONF_CUSTOMDATES, $component);
 

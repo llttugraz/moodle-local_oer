@@ -192,8 +192,16 @@ class zipper {
         }
         $fileary = explode('/', $file);
         $filename = end($fileary);
-        send_file($file, $filename, 0, false,
-                false, 'application/zip', true, true);
+        send_file(
+            $file,
+            $filename,
+            0,
+            false,
+            false,
+            'application/zip',
+            true,
+            true
+        );
         $this->delete_temp_folder($file);
     }
 }

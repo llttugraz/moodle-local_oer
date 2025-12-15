@@ -79,8 +79,12 @@ class fileinfo_form extends \moodleform {
         $mform->addRule('title', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('title', 'title', 'local_oer');
 
-        $mform->addElement('textarea', 'description', get_string('filedescription', 'local_oer'),
-                'wrap="virtual" rows="3" cols="60"');
+        $mform->addElement(
+            'textarea',
+            'description',
+            get_string('filedescription', 'local_oer'),
+            'wrap="virtual" rows="3" cols="60"'
+        );
         $mform->addHelpButton('description', 'filedescription', 'local_oer');
         if (in_array('description', $reqfields)) {
             $mform->addRule('description', get_string('required'), 'required', '', 'client');
@@ -162,13 +166,15 @@ class fileinfo_form extends \moodleform {
         $mform->addHelpButton('ignore', 'ignore', 'local_oer');
         $mform->disabledIf('ignore', 'upload', 'checked');
 
-        $prefhtml = $OUTPUT->render_from_template('local_oer/preferenceform',
-                [
+        $prefhtml = $OUTPUT->render_from_template(
+            'local_oer/preferenceform',
+            [
                         'enabled' => $preference !== false,
                         'saved' => $alreadystored,
                         'identifier' => $course['identifier'],
                         'courseid' => $course['courseid'],
-                ]);
+            ]
+        );
         $mform->addElement('html', $prefhtml);
 
         if ($writablefields = oermod::get_writable_fields($element)) {
@@ -265,16 +271,24 @@ class fileinfo_form extends \moodleform {
      */
     public static function add_shared_fields_to_form(\MoodleQuickForm $mform, bool $addnopref, array $supportedlicences) {
         $reqfields = static::get_required_fields();
-        $mform->addElement('select', 'context', get_string('context', 'local_oer'),
-                formhelper::lom_context_list(true, $addnopref));
+        $mform->addElement(
+            'select',
+            'context',
+            get_string('context', 'local_oer'),
+            formhelper::lom_context_list(true, $addnopref)
+        );
         $mform->setDefault('context', $addnopref ? 'nopref' : 1);
         $mform->addHelpButton('context', 'context', 'local_oer');
         if (in_array('context', $reqfields)) {
             $mform->addRule('context', get_string('required'), 'required', '', 'client');
         }
 
-        $mform->addElement('select', 'license', get_string('license'),
-                license::get_licenses_select_data($addnopref, $supportedlicences));
+        $mform->addElement(
+            'select',
+            'license',
+            get_string('license'),
+            license::get_licenses_select_data($addnopref, $supportedlicences)
+        );
         $mform->setDefault('license', $addnopref ? 'nopref' : 'unknown');
         $mform->addHelpButton('license', 'license', 'local_oer');
         $mform->addRule('license', get_string('required'), 'required', '', 'client');
@@ -309,16 +323,24 @@ class fileinfo_form extends \moodleform {
             $mform->addRule('tags', get_string('required'), 'required', '', 'client');
         }
 
-        $mform->addElement('select', 'language', get_string('language', 'local_oer'),
-                formhelper::language_select_data($addnopref));
+        $mform->addElement(
+            'select',
+            'language',
+            get_string('language', 'local_oer'),
+            formhelper::language_select_data($addnopref)
+        );
         $mform->setDefault('language', $addnopref ? 'nopref' : 'de');
         $mform->addHelpButton('language', 'language', 'local_oer');
         if (in_array('language', $reqfields)) {
             $mform->addRule('language', get_string('required'), 'required', '', 'client');
         }
 
-        $mform->addElement('select', 'resourcetype', get_string('resourcetype', 'local_oer'),
-                formhelper::lom_resource_types(true, $addnopref));
+        $mform->addElement(
+            'select',
+            'resourcetype',
+            get_string('resourcetype', 'local_oer'),
+            formhelper::lom_resource_types(true, $addnopref)
+        );
         $mform->setDefault('resourcetype', $addnopref ? 'nopref' : 0);
         $mform->addHelpButton('resourcetype', 'resourcetype', 'local_oer');
         if (in_array('resourcetype', $reqfields)) {
@@ -418,14 +440,15 @@ class fileinfo_form extends \moodleform {
             foreach ($classifications as $key => $classplugin) {
                 // @codeCoverageIgnoreStart
                 // This code is not reachable without subplugins installed.
-                if (in_array('oerclassification_' . $key, $reqfields) &&
+                if (
+                    in_array('oerclassification_' . $key, $reqfields) &&
                         (empty($data['oerclassification_' . $key]) ||
-                                $data['oerclassification_' . $key] == '_qf__force_multiselect_submission')) {
+                                $data['oerclassification_' . $key] == '_qf__force_multiselect_submission')
+                ) {
                     $errors['oerclassification_' . $key] = get_string('error_upload_classification', 'local_oer');
                 }
                 // @codeCoverageIgnoreEnd
             }
-
         }
         if (empty($data['title'])) {
             $errors['title'] = get_string('required');
@@ -465,9 +488,12 @@ class fileinfo_form extends \moodleform {
             // Update 15.11.2022: File in multiple courses https://github.com/llttugraz/moodle-local_oer/issues/14 .
             // Check if the identifier is not already stored with another courseid.
             if ($DB->get_record('local_oer_elements', ['identifier' => $record->identifier])) {
-                logger::add($record->courseid, logger::LOGERROR,
-                        'Tried to create duplicate file entry for file ' . $record->identifier . '.' .
-                        'This code should not be reachable');
+                logger::add(
+                    $record->courseid,
+                    logger::LOGERROR,
+                    'Tried to create duplicate file entry for file ' . $record->identifier . '.' .
+                    'This code should not be reachable'
+                );
                 return;
             }
             $DB->insert_record('local_oer_elements', $record);
@@ -563,8 +589,11 @@ class fileinfo_form extends \moodleform {
      * @return void
      * @throws \coding_exception
      */
-    public static function prepare_classification_values_for_form(\MoodleQuickForm $mform, ?\stdClass $classificationdata,
-            array &$data): void {
+    public static function prepare_classification_values_for_form(
+        \MoodleQuickForm $mform,
+        ?\stdClass $classificationdata,
+        array &$data
+    ): void {
         $classification = oerclassification::get_enabled_plugins();
         $reqfields = static::get_required_fields();
         foreach ($classification as $key => $pluginname) {
@@ -577,9 +606,13 @@ class fileinfo_form extends \moodleform {
                     'multiple' => true,
             ];
             $mform->addElement('html', '<hr>');
-            $select = $mform->createElement('autocomplete', $frankenstyle,
-                    get_string('selectname', $frankenstyle),
-                    $selectdata, $options);
+            $select = $mform->createElement(
+                'autocomplete',
+                $frankenstyle,
+                get_string('selectname', $frankenstyle),
+                $selectdata,
+                $options
+            );
             $mform->addElement($select);
             $mform->addHelpButton($frankenstyle, 'selectname', $frankenstyle);
             if (in_array($frankenstyle, $reqfields)) {

@@ -25,6 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// TODO: Move classes to separate files.
+// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
+
 /**
  * Class courseinfo_subplugins_settings
  *
@@ -162,22 +165,26 @@ class oersubplugins_settings extends admin_setting {
                     $hideshow = '';
                     $displayname = html_writer::tag('span', $name, ['class' => 'error']);
                 } else if ($plugininfo->is_enabled()) {
-                    $url = new moodle_url('/local/oer/subplugins.php',
-                            [
+                    $url = new moodle_url(
+                        '/local/oer/subplugins.php',
+                        [
                                     'sesskey' => sesskey(), 'return' => 'settings',
                                     'disable' => $name,
                                     'type' => $key,
-                            ]);
+                        ]
+                    );
                     $hideshow = $OUTPUT->pix_icon('t/hide', $strdisable);
                     $hideshow = html_writer::link($url, $hideshow);
                     $displayname = $namestr;
                 } else {
-                    $url = new moodle_url('/local/oer/subplugins.php',
-                            [
+                    $url = new moodle_url(
+                        '/local/oer/subplugins.php',
+                        [
                                     'sesskey' => sesskey(), 'return' => 'settings',
                                     'enable' => $name,
                                     'type' => $key,
-                            ]);
+                        ]
+                    );
                     $hideshow = $OUTPUT->pix_icon('t/show', $strenable);
                     $hideshow = html_writer::link($url, $hideshow);
                     $displayname = $namestr;

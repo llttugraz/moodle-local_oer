@@ -132,8 +132,11 @@ class coursecustomfield {
      */
     public static function load_course_customfields_from_oer(int $courseid): array {
         global $DB;
-        $customfields = $DB->get_field('local_oer_courseinfo', 'customfields',
-                ['courseid' => $courseid, 'subplugin' => courseinfo::BASETYPE]);
+        $customfields = $DB->get_field(
+            'local_oer_courseinfo',
+            'customfields',
+            ['courseid' => $courseid, 'subplugin' => courseinfo::BASETYPE]
+        );
         return !empty($customfields) ? json_decode($customfields, true) : [];
     }
 

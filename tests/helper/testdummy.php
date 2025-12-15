@@ -19,10 +19,17 @@
  *
  * @package    local_oer
  * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2021 Educational Technologies, Graz, University of Technology
+ * @copyright  2022-2025 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_oer;
 
-$subplugins = (array) json_decode(file_get_contents(__DIR__ . "/subplugins.json"))->plugintypes;
+use local_oer\release\releasedata;
+
+/**
+ * Instantiate an unaltered version of abstract class releasedata.
+ */
+class testdummy extends releasedata {
+    // Does not extend parent.
+}

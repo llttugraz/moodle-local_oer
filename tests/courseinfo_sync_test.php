@@ -86,21 +86,27 @@ final class courseinfo_sync_test extends \advanced_testcase {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(
-                [
+            [
                         'fullname' => 'Sync test course 1',
                         'shortname' => 'synccourse',
                         'summary' => 'A course created for a php unit test',
                 ]
         );
 
-        $this->assertEquals(0, $DB->count_records('local_oer_courseinfo'),
-                'Nothing happened yet, table is empty.');
+        $this->assertEquals(
+            0,
+            $DB->count_records('local_oer_courseinfo'),
+            'Nothing happened yet, table is empty.'
+        );
 
         // Create entry.
         $sync = new courseinfo_sync();
         $sync->sync_course($course->id);
-        $this->assertEquals(1, $DB->count_records('local_oer_courseinfo'),
-                'Course has been synced, so it is present in the table.');
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_oer_courseinfo'),
+            'Course has been synced, so it is present in the table.'
+        );
         $record = $DB->get_record('local_oer_courseinfo', ['coursecode' => 'moodlecourse-' . $course->id]);
         $this->assertEquals('Sync test course 1', $record->coursename);
         $this->assertEquals('A course created for a php unit test', $record->description);

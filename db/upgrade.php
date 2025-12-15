@@ -41,7 +41,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2019052202) {
-
         // Define table local_oer_queue to be created.
         $table = new xmldb_table('local_oer_queue');
 
@@ -65,7 +64,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019053100) {
-
         // Define table local_oer_log to be created.
         $table = new xmldb_table('local_oer_log');
 
@@ -113,7 +111,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021121400) {
-
         // Define table local_oer_courseinfo to be created.
         $table = new xmldb_table('local_oer_courseinfo');
 
@@ -160,7 +157,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022011800) {
-
         // Define table local_oer_files to be created.
         $table = new xmldb_table('local_oer_files');
 
@@ -202,7 +198,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022011900) {
-
         // Define field persons to be added to local_oer_files.
         $table = new xmldb_table('local_oer_files');
         $field = new xmldb_field('persons', XMLDB_TYPE_TEXT, null, null, null, null, null, 'role');
@@ -217,7 +212,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022012500) {
-
         // Define table local_oer_preference to be created.
         $table = new xmldb_table('local_oer_preference');
 
@@ -484,7 +478,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022030700) {
-
         // Define table local_oer_snapshot to be created.
         $table = new xmldb_table('local_oer_snapshot');
 
@@ -520,7 +513,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022030701) {
-
         // Define field coursemetadata, additionaldata and releasehash to be added to local_oer_snapshot.
         $table = new xmldb_table('local_oer_snapshot');
         $field1 = new xmldb_field('coursemetadata', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'classification');
@@ -581,7 +573,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022030900) {
-
         // Define table local_oer_activecourses to be dropped.
         $table = new xmldb_table('local_oer_activecourses');
 
@@ -595,7 +586,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022031001) {
-
         // Define field preference to be dropped from local_oer_files.
         $table = new xmldb_table('local_oer_files');
         $field = new xmldb_field('preference');
@@ -668,7 +658,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022102000) {
-
         // Define field customfields to be added to local_oer_courseinfo.
         $table = new xmldb_table('local_oer_courseinfo');
         $field = new xmldb_field('customfields', XMLDB_TYPE_TEXT, null, null, null, null, null, 'lecturer_edited');
@@ -683,7 +672,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022111700) {
-
         // Define table local_oer_coursetofile to be created.
         $table = new xmldb_table('local_oer_coursetofile');
 
@@ -713,7 +701,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2023111700) {
-
         // Define table local_oer_elements to be created.
         $table = new xmldb_table('local_oer_elements');
 
@@ -754,8 +741,11 @@ function xmldb_local_oer_upgrade($oldversion) {
         foreach ($records as $record) {
             unset($record->id);
             $identifier = \local_oer\identifier::compose(
-                    'moodle', $CFG->wwwroot,
-                    'file', 'contenthash', $record->contenthash
+                'moodle',
+                $CFG->wwwroot,
+                'file',
+                'contenthash',
+                $record->contenthash
             );
 
             $record->identifier = $identifier;
@@ -779,7 +769,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2023111701) {
-
         $records = $DB->get_records('local_oer_snapshot');
 
         // Rename field contenthash on table local_oer_snapshot to identifier.
@@ -798,8 +787,11 @@ function xmldb_local_oer_upgrade($oldversion) {
 
         foreach ($records as $record) {
             $identifier = \local_oer\identifier::compose(
-                    'moodle', $CFG->wwwroot,
-                    'file', 'contenthash', $record->contenthash
+                'moodle',
+                $CFG->wwwroot,
+                'file',
+                'contenthash',
+                $record->contenthash
             );
 
             $record->identifier = $identifier;
@@ -830,7 +822,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024022200) {
-
         // Define field releasenumber to be added to local_oer_snapshot.
         $table = new xmldb_table('local_oer_snapshot');
         $field = new xmldb_field('releasenumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'releasehash');
@@ -862,9 +853,11 @@ function xmldb_local_oer_upgrade($oldversion) {
                 $DB->update_record('local_oer_snapshot', $record);
             } else {
                 // How can it be smaller? The values were sorted by timecreated.
-                echo html_writer::div($record->identifier .
+                echo html_writer::div(
+                    $record->identifier .
                         ': "releasenumber" could not be updated, has to be changed manually',
-                        'adminwarning');
+                    'adminwarning'
+                );
             }
         }
         $transaction->allow_commit();
@@ -874,7 +867,6 @@ function xmldb_local_oer_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024022601) {
-
         // Define field type to be added to local_oer_snapshot.
         $table = new xmldb_table('local_oer_snapshot');
         $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'releasenumber');
@@ -902,9 +894,11 @@ function xmldb_local_oer_upgrade($oldversion) {
             foreach ($releasedfiles as $releasedfile) {
                 $decomposed = \local_oer\identifier::decompose($releasedfile->identifier);
                 if ($decomposed->valuetype != 'contenthash') {
-                    echo html_writer::div($releasedfile->identifier .
+                    echo html_writer::div(
+                        $releasedfile->identifier .
                             ': Element is not a Moodle stored file. How is that possible during this update?',
-                            'adminwarning');
+                        'adminwarning'
+                    );
                     continue;
                 }
                 // Contenthash always leads to the same file.
@@ -914,20 +908,30 @@ function xmldb_local_oer_upgrade($oldversion) {
                         continue;
                     }
                     $fs = get_file_storage();
-                    $storedfile = $fs->get_file($file->contextid, $file->component, $file->filearea, $file->itemid, $file->filepath,
-                            $file->filename);
+                    $storedfile = $fs->get_file(
+                        $file->contextid,
+                        $file->component,
+                        $file->filearea,
+                        $file->itemid,
+                        $file->filepath,
+                        $file->filename
+                    );
                     if (!$storedfile) {
-                        echo html_writer::div($releasedfile->identifier .
+                        echo html_writer::div(
+                            $releasedfile->identifier .
                                 ': File does not exist anymore. Entry has to be cleaned up manually',
-                                'adminwarning');
+                            'adminwarning'
+                        );
                         continue;
                     }
-                    $url = \moodle_url::make_pluginfile_url($storedfile->get_contextid(),
-                            $storedfile->get_component(),
-                            $storedfile->get_filearea(),
-                            $storedfile->get_itemid(),
-                            $storedfile->get_filepath(),
-                            $storedfile->get_filename());
+                    $url = \moodle_url::make_pluginfile_url(
+                        $storedfile->get_contextid(),
+                        $storedfile->get_component(),
+                        $storedfile->get_filearea(),
+                        $storedfile->get_itemid(),
+                        $storedfile->get_filepath(),
+                        $storedfile->get_filename()
+                    );
                     $releasedfile->typedata = json_encode([
                             'mimetype' => $storedfile->get_mimetype(),
                             'filesize' => $storedfile->get_filesize(),

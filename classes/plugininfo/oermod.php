@@ -99,8 +99,12 @@ class oermod extends plugininfo {
         $module = self::get_module($element);
         $released = $module->set_element_to_release($element);
         if (!$released) {
-            logger::add($courseid, logger::LOGERROR,
-                    $element->get_identifier() . ' set to release did not work', get_class($module));
+            logger::add(
+                $courseid,
+                logger::LOGERROR,
+                $element->get_identifier() . ' set to release did not work',
+                get_class($module)
+            );
         }
     }
 

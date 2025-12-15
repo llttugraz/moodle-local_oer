@@ -4,11 +4,11 @@ on: [ push, pull_request ]
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:18
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -16,7 +16,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10
+        image: mariadb:10.11
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -30,34 +30,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
-        moodle-branch: [ 'MOODLE_401_STABLE', 'MOODLE_402_STABLE', 'MOODLE_403_STABLE', 'MOODLE_404_STABLE', 'MOODLE_405_STABLE' ]
+        php: [ '8.1', '8.2', '8.3', '8.4' ]
+        moodle-branch: [ 'MOODLE_405_STABLE', 'MOODLE_500_STABLE', 'MOODLE_501_STABLE' ]
         database: [ pgsql, mariadb ]
         exclude:
-          - php: '7.4'
-            moodle-branch: 'MOODLE_402_STABLE'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_403_STABLE'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_404_STABLE'
-          - php: '7.4'
-            moodle-branch: 'MOODLE_405_STABLE'
-          - php: '8.0'
-            moodle-branch: 'MOODLE_404_STABLE'
-          - php: '8.0'
-            moodle-branch: 'MOODLE_405_STABLE'
-          - php: '8.2'
-            moodle-branch: 'MOODLE_401_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_401_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_402_STABLE'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_403_STABLE'
+          - moodle-branch: 'MOODLE_405_STABLE'
+            php: '8.4'
+          - moodle-branch: 'MOODLE_500_STABLE'
+            php: '8.1'
+          - moodle-branch: 'MOODLE_501_STABLE'
+            php: '8.1'
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: plugin
 
@@ -65,9 +51,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: ${{ matrix.extensions }}
+          extensions: mbstring, xml, curl, zip, gd, intl, sodium, soap, exif
           ini-values: max_input_vars=5000
-          # none to use phpdbg fallback. Specify pcov (Moodle 3.10 and up) or xdebug to use them instead.
           coverage: pcov
 
       - name: Initialise moodle-plugin-ci
@@ -126,7 +111,37 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --coverage-text --fail-on-warning
+        run: |
+          
+          # In PHP Unit 11 the coverage information is inside a source tag instead of coverage.
+          # To use the same xml file for Moodle 4.5 and Moodle 5.0+ the tag is changed directly here.
+          # Since Moodle 5.1 the code is inside a public folder the folder will be read dynamically to 
+          # find the phpunit.xml
+          
+          if [ -d "moodle/public/local/oer" ]; then
+            PLUGIN_PATH="moodle/public/local/oer"
+            echo "Path detected: Moodle 5.1+ structure ($PLUGIN_PATH)"
+          else
+            PLUGIN_PATH="moodle/local/oer"
+            echo "Path detected: Legacy structure ($PLUGIN_PATH)"
+          fi
+
+          CONFIG_FILE="$PLUGIN_PATH/phpunit.xml"
+          
+          # Check if file exists before proceeding
+          if [ ! -f "$CONFIG_FILE" ]; then
+             echo "::error::Config file not found at $CONFIG_FILE"
+             ls -la $PLUGIN_PATH
+             exit 1
+          fi
+
+          if [[ "${{ matrix.moodle-branch }}" == "MOODLE_500_STABLE" || "${{ matrix.moodle-branch }}" == "MOODLE_501_STABLE" || "${{ matrix.moodle-branch }}" == "master" ]]; then
+            echo "Applying PHPUnit 11 patch (<coverage> -> <source>)..."
+            sed -i 's/<coverage>/<source>/g' "$CONFIG_FILE"
+            sed -i 's/<\/coverage>/<\/source>/g' "$CONFIG_FILE"
+          fi
+
+          moodle-plugin-ci phpunit --coverage-text --fail-on-warning
 
       - name: Behat features
         if: ${{ always() }}

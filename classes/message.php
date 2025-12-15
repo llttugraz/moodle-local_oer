@@ -53,8 +53,11 @@ class message {
         $message->subject = get_string('requirementschanged_subject', 'local_oer');
         $courseurl = new \moodle_url('/course/view.php', ['id' => $course->id]);
         $message->fullmessageformat = FORMAT_HTML;
-        $fullmessage = '<p>' . get_string('requirementschanged_body', 'local_oer',
-                        ['url' => $courseurl->out(), 'course' => $course->fullname]);
+        $fullmessage = '<p>' . get_string(
+            'requirementschanged_body',
+            'local_oer',
+            ['url' => $courseurl->out(), 'course' => $course->fullname]
+        );
         $filelisthtml = '';
         foreach ($elements as $title) {
             $filelisthtml .= '* ' . $title . '<br>';
@@ -64,8 +67,10 @@ class message {
         $message->fullmessagehtml = $fullmessage;
         $message->smallmessage = get_string('requirementschanged_small', 'local_oer');
         $message->notification = 1;
-        $message->contexturl = (new \moodle_url('/local/oer/views/main.php',
-                ['id' => $courseid]))->out(false);
+        $message->contexturl = (new \moodle_url(
+            '/local/oer/views/main.php',
+            ['id' => $courseid]
+        ))->out(false);
         $message->contexturlname = 'OER course files';
         $support = \core_user::get_support_user();
         $content = [

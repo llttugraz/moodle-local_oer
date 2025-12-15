@@ -72,7 +72,7 @@ class userlist {
                 $users[] = $user;
             }
         }
-        usort($users, function($a, $b) {
+        usort($users, function ($a, $b) {
             return strcasecmp($a->lastname, $b->lastname);
         });
 
@@ -86,6 +86,5 @@ class userlist {
                 array_slice($creators, $half),
             ],
         ];
-
     }
 }

@@ -55,25 +55,29 @@ class courseinfo_form extends \moodleform {
         $moodleonly = get_config('local_oer', 'metadataaggregator') == 'no_value';
 
         $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                'text' => get_string('courseinfoformhelp', 'local_oer'),
+            'text' => get_string('courseinfoformhelp', 'local_oer'),
         ]);
         $mform->addElement('html', $text);
         if (!$moodleonly) {
             $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                    'text' => get_string('courseinfoformexternhelp', 'local_oer'),
+                'text' => get_string('courseinfoformexternhelp', 'local_oer'),
             ]);
             $mform->addElement('html', $text);
         }
         $text = $OUTPUT->render_from_template('local_oer/forminfo', [
-                'text' => get_string('courseinfoformadditionalhelp', 'local_oer'),
+            'text' => get_string('courseinfoformadditionalhelp', 'local_oer'),
         ]);
         $mform->addElement('html', $text);
 
         foreach ($courses as $course) {
             $additionalinfo = '';
             if ($course->deleted == 1) {
-                $DB->set_field('local_oer_courseinfo', 'ignored', 1,
-                        ['courseid' => $customdata['courseid'], 'coursecode' => $course->coursecode]);
+                $DB->set_field(
+                    'local_oer_courseinfo',
+                    'ignored',
+                    1,
+                    ['courseid' => $customdata['courseid'], 'coursecode' => $course->coursecode]
+                );
                 $course->ignored = 1;
                 $additionalinfo = ' (' . get_string('deleted', 'local_oer') . ')';
             } else if ($course->ignored == 1) {
@@ -83,7 +87,7 @@ class courseinfo_form extends \moodleform {
             $mform->addElement('header', 'coursecode_' . $course->coursecode);
             $mform->setExpanded('coursecode_' . $course->coursecode, false);
             $data['coursecode_' . $course->coursecode] = get_string('course')
-                    . ': ' . $course->coursecode . $additionalinfo;
+                . ': ' . $course->coursecode . $additionalinfo;
 
             if ($course->deleted == 1) {
                 $mform->addElement('HTML', get_string('deleted_help', 'local_oer'));
@@ -103,21 +107,48 @@ class courseinfo_form extends \moodleform {
             $textareaformat = 'wrap="virtual" rows="3" cols="45"';
             $mform = $this->form_default_element($mform, $course, $data, 'coursename', 'text', 255, 0);
             $mform = $this->form_default_element($mform, $course, $data, 'structure', 'text', 255);
-            $mform = $this->form_default_element($mform, $course, $data, 'description', 'textarea', 0, 0, false,
-                    $textareaformat);
-            $mform = $this->form_default_element($mform, $course, $data, 'objectives', 'textarea', 0, 0, false,
-                    $textareaformat);
+            $mform = $this->form_default_element(
+                $mform,
+                $course,
+                $data,
+                'description',
+                'textarea',
+                0,
+                0,
+                false,
+                $textareaformat
+            );
+            $mform = $this->form_default_element(
+                $mform,
+                $course,
+                $data,
+                'objectives',
+                'textarea',
+                0,
+                0,
+                false,
+                $textareaformat
+            );
             $mform = $this->form_default_element($mform, $course, $data, 'organisation', 'text', 255);
             $languages = formhelper::language_select_data();
             $mform = $this->form_default_element($mform, $course, $data, 'language', 'select', 2, 0, false, $languages);
-            $mform = $this->form_default_element($mform, $course, $data, 'lecturer', 'textarea', 0, 0, false,
-                    $textareaformat);
+            $mform = $this->form_default_element(
+                $mform,
+                $course,
+                $data,
+                'lecturer',
+                'textarea',
+                0,
+                0,
+                false,
+                $textareaformat
+            );
 
             if ($course->subplugin == courseinfo::BASETYPE && get_config('local_oer', 'coursecustomfields')) {
                 $customfields = coursecustomfield::get_course_customfields_with_applied_config($course->courseid, true);
                 foreach ($customfields as $category) {
                     $categoryname = str_replace(' ', '', strtolower($category['name'])) . $category['id'] . '_' .
-                            $course->coursecode;
+                        $course->coursecode;
                     $cattext = empty($category['fields']) ? get_string('nofieldsincat', 'local_oer') : '';
                     $mform->addElement('html', '<hr>');
                     $mform->addElement('static', $categoryname, '<strong>' . $category['name'] . '</strong>', $cattext);
@@ -126,8 +157,12 @@ class courseinfo_form extends \moodleform {
                         $shortname = $field['shortname'];
                         switch ($field['type']) {
                             case 'date':
-                                $mform->addElement('static', $categoryname . $shortname, $field['fullname'],
-                                        userdate($field['data']));
+                                $mform->addElement(
+                                    'static',
+                                    $categoryname . $shortname,
+                                    $field['fullname'],
+                                    userdate($field['data'])
+                                );
                                 break;
                             case 'select':
                                 $value = $field['data'];
@@ -225,11 +260,20 @@ class courseinfo_form extends \moodleform {
      * @return \MoodleQuickForm
      * @throws \coding_exception
      */
-    private function form_default_element(\MoodleQuickForm $mform, \stdClass $course, array &$data,
-            string $identifier, string $type, int $maxlength = 0,
-            int $minlength = 0, bool $required = false,
-            $additionaldata = false, string $shownname = '',
-            string $helpstring = '', $ignoreable = false): \MoodleQuickForm {
+    private function form_default_element(
+        \MoodleQuickForm $mform,
+        \stdClass $course,
+        array &$data,
+        string $identifier,
+        string $type,
+        int $maxlength = 0,
+        int $minlength = 0,
+        bool $required = false,
+        $additionaldata = false,
+        string $shownname = '',
+        string $helpstring = '',
+        $ignoreable = false
+    ): \MoodleQuickForm {
         $name = $identifier . '_' . $course->coursecode;
         $shownname = $shownname == '' ? get_string($identifier, 'local_oer') : $shownname;
         $checkbox = $identifier . '_edited_' . $course->coursecode;
@@ -298,20 +342,29 @@ class courseinfo_form extends \moodleform {
                                 $course->ignored = $value;
                                 $update = true;
                             }
+                            // Fall through.
                         case 'coursename_edited':
+                            // Fall through.
                         case 'structure_edited':
+                            // Fall through.
                         case 'description_edited':
+                            // Fall through.
                         case 'objectives_edited':
+                            // Fall through.
                         case 'organisation_edited':
+                            // Fall through.
                         case 'language_edited':
+                            // Fall through.
                         case 'lecturer_edited':
                             if ($course->$identifier != $value) {
                                 $update = true;
                                 $course->$identifier = $value;
                             }
                             $name = str_replace('_edited', '', $identifier);
-                            if ($value == 1 && $course->$name
-                                    != $fromform[$name . '_' . $course->coursecode]) {
+                            if (
+                                $value == 1 && $course->$name
+                                != $fromform[$name . '_' . $course->coursecode]
+                            ) {
                                 $course->$name = $fromform[$name . '_' . $course->coursecode];
                                 $update = true;
                             }

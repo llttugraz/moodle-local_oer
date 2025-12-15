@@ -57,8 +57,11 @@ class module implements \local_oer\modules\module {
                 $element->set_origin('mod_resource', 'pluginname', 'mod_resource');
                 $element->set_title($file->get_filename());
                 $identifier = \local_oer\identifier::compose(
-                        'moodle', $CFG->wwwroot, 'file',
-                        'contenthash', $file->get_contenthash()
+                    'moodle',
+                    $CFG->wwwroot,
+                    'file',
+                    'contenthash',
+                    $file->get_contenthash()
                 );
                 $element->set_identifier($identifier);
                 $element->set_license($file->get_license() ?? 'unknown');

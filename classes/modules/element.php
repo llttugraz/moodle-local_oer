@@ -396,8 +396,14 @@ class element {
         $this->set_license($metadata->license);
 
         // There could be more than one snapshot, so only get the newest.
-        $timestamps = $DB->get_records('local_oer_snapshot', ['identifier' => $this->get_identifier()],
-                'timecreated DESC', 'id,timecreated', 0, 1);
+        $timestamps = $DB->get_records(
+            'local_oer_snapshot',
+            ['identifier' => $this->get_identifier()],
+            'timecreated DESC',
+            'id,timecreated',
+            0,
+            1
+        );
         $snapshot = new \stdClass();
         $snapshot->release = empty($timestamps) ? 0 : reset($timestamps)->timecreated;
 
@@ -561,8 +567,14 @@ class element {
      * @throws \coding_exception
      * @throws \invalid_parameter_exception
      */
-    public function add_information(string $areastring, string $component, string $name, ?string $metadatafield,
-            string $rawdata, ?string $url = null): void {
+    public function add_information(
+        string $areastring,
+        string $component,
+        string $name,
+        ?string $metadatafield,
+        string $rawdata,
+        ?string $url = null
+    ): void {
         $information = new information();
         $information->set_area($areastring, $component);
         $information->set_name($name);

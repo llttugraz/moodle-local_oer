@@ -85,13 +85,15 @@ class courseinfo_sync {
         }
         foreach ($sync['markdeleted'] as $course) {
             $delete = false;
-            if ($course->coursename_edited == 0 &&
+            if (
+                $course->coursename_edited == 0 &&
                     $course->structure_edited == 0 &&
                     $course->description_edited == 0 &&
                     $course->objectives_edited == 0 &&
                     $course->organisation_edited == 0 &&
                     $course->language_edited == 0 &&
-                    $course->lecturer_edited == 0) {
+                    $course->lecturer_edited == 0
+            ) {
                 $delete = true;
             }
             if ($delete) {
@@ -151,8 +153,10 @@ class courseinfo_sync {
         $updatecourse->timemodified = $newcourse->timemodified;
         // This check has to be made against newcourse, oldcourse may not exist yet.
         if ($newcourse->subplugin == courseinfo::BASETYPE) {
-            [$updatecourse->customfields, $updateneeded] = $this->compare_customfields($oldcourse->customfields,
-                    $newcourse->customfields);
+            [$updatecourse->customfields, $updateneeded] = $this->compare_customfields(
+                $oldcourse->customfields,
+                $newcourse->customfields
+            );
         }
 
         if ($oldcourse->coursename_edited == 0 && $oldcourse->coursename != $newcourse->coursename) {

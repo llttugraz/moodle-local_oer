@@ -160,10 +160,16 @@ final class oermod_test extends \advanced_testcase {
         require_once($CFG->libdir . '/adminlib.php');
         $this->setAdminUser();
         $ADMIN = new \admin_root(true);
-        $ADMIN->add('root', new \admin_category('oersettings',
-                new \lang_string('oer_link', 'local_oer'), false));
-        $ADMIN->add('root', new \admin_category('localoersubpluginssettings',
-                new \lang_string('pluginname', 'local_oer'), true));
+        $ADMIN->add('root', new \admin_category(
+            'oersettings',
+            new \lang_string('oer_link', 'local_oer'),
+            false
+        ));
+        $ADMIN->add('root', new \admin_category(
+            'localoersubpluginssettings',
+            new \lang_string('pluginname', 'local_oer'),
+            true
+        ));
         $settings = 'not Null, trying to load the (non-existent) settings will set this variable to null.';
         foreach (\core_plugin_manager::instance()->get_plugins_of_type('oermod') as $plugin) {
             if ($plugin->name == 'resource') {

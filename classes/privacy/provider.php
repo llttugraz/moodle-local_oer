@@ -36,8 +36,10 @@ use core_privacy\local\request\writer;
 /**
  * Class provider
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider,
-        \core_privacy\local\request\plugin\provider {
+class provider implements
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Get metadata
      *
@@ -55,17 +57,18 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
-                'local_oer_userlist',
-                [
+            'local_oer_userlist',
+            [
                         'userid' => 'privacy:metadata:local_oer_userlist:userid',
                         'type' => 'privacy:metadata:local_oer_userlist:type',
                         'timecreated' => 'privacy:metadata:local_oer_userlist:timecreated',
                 ],
-                'privacy:metadata:local_oer_userlist'
+            'privacy:metadata:local_oer_userlist'
         );
 
-        $collection->add_database_table('local_oer_courseinfo',
-                [
+        $collection->add_database_table(
+            'local_oer_courseinfo',
+            [
                         'courseid' => 'privacy:metadata:courseid',
                         'coursecode' => 'privacy:metadata:coursecode',
                         'deleted' => 'privacy:metadata:deleted',
@@ -92,11 +95,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_courseinfo'
+            'privacy:metadata:local_oer_courseinfo'
         );
 
-        $collection->add_database_table('local_oer_coursetofile',
-                [
+        $collection->add_database_table(
+            'local_oer_coursetofile',
+            [
                         'contenthash' => 'privacy:metadata:contenthash',
                         'courseid' => 'privacy:metadata:courseid',
                         'coursecode' => 'privacy:metadata:coursecode',
@@ -105,11 +109,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_coursetofile'
+            'privacy:metadata:local_oer_coursetofile'
         );
 
-        $collection->add_database_table('local_oer_elements',
-                [
+        $collection->add_database_table(
+            'local_oer_elements',
+            [
                         'courseid' => 'privacy:metadata:courseid',
                         'identifier' => 'privacy:metadata:identifier',
                         'type' => 'privacy:metadata:type',
@@ -127,11 +132,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_elements'
+            'privacy:metadata:local_oer_elements'
         );
 
-        $collection->add_database_table('local_oer_log',
-                [
+        $collection->add_database_table(
+            'local_oer_log',
+            [
                         'courseid' => 'privacy:metadata:courseid',
                         'type' => 'privacy:metadata:type',
                         'message' => 'privacy:metadata:message',
@@ -140,11 +146,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_log'
+            'privacy:metadata:local_oer_log'
         );
 
-        $collection->add_database_table('local_oer_preference',
-                [
+        $collection->add_database_table(
+            'local_oer_preference',
+            [
                         'courseid' => 'privacy:metadata:courseid',
                         'context' => 'privacy:metadata:context',
                         'license' => 'privacy:metadata:license',
@@ -158,11 +165,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_preference'
+            'privacy:metadata:local_oer_preference'
         );
 
-        $collection->add_database_table('local_oer_snapshot',
-                [
+        $collection->add_database_table(
+            'local_oer_snapshot',
+            [
                         'courseid' => 'privacy:metadata:courseid',
                         'identifier' => 'privacy:metadata:identifier',
                         'title' => 'privacy:metadata:title',
@@ -184,7 +192,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => 'privacy:metadata:timecreated',
                         'timemodified' => 'privacy:metadata:timemodified',
                 ],
-                'privacy:metadata:local_oer_snapshot'
+            'privacy:metadata:local_oer_snapshot'
         );
 
         return $collection;
@@ -214,7 +222,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             $users = $DB->get_records('local_oer_userlist');
             foreach ($users as $user) {
                 static::delete_user_data($user->userid);
-
             }
         }
 
@@ -238,7 +245,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
-
             if ($context->contextlevel == CONTEXT_SYSTEM) {
                 static::delete_user_data($userid);
             }
@@ -246,7 +252,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             if ($context->contextlevel == CONTEXT_COURSE) {
                 static::change_userid_to_adminid($context->instanceid, $userid);
             }
-
         }
     }
 
@@ -281,7 +286,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 }
             }
         }
-
     }
 
     /**
@@ -306,11 +310,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                         'timecreated' => transform::datetime($userrecord->timecreated),
                 ];
                 writer::with_context(\context_system::instance())->export_data(
-                        ['local_oer_userlist'], $data);
+                    ['local_oer_userlist'],
+                    $data
+                );
             }
         }
 
-        $contexts = array_filter($contextlist->get_contexts(), function($context) {
+        $contexts = array_filter($contextlist->get_contexts(), function ($context) {
             if ($context->contextlevel == CONTEXT_COURSE) {
                 return $context;
             }
@@ -319,12 +325,11 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         if (empty($contexts)) {
             return;
         }
-        $courseids = array_map(function($context) {
+        $courseids = array_map(function ($context) {
             return $context->instanceid;
         }, $contexts);
 
         foreach ($tablenames as $table) {
-
             [$insql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
             $sql = "SELECT s.*, c.id as courseid
                       FROM {" . $table . "} s
@@ -350,10 +355,11 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 $statsrecords[$record->courseid]->entries[] = (array) $record;
             }
             foreach ($statsrecords as $coursestats) {
-                \core_privacy\local\request\writer::with_context($coursestats->context)->export_data([$table],
-                        (object) $coursestats->entries);
+                \core_privacy\local\request\writer::with_context($coursestats->context)->export_data(
+                    [$table],
+                    (object) $coursestats->entries
+                );
             }
-
         }
     }
 
@@ -406,7 +412,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 $userlist->add_from_sql('usermodified', $sql, $params);
             }
         }
-
     }
 
     /**
@@ -458,5 +463,4 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             }
         }
     }
-
 }

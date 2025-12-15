@@ -50,9 +50,20 @@ class fromform {
      * @return array
      * @throws \Exception
      */
-    public static function fileinfoform_submit(int $courseid, string $identifier, string $title, string $description,
-            int $context, string $license, string $language, int $resourcetype, array $persons,
-            int $upload, int $ignore, array $tags = []) {
+    public static function fileinfoform_submit(
+        int $courseid,
+        string $identifier,
+        string $title,
+        string $description,
+        int $context,
+        string $license,
+        string $language,
+        int $resourcetype,
+        array $persons,
+        int $upload,
+        int $ignore,
+        array $tags = []
+    ) {
         if ($upload == 1 && $ignore == 1) {
             throw new \Exception('Upload and ignore cannot be set at the same time.');
         }

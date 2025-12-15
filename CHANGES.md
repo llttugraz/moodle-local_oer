@@ -1,3 +1,8 @@
+### 2025-12-12 - v2.4.0
+* Remove support for Moodle < 4.5
+* Add support for Moodle 5.0 and 5.1
+* Supported PHP Versions 8.1, 8.2, 8.3, 8.4
+
 ### 2025-05-15 - v2.3.4
 * Add a view with a list of OER creators
 * Make filetype icons bigger

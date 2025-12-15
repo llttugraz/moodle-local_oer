@@ -32,8 +32,11 @@
  * @throws coding_exception
  * @throws moodle_exception
  */
-function local_oer_extend_navigation_course(navigation_node $parentnode, stdClass $course,
-        context_course $context) {
+function local_oer_extend_navigation_course(
+    navigation_node $parentnode,
+    stdClass $course,
+    context_course $context
+) {
     $capabilities = [
             'local/oer:viewitems',
     ];
@@ -43,8 +46,13 @@ function local_oer_extend_navigation_course(navigation_node $parentnode, stdClas
     }
     $url = new moodle_url('/local/oer/views/main.php', ['id' => $course->id]);
     $node = navigation_node::create(
-            get_string('oer_link', 'local_oer'),
-            $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/upload', ''));
+        get_string('oer_link', 'local_oer'),
+        $url,
+        navigation_node::TYPE_SETTING,
+        null,
+        null,
+        new pix_icon('i/upload', '')
+    );
     $parentnode->add_node($node);
 }
 
@@ -63,15 +71,16 @@ function local_oer_extend_navigation(global_navigation $navigation) {
         $beforenode = $coursenode->find('localboostnavigationcoursesections', global_navigation::TYPE_UNKNOWN);
         $beforekey = $beforenode ? $beforenode->key : null;
         $coursenode->add_node(
-                navigation_node::create(
-                        get_string('oer_link', 'local_oer'),
-                        new moodle_url("/local/oer/views/main.php", ["id" => $PAGE->course->id]),
-                        navigation_node::TYPE_CUSTOM,
-                        '',
-                        'oer',
-                        new pix_icon('i/upload', '')
-                ),
-                $beforekey);
+            navigation_node::create(
+                get_string('oer_link', 'local_oer'),
+                new moodle_url("/local/oer/views/main.php", ["id" => $PAGE->course->id]),
+                navigation_node::TYPE_CUSTOM,
+                '',
+                'oer',
+                new pix_icon('i/upload', '')
+            ),
+            $beforekey
+        );
     }
 }
 
@@ -89,8 +98,10 @@ function local_oer_extend_navigation(global_navigation $navigation) {
  * @throws required_capability_exception
  */
 function local_oer_output_fragment_formdata(array $args): string {
-    if (!isset($args['courseid'])
-            || !isset($args['formtype'])) {
+    if (
+        !isset($args['courseid'])
+            || !isset($args['formtype'])
+    ) {
         return 'wrong arguments given';
     }
 
@@ -223,8 +234,15 @@ function local_oer_output_fragment_personform(array $args): string {
  * @throws dml_exception
  * @throws moodle_exception
  */
-function local_oer_pluginfile(?\stdClass $course, ?\stdClass $cm, ?\stdClass $context,
-        string $filearea, array $args, bool $forcedownload, array $options = []): void {
+function local_oer_pluginfile(
+    ?\stdClass $course,
+    ?\stdClass $cm,
+    ?\stdClass $context,
+    string $filearea,
+    array $args,
+    bool $forcedownload,
+    array $options = []
+): void {
     if (get_config('local_oer', 'pullservice') != 1) {
         throw new \moodle_exception('Webservice to show public accessible OER Files is not activated on this system.');
     }
@@ -268,5 +286,3 @@ function local_oer_pre_user_delete(stdClass $user) {
         }
     }
 }
-
-

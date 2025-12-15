@@ -54,9 +54,13 @@ final class elements_test extends \advanced_testcase {
      */
     public function create_random_element(bool $setlicense = true): element {
         $element = new element('oermod_resource\module', element::OERTYPE_MOODLEFILE);
-        $identifier = identifier::compose('phpunit', 'localhost',
-                'test', 'hash',
-                hash('sha256', microtime() . rand(10000, 10000000)));
+        $identifier = identifier::compose(
+            'phpunit',
+            'localhost',
+            'test',
+            'hash',
+            hash('sha256', microtime() . rand(10000, 10000000))
+        );
         $element->set_identifier($identifier);
         $element->set_title($this->getDataGenerator()->firstnames[rand(0, count($this->getDataGenerator()->firstnames) - 1)]);
         if ($setlicense) {

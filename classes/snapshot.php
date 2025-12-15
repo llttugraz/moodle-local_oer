@@ -163,9 +163,14 @@ class snapshot {
         $snapshot->usermodified = $USER->id;
         $snapshot->timemodified = time();
         $snapshot->timecreated = time();
-        $latestrelease = $DB->get_records('local_oer_snapshot',
-                ['courseid' => $this->courseid, 'identifier' => $element->get_identifier()],
-                'timecreated DESC', '*', 0, 1);
+        $latestrelease = $DB->get_records(
+            'local_oer_snapshot',
+            ['courseid' => $this->courseid, 'identifier' => $element->get_identifier()],
+            'timecreated DESC',
+            '*',
+            0,
+            1
+        );
         if (empty($latestrelease) || reset($latestrelease)->releasehash != $snapshot->releasehash) {
             $DB->insert_record('local_oer_snapshot', $snapshot);
             // When a snapshot is created, this element is released and available through webservice.
@@ -278,7 +283,8 @@ class snapshot {
 
         foreach ($courses as $key => $course) {
             foreach ($remove as $rm) {
-                if ($course->courseid == $rm->courseid &&
+                if (
+                    $course->courseid == $rm->courseid &&
                         $course->coursecode == $rm->coursecode &&
                         $rm->state == coursetofile::COURSETOFILE_DISABLED
                 ) {
@@ -328,9 +334,11 @@ class snapshot {
      * @throws \dml_exception
      */
     private function add_customfields_to_snapshot(\stdClass $course, array $info) {
-        if ($course->subplugin == courseinfo::BASETYPE
+        if (
+            $course->subplugin == courseinfo::BASETYPE
                 && strpos($course->coursecode, 'moodlecourse') !== false
-                && get_config('local_oer', 'coursecustomfields') == 1) {
+                && get_config('local_oer', 'coursecustomfields') == 1
+        ) {
             $customfields = coursecustomfield::get_customfields_for_snapshot($course->courseid);
             if (!empty($customfields)) {
                 $info['customfields'] = $customfields;

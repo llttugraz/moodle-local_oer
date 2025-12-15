@@ -68,12 +68,14 @@ class filehelper {
      * @return \moodle_url|string
      */
     public static function get_file_url(\stored_file $file, bool $string = false) {
-        $url = \moodle_url::make_pluginfile_url($file->get_contextid(),
-                $file->get_component(),
-                $file->get_filearea(),
-                $file->get_itemid(),
-                $file->get_filepath(),
-                $file->get_filename());
+        $url = \moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        );
         return $string ? $url->out() : $url;
     }
 }

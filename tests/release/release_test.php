@@ -167,8 +167,13 @@ final class release_test extends \advanced_testcase {
         foreach ($filereleasematrix as $filerelease) {
             $record = new \stdClass();
             $record->courseid = $filerelease[0];
-            $record->identifier = identifier::compose('phpunit', 'localhost',
-                    'testdata', 'number', $filerelease[1]);
+            $record->identifier = identifier::compose(
+                'phpunit',
+                'localhost',
+                'testdata',
+                'number',
+                $filerelease[1]
+            );
             $record->title = $this->getDataGenerator()->lastnames[rand(0, count($this->getDataGenerator()->lastnames) - 1)];
             $record->description = $this->getDataGenerator()->loremipsum;
             $record->context = 1;
@@ -257,14 +262,18 @@ final class release_test extends \advanced_testcase {
         $releases = release::get_latest_releases('v1.0.0');
         $this->assertArrayHasKey('moodlecourses', $releases);
         $moodlecourses = $releases['moodlecourses'];
-        $courses = $DB->get_records_sql('SELECT DISTINCT(courseid) FROM {local_oer_snapshot} WHERE type = :type',
-                ['type' => element::OERTYPE_MOODLEFILE]);
+        $courses = $DB->get_records_sql(
+            'SELECT DISTINCT(courseid) FROM {local_oer_snapshot} WHERE type = :type',
+            ['type' => element::OERTYPE_MOODLEFILE]
+        );
         $this->assertCount(count($courses), $moodlecourses);
         $course = reset($moodlecourses);
         $courseid = $course['files'][0]['courses'][0]->courseid;
-        $files = $DB->get_records_sql('SELECT DISTINCT(identifier) FROM {local_oer_snapshot} ' .
+        $files = $DB->get_records_sql(
+            'SELECT DISTINCT(identifier) FROM {local_oer_snapshot} ' .
                 'WHERE type = :type AND courseid = :courseid',
-                ['type' => element::OERTYPE_MOODLEFILE, 'courseid' => $courseid]);
+            ['type' => element::OERTYPE_MOODLEFILE, 'courseid' => $courseid]
+        );
         $this->assertCount(count($files), $course['files']);
     }
 
@@ -363,8 +372,10 @@ final class release_test extends \advanced_testcase {
         $helper = new testcourse();
         $course = $helper->generate_testcourse($this->getDataGenerator());
         $helper->sync_course_info($course->id);
-        $this->assertTrue($DB->record_exists('local_oer_courseinfo', ['courseid' => $course->id]),
-                'There should be at least one courseinfo entry for testcourse');
+        $this->assertTrue(
+            $DB->record_exists('local_oer_courseinfo', ['courseid' => $course->id]),
+            'There should be at least one courseinfo entry for testcourse'
+        );
         $snapshot = new snapshot($course->id);
         $files = release::get_released_files_for_course($course->id, 'v2.0.0');
         $this->assertTrue(empty($files), 'No files have been marked for release yet');
@@ -381,8 +392,11 @@ final class release_test extends \advanced_testcase {
         $helper->set_files_to($course->id, 1, false);
         $snapshot->create_snapshot_of_course_files(3);
         $files = release::get_released_files_for_course($course->id, 'v2.0.0');
-        $this->assertEquals(5, count($files),
-                'One file has been set to non-release, but the files already have been released, so 5 are found');
+        $this->assertEquals(
+            5,
+            count($files),
+            'One file has been set to non-release, but the files already have been released, so 5 are found'
+        );
     }
 
     /**
@@ -527,7 +541,7 @@ final class release_test extends \advanced_testcase {
         // Test course customfields - configurate customfields and test if data is present in release.
         $customcat1 = $this->getDataGenerator()->create_custom_field_category(['name' => 'First Category']);
         $this->getDataGenerator()->create_custom_field(
-                [
+            [
                         'name' => 'semester',
                         'shortname' => 'sem',
                         'type' => 'text',
@@ -536,7 +550,8 @@ final class release_test extends \advanced_testcase {
                                 'visibility' => 0,
                                 'defaultvalue' => 'nosemester',
                         ],
-                ]);
+            ]
+        );
         $handler = \core_course\customfield\course_handler::create();
         $data = new \stdClass();
         $data->id = $course->id;

@@ -143,8 +143,11 @@ final class courseinfo_test extends \advanced_testcase {
                 'b' => 'aaaa',
         ];
         $metadata->customfields = json_encode($json);
-        $id = $DB->get_field('local_oer_courseinfo', 'id',
-                ['courseid' => $this->courseid, 'coursecode' => $metadata->coursecode]);
+        $id = $DB->get_field(
+            'local_oer_courseinfo',
+            'id',
+            ['courseid' => $this->courseid, 'coursecode' => $metadata->coursecode]
+        );
         $metadata->id = $id;
         $DB->update_record('local_oer_courseinfo', $metadata);
         $courses = $courseinfo->load_metadata_from_database($this->courseid);
