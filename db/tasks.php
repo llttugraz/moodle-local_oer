@@ -46,4 +46,14 @@ $tasks = [
                 'month' => '*',
                 'disabled' => 0,
         ],
+        [
+                'classname' => 'local_oer\task\send_release_reminder_task',
+                'blocking' => 0,
+                'minute' => '0',
+                'hour' => '1',
+                'day' => '*',
+                'dayofweek' => '*',
+                'month' => '*',
+                'disabled' => 0,
+        ],
 ];

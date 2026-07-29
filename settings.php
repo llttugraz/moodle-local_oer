@@ -238,6 +238,45 @@ if ($hassiteconfig) {
         $applicationprofiles
     ));
 
+    $settings->add(new admin_setting_heading(
+        'oerreleasereminder',
+        new lang_string('releasereminderheading', 'local_oer'),
+        new lang_string('releasereminderheading_desc', 'local_oer')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_oer/releasereminder_enabled',
+        new lang_string('releasereminderenabled', 'local_oer'),
+        new lang_string('releasereminderenabled_desc', 'local_oer'),
+        '0',
+        '1',
+        '0'
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_oer/releasereminder_daysbefore',
+        new lang_string('releasereminderdaysbefore', 'local_oer'),
+        new lang_string('releasereminderdaysbefore_desc', 'local_oer'),
+        7,
+        range(0, 31)
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_oer/releasereminder_subject',
+        new lang_string('releaseremindersubject', 'local_oer'),
+        \local_oer\helper\multilang::apply_additional_info_mlang2(
+            get_string('releaseremindersubject_desc', 'local_oer')
+        ),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_oer/releasereminder_body',
+        new lang_string('releasereminderbody', 'local_oer'),
+        \local_oer\helper\multilang::apply_additional_info_mlang2(
+            get_string('releasereminderbody_desc', 'local_oer')
+        ),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
     if ($ADMIN->fulltree) {
         require_once(__DIR__ . '/adminlib.php');
         $settings->add(new oersubplugins_settings());

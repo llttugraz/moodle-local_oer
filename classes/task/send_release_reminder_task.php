@@ -15,20 +15,41 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Open Educational Resources Plugin
+ * Scheduled task to send OER release reminders.
  *
  * @package    local_oer
- * @author     Christian Ortner <christian.ortner@tugraz.at>
- * @copyright  2017 Educational Technologies, Graz, University of Technology
+ * @copyright  2026 Educational Technologies, Graz, University of Technology
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_oer\task;
 
-$plugin->version = 2026072100;
-$plugin->requires = 2021051700;
-$plugin->component = 'local_oer';
-$plugin->release = 'v2.4.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [];
-$plugin->supported    = [405, 501];
+use core\task\scheduled_task;
+use local_oer\release_reminder;
+
+/**
+ * Sends reminders for upcoming OER releases.
+ */
+class send_release_reminder_task extends scheduled_task {
+    /**
+     * Get task name.
+     *
+     * @return \lang_string|string
+     * @throws \coding_exception
+     */
+    public function get_name() {
+        return get_string('releaseremindertask', 'local_oer');
+    }
+
+    /**
+     * Execute task.
+     *
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function execute() {
+        release_reminder::send_if_due();
+    }
+}

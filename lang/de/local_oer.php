@@ -46,6 +46,20 @@ $string['applicationprofile_description'] =
         '</ul>' .
         'Weitere Informationen über die Struktur der Metadaten finden Sie in der ' .
         '<a href="https://github.com/llttugraz/moodle-local_oer/blob/main/README.md" target="_blank">ReadMe</a>';
+$string['aria:all'] = 'Alle Elemente anzeigen';
+$string['aria:default'] = 'Nach Standardreihenfolge sortieren';
+$string['aria:deleted'] = 'Gelöschte Elemente anzeigen';
+$string['aria:displaydropdown'] = 'Ansichtsauswahl';
+$string['aria:filetype'] = 'Nach Dateityp sortieren';
+$string['aria:groupingdropdown'] = 'Filterauswahl';
+$string['aria:ignore'] = 'Ignorierte Elemente anzeigen';
+$string['aria:noignore'] = 'Nicht ignorierte Elemente anzeigen';
+$string['aria:norelease'] = 'Nicht zur Veröffentlichung vorgemerkte Elemente anzeigen';
+$string['aria:released'] = 'Veröffentlichte Elemente anzeigen';
+$string['aria:sortingdropdown'] = 'Sortierauswahl';
+$string['aria:title_asc'] = 'Nach Titel aufsteigend sortieren';
+$string['aria:title_desc'] = 'Nach Titel absteigend sortieren';
+$string['aria:upload'] = 'Zur Veröffentlichung vorgemerkte Elemente anzeigen';
 $string['author'] = 'Autor:in';
 $string['card'] = 'Karten';
 $string['cb_allowedlist'] = 'Freigabeliste';
@@ -133,6 +147,7 @@ $string['customfield_help'] = 'Benutzerdefinierte Kursfelder können auf ähnlic
         'eingestellte verwendet werden kann. ' .
         'Weiters ist es auch möglich diese zu ignorieren, um sie nicht zu ' .
         'den Kurs-Metadaten der freigegebenen OER-Objekte hinzuzufügen.';
+$string['customfieldcategory'] = 'Benutzerdefinierte Feldkategorie';
 $string['customfieldcategory_help'] = '<p>Dies ist der Name einer benutzerdefinierten Feldkategorie, ' .
         'darunter sind die Felder der Kategorie zu sehen.</p>' .
         '<p>Benutzerdefinierte Felder können nicht überschrieben werden. ' .
@@ -228,6 +243,7 @@ $string['metadatanotwritable2'] = 'Diese Datei wird bereits in einem anderen Kur
 $string['metadatanotwritable3'] = 'Diese Datei wurde bereits veröffentlicht und kann deshalb nicht mehr editiert werden.';
 $string['minimumchars'] = 'Mindestens {$a} Zeichen erforderlich';
 $string['moreinformation'] = 'Weitere informationen';
+$string['multilang_info'] = 'Für Mehrsprachigkeit verwenden Sie bitte <b>mlang</b>-Tags';
 $string['multiplecourses'] = 'Mehrere Kurse verwenden diese Datei';
 $string['multiplecoursestofile'] = 'Mehrere Kurse verwenden diese Datei. Sie können auch ' .
         'Kurs-Metadaten hinzufügen, die zu einem anderen Kurs ' .
@@ -439,6 +455,7 @@ $string['questionnaire'] = 'Fragebogen';
 $string['readyforupload'] = 'Voraussetzungen für die Freigabe:';
 $string['reason'] = 'Grund';
 $string['released'] = 'Veröffentlicht';
+$string['releasehistory'] = 'OER Veröffentlichungshistorie';
 $string['releasehour'] = 'Uhrzeit';
 $string['releasehour_help'] = 'Veröffentlichungszeitpunkt.';
 $string['releaseplugin'] = 'Verwendet zur Veröffentlichung';
@@ -446,9 +463,21 @@ $string['releaseplugin_description'] = 'Wählen Sie ein Subplugin, um das Veröf
         'Wenn kein Subplugin zum Hochladen von Dateien in ein Repository ' .
         'installiert ist, steht der Pull-Service des ' .
         'Basis-Plugins zur Verfügung.';
+$string['releasereminderbody'] = 'E-Mail-Text zur Veröffentlichung';
+$string['releasereminderbody_desc'] = 'E-Mail-Text für OER Erinnerungen zur Veröffentlichung. ' .
+        'Verfügbare Platzhalter: {firstname}, {lastname}, {releasedate}.';
+$string['releasereminderdaysbefore'] = 'Anzahl der Tage';
+$string['releasereminderdaysbefore_desc'] = 'Die E-Mail wird so viele Tage vor der nächsten OER Veröffentlichung gesendet.';
+$string['releasereminderenabled'] = 'E-Mails zur Veröffentlichung aktivieren';
+$string['releasereminderenabled_desc'] = 'Wenn aktiviert, erhalten die konfigurierten OER Empfänger:innen eine E-Mail vor der Veröffentlichung.';
+$string['releasereminderheading'] = 'E-Mail zur Veröffentlichung';
+$string['releasereminderheading_desc'] = 'Konfiguration der E-Mail, die Benutzer:innen vor der Veröffentlichung von Dateien erhalten.';
+$string['releaseremindersubject'] = 'Betreff der E-Mail';
+$string['releaseremindersubject_desc'] = 'Betreff für OER Erinnerungen zur Veröffentlichung. ' .
+        'Verfügbare Platzhalter: {releasedate}.';
+$string['releaseremindertask'] = 'Task zum Senden von OER E-Mails zur Veröffentlichung';
 $string['releasetime'] = 'Veröffentlichungsrythmus';
 $string['releasetime_help'] = 'Veröffentlichungsrythmus auswählen';
-$string['releasetimebutton'] = 'Veröffentlichungszeitpunkt einstellen';
 $string['requiredfields'] = 'Notwendige Felder';
 $string['requiredfields_desc'] = 'Für das Release benötigte Metadaten/Formularfelder auswählen. ' .
         'Titel, Person(en) und Lizenz werden immer benötigt und ' .
@@ -484,9 +513,13 @@ $string['state'] = 'Status der Datei';
 $string['structure'] = 'Struktur';
 $string['structure_help'] = 'Was ist der Modus des Kurses? zB. Vorlesung, Übung, Labor ...';
 $string['subpluginsheading'] = 'Liste der installierten Sub-Plugins';
+$string['subplugintype_oerclassification'] = 'OER zusätzliche Klassifizierungen';
 $string['subplugintype_oerclassification_plural'] = 'OER classifications';
+$string['subplugintype_oercourseinfo'] = 'OER zusätzliche Kursinformationen';
 $string['subplugintype_oercourseinfo_plural'] = 'OER courseinfos';
+$string['subplugintype_oermod'] = 'OER Datenquellen-Module';
 $string['subplugintype_oermod_plural'] = 'OER data source modules';
+$string['subplugintype_oeruploader'] = 'OER veröffentlichte Dateien hochladen';
 $string['subplugintype_oeruploader_plural'] = ' Upload released files';
 $string['tags'] = 'Schlagwörter';
 $string['tags_help'] = '<p>Zusätzliche Schlagwörter zur Klassifizierung der Datei.</p>' .
@@ -523,6 +556,7 @@ $string['uploadignoreerror'] = 'Zur Freigabe markieren und Ignorieren können ni
 $string['uploadinfotext'] = 'Informationen zum Hochladen';
 $string['uploadinfotext_description'] = 'Text, der Nutzer:innen über Zweck und Lizenzierung hochgeladener Lehrmaterialien informiert.<br>
                                          Wenn nicht angegeben, wird der Standardtext aus Sprachdateien verwendet.';
+$string['uploadtimebutton'] = 'Veröffentlichungszeitpunkt einstellen';
 $string['uselicensereplacement'] = 'Lizenz Kurznamen ersetzen';
 $string['uselicensereplacement_description'] = 'Wenn diese Option aktiviert ist, steht ein Textfeld zur Verfügung, ' .
         'in dem Alternativen für Moodle-Lizenzkurznamen definiert ' .

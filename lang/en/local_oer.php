@@ -45,6 +45,20 @@ $string['applicationprofile_description'] = 'Select the application profile whic
         '</ul>' .
         'More information regarding the metadata structure can be found in the ' .
         '<a href="https://github.com/llttugraz/moodle-local_oer/blob/main/README.md" target="_blank">ReadMe</a>';
+$string['aria:all'] = 'Show all elements';
+$string['aria:default'] = 'Sort by default order';
+$string['aria:deleted'] = 'Show deleted elements';
+$string['aria:displaydropdown'] = 'Display dropdown';
+$string['aria:filetype'] = 'Sort by file type';
+$string['aria:groupingdropdown'] = 'Filter dropdown';
+$string['aria:ignore'] = 'Show ignored elements';
+$string['aria:noignore'] = 'Show not ignored elements';
+$string['aria:norelease'] = 'Show elements not marked for release';
+$string['aria:released'] = 'Show released elements';
+$string['aria:sortingdropdown'] = 'Sorting dropdown';
+$string['aria:title_asc'] = 'Sort by title ascending';
+$string['aria:title_desc'] = 'Sort by title descending';
+$string['aria:upload'] = 'Show elements marked for release';
 $string['author'] = 'Author';
 $string['card'] = 'Card';
 $string['cb_allowedlist'] = 'Allowedlist';
@@ -210,6 +224,7 @@ $string['metadatanotwritable2'] = 'The metadata of this file has already been ed
 $string['metadatanotwritable3'] = 'This file has already been released and cannot be edited anymore.';
 $string['minimumchars'] = 'Minimum of {$a} characters';
 $string['moreinformation'] = 'More information';
+$string['multilang_info'] = 'For multilingual support please use <b>mlang</b> tags';
 $string['multiplecourses'] = 'File is used in multiple courses';
 $string['multiplecoursestofile'] = 'File is used in multiple courses. You can also add course metadata ' .
         'that belongs to an other course than where the file is edited.';
@@ -418,6 +433,19 @@ $string['releaseplugin'] = 'Use for releases';
 $string['releaseplugin_description'] = 'Choose subplugin to handle the release. ' .
         'When no subplugin is installed for uploading files to a ' .
         'repository, the pull service of the base plugin is available.';
+$string['releasereminderbody'] = 'Release email body';
+$string['releasereminderbody_desc'] = 'Email body for OER release reminders. Available placeholders: ' .
+        '{firstname}, {lastname}, {releasedate}.';
+$string['releasereminderdaysbefore'] = 'Number of days';
+$string['releasereminderdaysbefore_desc'] = 'The email is sent this many days before the next OER release.';
+$string['releasereminderenabled'] = 'Enable release emails';
+$string['releasereminderenabled_desc'] = 'When enabled, configured OER recipients receive an email before the release.';
+$string['releasereminderheading'] = 'Release email';
+$string['releasereminderheading_desc'] = 'Configure the email sent to users before files are released.';
+$string['releaseremindersubject'] = 'Release email subject';
+$string['releaseremindersubject_desc'] = 'Email subject for OER release reminders. Available placeholders: ' .
+        '{releasedate}.';
+$string['releaseremindertask'] = 'Task to send OER release emails';
 $string['releasetime'] = 'Releaserythm';
 $string['releasetime_help'] = 'Choose release/snapshot rythm for file metadata';
 $string['requiredfields'] = 'Required fields';

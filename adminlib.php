@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// TODO: Move classes to separate files.
+// ToDo: Move classes to separate files.
 // phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
 
 /**
